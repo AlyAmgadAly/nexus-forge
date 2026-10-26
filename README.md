@@ -6,7 +6,7 @@ A Runeterra-inspired card game with a scenic home screen, deck builder, Card For
 
 ## Play on Windows
 
-1. Download `NexusForge-0.2.0-portable.exe` from the project's Releases page, or build it locally with `npm run build:win` (see [Build the Windows release](#build-the-windows-release)). No Node.js installation is required.
+1. Download `NexusForge-0.2.0-portable.exe` from the [project's Releases page](https://github.com/AlyAmgadAly/nexus-forge/releases), or build it locally with `npm run build:win` (see [Build the Windows release](#build-the-windows-release)). No Node.js installation is required.
 2. Launch the game. The executable is portable, but user data is stored per Windows account (see [Data and backups](#data-and-backups)). The build is unsigned, so Windows SmartScreen may warn on first launch; use **More info → Run anyway** only for a build you trust.
 3. Choose **Create a room**, then share the five-character room code.
 4. Friends launch their own copy, choose **Join a room** or **Spectate**, and enter the code.

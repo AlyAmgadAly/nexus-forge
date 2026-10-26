@@ -38,6 +38,8 @@ The executable is portable, but writable data lives under `%APPDATA%\Nexus Forge
 3. Each friend launches the same release, chooses **Join a room** (or **Spectate**), and enters the code.
 4. Pick decks, ready up, and the host starts.
 
+Full install and development instructions: [README.md](https://github.com/AlyAmgadAly/nexus-forge/blob/main/README.md).
+
 The host must keep the app open. Leaving closes the room for everyone. A guest who drops can reconnect to the same seat for up to two minutes; only that guest's rotated token can reclaim it. There is no automatic host migration or crash resume.
 
 ## Compatibility
@@ -69,7 +71,7 @@ The following have **not** been run and must not be treated as verified:
 - Launch on a clean Windows machine/account with no Node.js installed. The portable build was launched on the build machine.
 - Reproducibility of the artifact hash across build machines.
 
-The same-machine tests above are adapter/UI smoke evidence only, not proof of internet reachability. See the network acceptance matrix in [ROADMAP.md](../ROADMAP.md).
+The same-machine tests above are adapter/UI smoke evidence only, not proof of internet reachability. See the network acceptance matrix in [ROADMAP.md](https://github.com/AlyAmgadAly/nexus-forge/blob/main/ROADMAP.md).
 
 ## Known limitations
 
@@ -89,4 +91,4 @@ npm test
 npm run build:win
 ```
 
-`npm run build:win` reruns syntax/tests before writing `release/NexusForge-0.2.0-portable.exe`. Rebuilding changes the SHA-256 above. For the complete automated, local desktop, packaged-app, and external-network test procedure, see [testing.md](testing.md).
+`npm run build:win` reruns syntax/tests before writing `release/NexusForge-0.2.0-portable.exe`. Rebuilding changes the SHA-256 above. For the complete automated, local desktop, packaged-app, and external-network test procedure, see [docs/testing.md](https://github.com/AlyAmgadAly/nexus-forge/blob/main/docs/testing.md).
