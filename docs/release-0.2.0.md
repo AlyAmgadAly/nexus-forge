@@ -8,6 +8,7 @@ This release adds a portable Windows desktop app and room-code multiplayer over 
 
 | Item | Value |
 | --- | --- |
+| Release | [Nexus Forge v0.2.0](https://github.com/AlyAmgadAly/nexus-forge/releases/tag/v0.2.0) |
 | File | `NexusForge-0.2.0-portable.exe` |
 | Target | Windows x64 portable executable |
 | Size | 121,332,668 bytes |

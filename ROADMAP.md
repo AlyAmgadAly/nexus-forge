@@ -53,7 +53,7 @@ Avoid a second game engine in the renderer. Separate message dispatch from WebSo
 | [M4](https://github.com/AlyAmgadAly/nexus-forge/milestone/4) | Player decks, room content synchronization, and version checks | M3 | Implemented; local deck/content approval verified | [#4](https://github.com/AlyAmgadAly/nexus-forge/issues/4) |
 | [M5](https://github.com/AlyAmgadAly/nexus-forge/milestone/5) | Reconnects, host departure, and clear connection states | M3, M4 | Implemented; local reconnect/host-close verified | [#5](https://github.com/AlyAmgadAly/nexus-forge/issues/5) |
 | [M6](https://github.com/AlyAmgadAly/nexus-forge/milestone/6) | Automated regression coverage and real-network release testing | M1-M5 | Automated checks pass; external matrix pending | [#6](https://github.com/AlyAmgadAly/nexus-forge/issues/6) |
-| [M7](https://github.com/AlyAmgadAly/nexus-forge/milestone/7) | Portable Windows release and player instructions | M6 | Portable artifact built; clean-machine/external gates pending | [#7](https://github.com/AlyAmgadAly/nexus-forge/issues/7) |
+| [M7](https://github.com/AlyAmgadAly/nexus-forge/milestone/7) | Portable Windows release and player instructions | M6 | Release v0.2.0 published; clean-machine/external gates pending | [#7](https://github.com/AlyAmgadAly/nexus-forge/issues/7) |
 
 GitHub issues and milestones mirror M1-M7. Completing an issue requires its acceptance criteria and recorded evidence, not just code being merged.
 
@@ -237,9 +237,9 @@ Acceptance criteria:
 
 - [ ] The downloaded `.exe` launches on a clean Windows setup, preserves data after restart, and exits cleanly.
 - [ ] **External gate:** two friends on separate internet connections host/join and play with the release artifact.
-- [ ] The release links to a matching commit/checksum and documents supported paths and remaining limitations.
+- [x] The release links to a matching commit/checksum and documents supported paths and remaining limitations.
 
-Local evidence: `release/NexusForge-0.2.0-portable.exe` was built for Windows x64 with packaged seed content and unpacked `sharp` native files. On the build machine it launched with fresh per-user data, loaded 1,647 base cards, registered a PeerJS host room, and exited without leaving processes or listening service ports. It has not run on a clean Windows machine/account, has not been published to GitHub Releases, and has not been used between separate networks. All M7 acceptance boxes remain open.
+Release evidence: [Nexus Forge v0.2.0](https://github.com/AlyAmgadAly/nexus-forge/releases/tag/v0.2.0) was published on 26 October 2026 with `NexusForge-0.2.0-portable.exe` (121,332,668 bytes; SHA-256 `AC45ED31054568C0706EAACD681F8BC38A709E13F5584587C63DB218A60D4AAA`). The release page links to the tagged commit and documents supported paths, checksum, and limitations. The build has not run on a clean Windows machine/account and has not been used between separate networks. The clean-machine and external-network acceptance boxes remain open.
 
 ## Definition of the first desktop internet release
 
