@@ -1,7 +1,7 @@
 import { esc, toast } from '../ui.js';
 
 // Local vector ornaments; the scene and feature artwork live in public/assets.
-function icon(name) {
+export function icon(name) {
   const shapes = {
     home: '<path d="M18 8h27v7h-5v34H18v-6h5V15h-5z M29 17v23h5V17z M34 31l9 18h-7l-7-15"/>',
     play: '<path d="m15 9 34 34-6 6L9 15z M49 9 15 43l-6 6 6-1 34-33z M10 37l11 11 M37 10l11 11"/><path d="m13 13 7-4 29 29-3 8-8 3L9 20z" opacity=".4"/>',
@@ -151,7 +151,7 @@ export function renderHome(root, ctx) {
     });
   }
 
-  root.querySelectorAll('[data-home-play]').forEach((button) => button.addEventListener('click', () => openPlay()));
+  root.querySelectorAll('[data-home-play]').forEach((button) => button.addEventListener('click', () => ctx.navigate('#/play')));
   root.querySelector('#home-open-join').addEventListener('click', () => openPlay('join'));
   root.querySelector('#home-profile').addEventListener('click', async () => {
     const prompt = ctx.modalPrompt('Your player name', { label: 'Display name', value: state.playerName, placeholder: 'Summoner name', confirmLabel: 'Save name' });

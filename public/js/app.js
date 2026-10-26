@@ -2,6 +2,7 @@ import { apiGet, apiPost, getAdminToken, setAdminToken } from './api.js';
 import { setCardIndex, initTooltips, toast, openModal, closeModal, modalPrompt, modalConfirm, copyText, esc } from './ui.js';
 import { renderHome } from './views/home.js';
 import { renderDeckBuilder } from './views/deckbuilder.js';
+import { renderDeckSelection } from './views/deckselection.js';
 import { renderLobby } from './views/lobby.js';
 import { renderGame } from './views/game.js';
 import { renderAdmin } from './views/admin.js';
@@ -37,6 +38,7 @@ export const state = {
   gameRoom: null,
   spectator: false,
   pendingJoin: '',
+  pendingRoomDeckId: null,
   deckEditId: null,
   route: '',
   bootError: '',
@@ -167,14 +169,17 @@ async function ensureName() {
   return clean;
 }
 
-export async function createRoom() {
+export async function createRoom(deckId = null) {
   const name = await ensureName();
-  if (!name) return;
+  if (!name) return false;
+  state.pendingRoomDeckId = deckId;
   if (state.desktop) {
     setNet({ role: 'host', status: 'creating', error: '', signalingLost: false, retries: 0 });
     sessionStorage.setItem(NET_ROLE_KEY, 'host');
   }
-  send('create', { name });
+  const sent = send('create', { name });
+  if (!sent) state.pendingRoomDeckId = null;
+  return sent;
 }
 
 function netStatusInfo() {
@@ -290,6 +295,7 @@ function resetNetworkSession() {
 }
 
 function resetRoomState({ network = true } = {}) {
+  state.pendingRoomDeckId = null;
   state.roomCode = null;
   localStorage.removeItem(ROOM_KEY);
   state.lobby = null;
@@ -666,12 +672,12 @@ export function cancelReconnect() {
 }
 
 export async function submitGuestDeck(deckId) {
-  if (!state.desktop || state.net.role !== 'guest') return;
+  if (!state.desktop || state.net.role !== 'guest') return false;
   state.net.deckId = deckId || 'auto';
   if (!deckId || deckId === 'auto') {
-    send('setDeck', { deckId: 'auto' });
+    const sent = send('setDeck', { deckId: 'auto' });
     renderApp();
-    return;
+    return sent;
   }
   try {
     const data = await apiGet(`/api/decks/${encodeURIComponent(deckId)}`);
@@ -682,13 +688,17 @@ export async function submitGuestDeck(deckId) {
       count: Number(entry.count || entry.quantity || 1),
     })).filter((entry) => entry.cardId);
     if (!cards.length) throw new Error('That deck is empty.');
-    if (send('setDeck', { deck: { name: deck.name, cards, regions: deck.regions || [] } })) {
+    const sent = send('setDeck', { deck: { name: deck.name, cards, regions: deck.regions || [] } });
+    if (sent) {
       toast(`Submitting “${deck.name}” to the host…`, 'gold');
     }
+    renderApp();
+    return sent;
   } catch (err) {
     toast(err.message || 'Could not load that deck.', 'error');
   }
   renderApp();
+  return false;
 }
 
 async function offerCustomContent(unknownCards) {
@@ -778,6 +788,9 @@ export function leaveRoom() {
 
 function updateConnection() {
   document.querySelectorAll('.home-online-action').forEach((button) => { button.disabled = !state.connected; });
+  document.querySelectorAll('.deck-online-action').forEach((button) => {
+    button.disabled = !state.connected || button.dataset.locked === 'true' || button.dataset.submitting === 'true';
+  });
   document.querySelectorAll('.conn').forEach((el) => {
     el.classList.toggle('on', state.connected);
     el.classList.toggle('off', !state.connected);
@@ -849,6 +862,9 @@ function handleMessage(msg) {
     }
     case 'roomCreated': {
       saveRoomCode(msg.code);
+      const deckId = state.pendingRoomDeckId;
+      state.pendingRoomDeckId = null;
+      if (deckId) send('setDeck', { deckId });
       state.lastLobbyRevision = -1;
       state.lastGameRevision = -1;
       state.net.role = 'host';
@@ -926,7 +942,10 @@ function handleMessage(msg) {
         renderApp();
         break;
       }
-      if (location.hash !== '#/lobby') navigate('#/lobby');
+      // Room snapshots must not interrupt a collection search or unsaved edit.
+      if (location.hash === '#/decks' || location.hash.startsWith('#/deck/') || location.hash === '#/collection/decks') break;
+      if (location.hash === '#/play') renderApp();
+      else if (location.hash !== '#/lobby') navigate('#/lobby');
       else renderApp();
       break;
     }
@@ -1050,6 +1069,8 @@ function parseRoute() {
     return { name: 'decks' };
   }
   if (raw.startsWith('/decks')) { state.route = '/decks'; return { name: 'decks' }; }
+  if (raw === '/collection/decks') { state.route = raw; return { name: 'collectionDecks' }; }
+  if (raw === '/play') { state.route = '/play'; return { name: 'selection' }; }
   if (raw.startsWith('/lobby')) { state.route = '/lobby'; return { name: 'lobby' }; }
   if (raw.startsWith('/game')) { state.route = '/game'; return { name: 'game' }; }
   if (raw.startsWith('/admin')) { state.route = '/admin'; return { name: 'admin' }; }
@@ -1083,6 +1104,8 @@ export function renderApp() {
   document.body.classList.toggle('game-mode', route.name === 'game' && !!state.game);
   const homeRoute = route.name === 'home' || (route.name === 'lobby' && !state.lobby) || (route.name === 'game' && !state.game);
   document.body.classList.toggle('home-mode', homeRoute);
+  document.body.classList.toggle('deck-selection-mode', route.name === 'selection' || route.name === 'collectionDecks');
+  document.body.classList.toggle('collection-mode', route.name === 'decks');
   const oldShell = app.querySelector('.app-shell');
   if (!oldShell) {
     app.innerHTML = `<div class="app-shell">${topbarHtml()}<main id="view" class="page"></main></div>`;
@@ -1093,7 +1116,8 @@ export function renderApp() {
   }
   const main = document.getElementById('view');
   if (!main) return;
-  main.replaceChildren();
+  // Let the picker preserve keyboard focus during live room updates.
+  if (!['selection', 'collectionDecks'].includes(route.name)) main.replaceChildren();
   main.className = 'page';
   const ctx = {
     state,
@@ -1116,7 +1140,9 @@ export function renderApp() {
     cancelReconnect,
     offerCustomContent,
   };
-  if (route.name === 'decks') renderDeckBuilder(main, ctx);
+  if (route.name === 'selection') renderDeckSelection(main, ctx);
+  else if (route.name === 'collectionDecks') renderDeckSelection(main, ctx, { collection: true });
+  else if (route.name === 'decks') renderDeckBuilder(main, ctx);
   else if (route.name === 'lobby') {
     if (!state.lobby) renderHome(main, ctx);
     else { main.classList.add('narrow'); renderLobby(main, ctx); }

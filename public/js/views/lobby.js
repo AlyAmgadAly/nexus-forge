@@ -162,6 +162,7 @@ export function renderLobby(root, ctx) {
               </div>
               <div class="deck-select-row mb">
                 <div class="tiny muted2 grow">${you.deckName || 'Auto deck'}</div>
+                ${!room.started && !you.contentPending ? '<a class="btn btn-sm btn-primary" href="#/play">Choose deck</a>' : ''}
                 <a class="btn btn-sm btn-ghost" href="#/decks">Edit decks</a>
               </div>
               ${you.contentPending ? `<div class="notice gold small mb">${content.yourPending ? 'Your custom cards are with the host for approval.' : 'Your deck is waiting for the host to approve its custom cards.'}</div>` : ''}

@@ -74,6 +74,7 @@ function publicCard(card, { admin = false } = {}) {
     set: card.set,
     setName: card.setName,
     spellSpeed: card.spellSpeed,
+    formats: card.formats || [],
     art: card.art,
     fullArt: card.fullArt,
     collectible: card.collectible,
@@ -341,8 +342,10 @@ app.delete('/api/decks/:id', async (req, res) => {
 app.get('/art/:code', async (req, res) => {
   const code = String(req.params.code || '');
   if (!safeCode(code)) return res.status(400).send('Bad art code');
-  const localWebp = path.join(store.artDir, `${code}.webp`);
-  const localPng = path.join(store.artDir, `${code}.png`);
+  const face = req.query.face === '1';
+  const cacheCode = face ? `${code}-face` : code;
+  const localWebp = path.join(store.artDir, `${cacheCode}.webp`);
+  const localPng = path.join(store.artDir, `${cacheCode}.png`);
   try {
     await access(localWebp);
     res.set('Cache-Control', 'public, max-age=604800');
@@ -372,7 +375,7 @@ app.get('/art/:code', async (req, res) => {
       try { await access(file); return res.type(type).sendFile(file); } catch {}
     }
   }
-  const art = card.fullArt || card.art || '';
+  const art = (face ? card.art : card.fullArt || card.art) || '';
   if (/^https?:\/\//i.test(art)) {
     let fetched = null;
     for (let attempt = 0; attempt < 2 && !fetched; attempt++) {
@@ -395,7 +398,9 @@ app.get('/art/:code', async (req, res) => {
       try {
         out = await sharp(fetched)
           .rotate()
-          .resize(600, 856, { fit: 'cover', position: sharp.strategy.attention })
+          .resize(face ? 680 : 600, face ? 1024 : 856, face
+            ? { fit: 'inside', withoutEnlargement: true }
+            : { fit: 'cover', position: sharp.strategy.attention })
           .webp({ quality: 82 })
           .toBuffer();
         type = 'image/webp';

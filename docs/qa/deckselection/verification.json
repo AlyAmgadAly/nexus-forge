@@ -1,0 +1,397 @@
+{
+  "date": "2026-10-26",
+  "runtime": "Source service on loopback; headless Microsoft Edge via REA",
+  "automated": {
+    "command": "npm run test:all",
+    "syntaxFiles": 35,
+    "tests": 23,
+    "passed": 23,
+    "failed": 0
+  },
+  "limitations": [
+    "Fresh native Electron run and external-network testing were not performed for this UI change."
+  ],
+  "scenarios": [
+    {
+      "name": "Gallery, reference resolution",
+      "evidenceId": "ev_fc3873877da3d005bcd3c9a81dfbcfba4a415bfdc7f9cf3d0db8e6ac3128717c",
+      "screenshot": "gallery-1910x1073.png",
+      "steps": [
+        {
+          "step": "scenario_start",
+          "status": "completed",
+          "error": null
+        },
+        {
+          "step": "gallery",
+          "status": "completed",
+          "error": null
+        },
+        {
+          "step": "art-loaded",
+          "status": "completed",
+          "error": null
+        }
+      ],
+      "pageErrors": []
+    },
+    {
+      "name": "Selected-deck preview",
+      "evidenceId": "ev_74fe4640da3808eebb84004c2e9be69503847a56be22e1553f662ef3a7421b1c",
+      "screenshot": "selected-1910x1073.png",
+      "steps": [
+        {
+          "step": "scenario_start",
+          "status": "completed",
+          "error": null
+        },
+        {
+          "step": "gallery-loaded",
+          "status": "completed",
+          "error": null
+        },
+        {
+          "step": "art-loaded",
+          "status": "completed",
+          "error": null
+        },
+        {
+          "step": "choose-vanguard",
+          "status": "completed",
+          "error": null
+        }
+      ],
+      "pageErrors": []
+    },
+    {
+      "name": "Narrow-screen preview",
+      "evidenceId": "ev_4db2b1f2c05895d1bb3feef511a8d346822b134d5eb8f0c76e5d5e957397eb6c",
+      "screenshot": "selected-390x844.png",
+      "steps": [
+        {
+          "step": "scenario_start",
+          "status": "completed",
+          "error": null
+        },
+        {
+          "step": "mobile-gallery",
+          "status": "completed",
+          "error": null
+        },
+        {
+          "step": "art-loaded",
+          "status": "completed",
+          "error": null
+        },
+        {
+          "step": "mobile-preview",
+          "status": "completed",
+          "error": null
+        }
+      ],
+      "pageErrors": []
+    },
+    {
+      "name": "Home, search, favorite, create and switch decks",
+      "evidenceId": "ev_2731efd5da6e34d1bf39c2afda372640dd51fad6c7130a2c369032a53596b435",
+      "screenshot": null,
+      "steps": [
+        {
+          "step": "scenario_start",
+          "status": "completed",
+          "error": null
+        },
+        {
+          "step": "home-ready",
+          "status": "completed",
+          "error": null
+        },
+        {
+          "step": "play-opens-gallery",
+          "status": "completed",
+          "error": null
+        },
+        {
+          "step": "gallery",
+          "status": "completed",
+          "error": null
+        },
+        {
+          "step": "preview-vanguard",
+          "status": "completed",
+          "error": null
+        },
+        {
+          "step": "favorite-vanguard",
+          "status": "completed",
+          "error": null
+        },
+        {
+          "step": "favorite-saved",
+          "status": "completed",
+          "error": null
+        },
+        {
+          "step": "close-preview",
+          "status": "completed",
+          "error": null
+        },
+        {
+          "step": "search-frost",
+          "status": "completed",
+          "error": null
+        },
+        {
+          "step": "filtered-one-deck",
+          "status": "completed",
+          "error": null
+        },
+        {
+          "step": "choose-frost",
+          "status": "completed",
+          "error": null
+        },
+        {
+          "step": "create-with-frost",
+          "status": "completed",
+          "error": null
+        },
+        {
+          "step": "name",
+          "status": "completed",
+          "error": null
+        },
+        {
+          "step": "confirm-name",
+          "status": "completed",
+          "error": null
+        },
+        {
+          "step": "frost-equipped",
+          "status": "completed",
+          "error": null
+        },
+        {
+          "step": "change-loadout",
+          "status": "completed",
+          "error": null
+        },
+        {
+          "step": "clear-search",
+          "status": "completed",
+          "error": null
+        },
+        {
+          "step": "preview-auto",
+          "status": "completed",
+          "error": null
+        },
+        {
+          "step": "select-auto",
+          "status": "completed",
+          "error": null
+        },
+        {
+          "step": "auto-equipped",
+          "status": "completed",
+          "error": null
+        },
+        {
+          "step": "reopen-gallery",
+          "status": "completed",
+          "error": null
+        },
+        {
+          "step": "preview-tides",
+          "status": "completed",
+          "error": null
+        },
+        {
+          "step": "select-tides",
+          "status": "completed",
+          "error": null
+        },
+        {
+          "step": "tides-equipped",
+          "status": "completed",
+          "error": null
+        }
+      ],
+      "pageErrors": []
+    },
+    {
+      "name": "Guest selection during live room updates",
+      "evidenceId": "ev_37151d361fc4e97dee97bd85d34e2daf84207c3c24eae67032ea7561c54976a3",
+      "screenshot": null,
+      "steps": [
+        {
+          "step": "scenario_start",
+          "status": "completed",
+          "error": null
+        },
+        {
+          "step": "guest-name",
+          "status": "completed",
+          "error": null
+        },
+        {
+          "step": "join",
+          "status": "completed",
+          "error": null
+        },
+        {
+          "step": "joined",
+          "status": "completed",
+          "error": null
+        },
+        {
+          "step": "choose",
+          "status": "completed",
+          "error": null
+        },
+        {
+          "step": "filter",
+          "status": "completed",
+          "error": null
+        },
+        {
+          "step": "preview",
+          "status": "completed",
+          "error": null
+        },
+        {
+          "step": "three-live-snapshots",
+          "status": "completed",
+          "error": null
+        },
+        {
+          "step": "preview-still-open",
+          "status": "completed",
+          "error": null
+        },
+        {
+          "step": "confirm",
+          "status": "completed",
+          "error": null
+        },
+        {
+          "step": "guest-deck-equipped",
+          "status": "completed",
+          "error": null
+        }
+      ],
+      "pageErrors": []
+    },
+    {
+      "name": "Spectator selection locked",
+      "evidenceId": "ev_00958ef0d1064084ecfdd925b214ddcba3f130bd00645cdb0035279af38a92cf",
+      "screenshot": null,
+      "steps": [
+        {
+          "step": "scenario_start",
+          "status": "completed",
+          "error": null
+        },
+        {
+          "step": "name",
+          "status": "completed",
+          "error": null
+        },
+        {
+          "step": "spectate",
+          "status": "completed",
+          "error": null
+        },
+        {
+          "step": "lobby",
+          "status": "completed",
+          "error": null
+        },
+        {
+          "step": "home",
+          "status": "completed",
+          "error": null
+        },
+        {
+          "step": "play",
+          "status": "completed",
+          "error": null
+        },
+        {
+          "step": "preview",
+          "status": "completed",
+          "error": null
+        },
+        {
+          "step": "locked",
+          "status": "completed",
+          "error": null
+        }
+      ],
+      "pageErrors": []
+    },
+    {
+      "name": "Cancel, favorite persistence and edit starter copy",
+      "evidenceId": "ev_b7ce4da263efaab9825ef8921fa1f00f1ccc84a4bbdd825b24b42004abe6d25b",
+      "screenshot": null,
+      "steps": [
+        {
+          "step": "scenario_start",
+          "status": "completed",
+          "error": null
+        },
+        {
+          "step": "preview",
+          "status": "completed",
+          "error": null
+        },
+        {
+          "step": "create",
+          "status": "completed",
+          "error": null
+        },
+        {
+          "step": "cancel-name",
+          "status": "completed",
+          "error": null
+        },
+        {
+          "step": "action-restored",
+          "status": "completed",
+          "error": null
+        },
+        {
+          "step": "favorite",
+          "status": "completed",
+          "error": null
+        },
+        {
+          "step": "close",
+          "status": "completed",
+          "error": null
+        },
+        {
+          "step": "reopen",
+          "status": "completed",
+          "error": null
+        },
+        {
+          "step": "favorite-retained",
+          "status": "completed",
+          "error": null
+        },
+        {
+          "step": "edit-copy",
+          "status": "completed",
+          "error": null
+        },
+        {
+          "step": "editor-opens",
+          "status": "completed",
+          "error": null
+        }
+      ],
+      "pageErrors": []
+    }
+  ]
+}

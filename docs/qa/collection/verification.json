@@ -1,0 +1,651 @@
+{
+  "automated": {
+    "command": "npm run test:all",
+    "syntaxFiles": 36,
+    "tests": 24,
+    "passed": 24,
+    "failed": 0
+  },
+  "runtime": {
+    "tool": "REA capture_browser_scenario",
+    "browser": "Microsoft Edge",
+    "data": "CRUD flows used an isolated temporary data folder. Final source preview on port 3001 uses the existing library.",
+    "scenarios": [
+      {
+        "key": "builderCollectionFinal",
+        "evidenceId": "ev_d881ce164e528e252c72c5ec515d658917ee95193aa699c56c8a3ea05b0f5e08",
+        "steps": [
+          {
+            "id": "scenario_start",
+            "status": "completed",
+            "error": null
+          },
+          {
+            "id": "cards",
+            "status": "completed",
+            "error": null
+          },
+          {
+            "id": "images",
+            "status": "completed",
+            "error": null
+          }
+        ],
+        "pageErrors": []
+      },
+      {
+        "key": "builderRegionsFinal",
+        "evidenceId": "ev_bcdf82d49d86c99f23ce398b88a77a080064168dde0497714a2a903a339008db",
+        "steps": [
+          {
+            "id": "scenario_start",
+            "status": "completed",
+            "error": null
+          },
+          {
+            "id": "regions",
+            "status": "completed",
+            "error": null
+          },
+          {
+            "id": "images",
+            "status": "completed",
+            "error": null
+          }
+        ],
+        "pageErrors": []
+      },
+      {
+        "key": "builderEditFlow",
+        "evidenceId": "ev_c4faf115366f212d7112af26ec97eb61adc933f7d1f0e3c9b1e7633a23126856",
+        "steps": [
+          {
+            "id": "scenario_start",
+            "status": "completed",
+            "error": null
+          },
+          {
+            "id": "find-annie",
+            "status": "completed",
+            "error": null
+          },
+          {
+            "id": "search-settled",
+            "status": "completed",
+            "error": null
+          },
+          {
+            "id": "add-one",
+            "status": "completed",
+            "error": null
+          },
+          {
+            "id": "add-two",
+            "status": "completed",
+            "error": null
+          },
+          {
+            "id": "add-three",
+            "status": "completed",
+            "error": null
+          },
+          {
+            "id": "copy-limit",
+            "status": "completed",
+            "error": null
+          },
+          {
+            "id": "remove-one",
+            "status": "completed",
+            "error": null
+          },
+          {
+            "id": "can-add-again",
+            "status": "completed",
+            "error": null
+          },
+          {
+            "id": "autobuild",
+            "status": "completed",
+            "error": null
+          },
+          {
+            "id": "legal",
+            "status": "completed",
+            "error": null
+          },
+          {
+            "id": "name",
+            "status": "completed",
+            "error": null
+          },
+          {
+            "id": "save",
+            "status": "completed",
+            "error": null
+          },
+          {
+            "id": "saved",
+            "status": "completed",
+            "error": null
+          },
+          {
+            "id": "export",
+            "status": "completed",
+            "error": null
+          },
+          {
+            "id": "code",
+            "status": "completed",
+            "error": null
+          },
+          {
+            "id": "close-export",
+            "status": "completed",
+            "error": null
+          },
+          {
+            "id": "show-library",
+            "status": "completed",
+            "error": null
+          },
+          {
+            "id": "finish",
+            "status": "completed",
+            "error": null
+          }
+        ],
+        "pageErrors": []
+      },
+      {
+        "key": "builderFilterFlow",
+        "evidenceId": "ev_e53d7d3eb641ace8e7a8b361b59c7a921c90b4e597005212b0af6042ef4b3236",
+        "steps": [
+          {
+            "id": "scenario_start",
+            "status": "completed",
+            "error": null
+          },
+          {
+            "id": "search",
+            "status": "completed",
+            "error": null
+          },
+          {
+            "id": "debounce",
+            "status": "completed",
+            "error": null
+          },
+          {
+            "id": "regions",
+            "status": "completed",
+            "error": null
+          },
+          {
+            "id": "demacia",
+            "status": "completed",
+            "error": null
+          },
+          {
+            "id": "empty-intersection",
+            "status": "completed",
+            "error": null
+          },
+          {
+            "id": "clear",
+            "status": "completed",
+            "error": null
+          },
+          {
+            "id": "filters",
+            "status": "completed",
+            "error": null
+          },
+          {
+            "id": "champions",
+            "status": "completed",
+            "error": null
+          },
+          {
+            "id": "spells",
+            "status": "completed",
+            "error": null
+          },
+          {
+            "id": "no-champion-spells",
+            "status": "completed",
+            "error": null
+          },
+          {
+            "id": "toggle-spells-off",
+            "status": "completed",
+            "error": null
+          },
+          {
+            "id": "champions-restored",
+            "status": "completed",
+            "error": null
+          },
+          {
+            "id": "eight-plus",
+            "status": "completed",
+            "error": null
+          },
+          {
+            "id": "tryndamere",
+            "status": "completed",
+            "error": null
+          },
+          {
+            "id": "close-drawer",
+            "status": "completed",
+            "error": null
+          },
+          {
+            "id": "format",
+            "status": "completed",
+            "error": null
+          },
+          {
+            "id": "standard",
+            "status": "completed",
+            "error": null
+          },
+          {
+            "id": "standard-label",
+            "status": "completed",
+            "error": null
+          },
+          {
+            "id": "clear-again",
+            "status": "completed",
+            "error": null
+          },
+          {
+            "id": "finish",
+            "status": "completed",
+            "error": null
+          }
+        ],
+        "pageErrors": []
+      },
+      {
+        "key": "builderStarterCopy",
+        "evidenceId": "ev_3c4957f5fc884416b28c9b934ff39054353371bf5fbc8907998afcc20f0e79b5",
+        "steps": [
+          {
+            "id": "scenario_start",
+            "status": "completed",
+            "error": null
+          },
+          {
+            "id": "starter",
+            "status": "completed",
+            "error": null
+          },
+          {
+            "id": "edit-copy",
+            "status": "completed",
+            "error": null
+          },
+          {
+            "id": "editable-copy",
+            "status": "completed",
+            "error": null
+          },
+          {
+            "id": "valid-copy",
+            "status": "completed",
+            "error": null
+          },
+          {
+            "id": "copy-name",
+            "status": "completed",
+            "error": null
+          },
+          {
+            "id": "save-copy",
+            "status": "completed",
+            "error": null
+          },
+          {
+            "id": "copy-saved",
+            "status": "completed",
+            "error": null
+          },
+          {
+            "id": "finish",
+            "status": "completed",
+            "error": null
+          }
+        ],
+        "pageErrors": []
+      },
+      {
+        "key": "builderMobile",
+        "evidenceId": "ev_5c146b4dd9ba8938ec47de427b18574133d51026c12bcbd8e03ffe98e33c28ac",
+        "steps": [
+          {
+            "id": "scenario_start",
+            "status": "completed",
+            "error": null
+          },
+          {
+            "id": "auto",
+            "status": "completed",
+            "error": null
+          },
+          {
+            "id": "legal",
+            "status": "completed",
+            "error": null
+          },
+          {
+            "id": "images",
+            "status": "completed",
+            "error": null
+          }
+        ],
+        "pageErrors": []
+      },
+      {
+        "key": "builderInspector",
+        "evidenceId": "ev_40a7472cf37f46241c82460542159c313f6da4ea2e3dade2c708295b8222c6e6",
+        "steps": [
+          {
+            "id": "scenario_start",
+            "status": "completed",
+            "error": null
+          },
+          {
+            "id": "search",
+            "status": "completed",
+            "error": null
+          },
+          {
+            "id": "debounce",
+            "status": "completed",
+            "error": null
+          },
+          {
+            "id": "inspect",
+            "status": "completed",
+            "error": null
+          },
+          {
+            "id": "details",
+            "status": "completed",
+            "error": null
+          },
+          {
+            "id": "images",
+            "status": "completed",
+            "error": null
+          }
+        ],
+        "pageErrors": []
+      },
+      {
+        "key": "builderImportDelete",
+        "evidenceId": "ev_6379f83659bdb462fe9e0bdbce6daec025922f765b10c91d37e8a37ba43c24ed",
+        "steps": [
+          {
+            "id": "scenario_start",
+            "status": "completed",
+            "error": null
+          },
+          {
+            "id": "open-import",
+            "status": "completed",
+            "error": null
+          },
+          {
+            "id": "code",
+            "status": "completed",
+            "error": null
+          },
+          {
+            "id": "import",
+            "status": "completed",
+            "error": null
+          },
+          {
+            "id": "import-completed",
+            "status": "completed",
+            "error": null
+          },
+          {
+            "id": "name",
+            "status": "completed",
+            "error": null
+          },
+          {
+            "id": "save",
+            "status": "completed",
+            "error": null
+          },
+          {
+            "id": "saved",
+            "status": "completed",
+            "error": null
+          },
+          {
+            "id": "duplicate",
+            "status": "completed",
+            "error": null
+          },
+          {
+            "id": "new-copy",
+            "status": "completed",
+            "error": null
+          },
+          {
+            "id": "copy-name",
+            "status": "completed",
+            "error": null
+          },
+          {
+            "id": "save-copy",
+            "status": "completed",
+            "error": null
+          },
+          {
+            "id": "copy-saved",
+            "status": "completed",
+            "error": null
+          },
+          {
+            "id": "delete-copy",
+            "status": "completed",
+            "error": null
+          },
+          {
+            "id": "confirm-delete",
+            "status": "completed",
+            "error": null
+          },
+          {
+            "id": "back-to-cards",
+            "status": "completed",
+            "error": null
+          },
+          {
+            "id": "settle",
+            "status": "completed",
+            "error": null
+          }
+        ],
+        "pageErrors": []
+      },
+      {
+        "key": "builderRoomUpdates",
+        "evidenceId": "ev_3cbe25555459194dcc45c472dac93e038bff3a65fd9e4aec60b03ae4ab9a14d3",
+        "steps": [
+          {
+            "id": "scenario_start",
+            "status": "completed",
+            "error": null
+          },
+          {
+            "id": "name",
+            "status": "completed",
+            "error": null
+          },
+          {
+            "id": "join",
+            "status": "completed",
+            "error": null
+          },
+          {
+            "id": "room",
+            "status": "completed",
+            "error": null
+          },
+          {
+            "id": "collection",
+            "status": "completed",
+            "error": null
+          },
+          {
+            "id": "cards",
+            "status": "completed",
+            "error": null
+          },
+          {
+            "id": "new",
+            "status": "completed",
+            "error": null
+          },
+          {
+            "id": "draft-name",
+            "status": "completed",
+            "error": null
+          },
+          {
+            "id": "find-annie",
+            "status": "completed",
+            "error": null
+          },
+          {
+            "id": "search",
+            "status": "completed",
+            "error": null
+          },
+          {
+            "id": "add-card",
+            "status": "completed",
+            "error": null
+          },
+          {
+            "id": "lobby-updates",
+            "status": "completed",
+            "error": null
+          },
+          {
+            "id": "still-building",
+            "status": "completed",
+            "error": null
+          },
+          {
+            "id": "kept-card",
+            "status": "completed",
+            "error": null
+          }
+        ],
+        "pageErrors": []
+      },
+      {
+        "key": "builderDesktopFinal",
+        "evidenceId": "ev_a409c6cb3fc6edef43d53f27f36ff829f4f0b57fb3c247cea927dd633cc67b0f",
+        "steps": [
+          {
+            "id": "scenario_start",
+            "status": "completed",
+            "error": null
+          },
+          {
+            "id": "deck",
+            "status": "completed",
+            "error": null
+          },
+          {
+            "id": "images",
+            "status": "completed",
+            "error": null
+          }
+        ],
+        "pageErrors": []
+      },
+      {
+        "key": "builderFiltersFinal",
+        "evidenceId": "ev_b2bb6e39c9e3abba49c70bfad51b305428d1bd99f32b44bbbd5bf7b3db589668",
+        "steps": [
+          {
+            "id": "scenario_start",
+            "status": "completed",
+            "error": null
+          },
+          {
+            "id": "filters",
+            "status": "completed",
+            "error": null
+          },
+          {
+            "id": "images",
+            "status": "completed",
+            "error": null
+          }
+        ],
+        "pageErrors": []
+      },
+      {
+        "key": "deckCenteredFinal",
+        "evidenceId": "ev_ef76d01e5dd3150abf69dbaa59d824f5433f4d137efedeb30e6c201cfaf270f8",
+        "steps": [
+          {
+            "id": "scenario_start",
+            "status": "completed",
+            "error": null
+          },
+          {
+            "id": "deck",
+            "status": "completed",
+            "error": null
+          },
+          {
+            "id": "images",
+            "status": "completed",
+            "error": null
+          }
+        ],
+        "pageErrors": []
+      },
+      {
+        "key": "collectionPreviewFinal",
+        "evidenceId": "ev_5f57155358f6a440ae1afb8820c57d9cd5549ddebf0f72ab8c8d9ea872a330ba",
+        "steps": [
+          {
+            "id": "scenario_start",
+            "status": "completed",
+            "error": null
+          },
+          {
+            "id": "faces",
+            "status": "completed",
+            "error": null
+          },
+          {
+            "id": "images",
+            "status": "completed",
+            "error": null
+          }
+        ],
+        "pageErrors": []
+      }
+    ]
+  },
+  "limitations": [
+    "Source browser verification only; no new portable build or native Electron run.",
+    "External-network multiplayer testing remains with the user."
+  ]
+}
