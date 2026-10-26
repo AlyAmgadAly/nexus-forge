@@ -1,0 +1,501 @@
+{
+  "date": "2026-10-26",
+  "tool": "REA capture_browser_scenario",
+  "browser": "Microsoft Edge 156.0.4314.42",
+  "engineTests": {
+    "passed": 12,
+    "failed": 0
+  },
+  "scenarios": [
+    {
+      "evidenceId": "ev_1f5d9d8e17b95108c04cd66914cef59212509035982a4c6693bb8a47b7fec277",
+      "viewport": {
+        "device_scale_factor": 1,
+        "height": 1074,
+        "width": 1913
+      },
+      "steps": [
+        {
+          "id": "scenario_start",
+          "status": "completed",
+          "error": null
+        },
+        {
+          "id": "connected",
+          "status": "completed",
+          "error": null
+        },
+        {
+          "id": "edit-profile",
+          "status": "completed",
+          "error": null
+        },
+        {
+          "id": "set-name",
+          "status": "completed",
+          "error": null
+        },
+        {
+          "id": "save-name",
+          "status": "completed",
+          "error": null
+        },
+        {
+          "id": "open-play",
+          "status": "completed",
+          "error": null
+        },
+        {
+          "id": "room-panel",
+          "status": "completed",
+          "error": null
+        },
+        {
+          "id": "create-room",
+          "status": "completed",
+          "error": null
+        },
+        {
+          "id": "room-created",
+          "status": "completed",
+          "error": null
+        },
+        {
+          "id": "leave-room",
+          "status": "completed",
+          "error": null
+        },
+        {
+          "id": "confirm-leave",
+          "status": "completed",
+          "error": null
+        },
+        {
+          "id": "returned-home",
+          "status": "completed",
+          "error": null
+        },
+        {
+          "id": "collection",
+          "status": "completed",
+          "error": null
+        },
+        {
+          "id": "deck-builder",
+          "status": "completed",
+          "error": null
+        },
+        {
+          "id": "home-from-decks",
+          "status": "completed",
+          "error": null
+        },
+        {
+          "id": "home-after-decks",
+          "status": "completed",
+          "error": null
+        },
+        {
+          "id": "card-forge",
+          "status": "completed",
+          "error": null
+        },
+        {
+          "id": "forge-open",
+          "status": "completed",
+          "error": null
+        },
+        {
+          "id": "home-from-forge",
+          "status": "completed",
+          "error": null
+        },
+        {
+          "id": "final-home",
+          "status": "completed",
+          "error": null
+        }
+      ],
+      "events": {
+        "dropped": 0,
+        "items": [],
+        "omissions": {
+          "by_kind": [],
+          "network_transaction_range": null,
+          "network_transactions": []
+        },
+        "retained": 0
+      }
+    },
+    {
+      "evidenceId": "ev_2c8c86fd5e07900f3c826d28c7162b7de62200b9989bfa90902ea2dc0129f6ed",
+      "viewport": {
+        "device_scale_factor": 1,
+        "height": 1074,
+        "width": 1913
+      },
+      "steps": [
+        {
+          "id": "scenario_start",
+          "status": "completed",
+          "error": null
+        },
+        {
+          "id": "invite-open",
+          "status": "completed",
+          "error": null
+        },
+        {
+          "id": "joiner-name",
+          "status": "completed",
+          "error": null
+        },
+        {
+          "id": "join-invite",
+          "status": "completed",
+          "error": null
+        },
+        {
+          "id": "joined-as-player",
+          "status": "completed",
+          "error": null
+        },
+        {
+          "id": "leave-player",
+          "status": "completed",
+          "error": null
+        },
+        {
+          "id": "confirm-leave-player",
+          "status": "completed",
+          "error": null
+        },
+        {
+          "id": "back-home",
+          "status": "completed",
+          "error": null
+        },
+        {
+          "id": "join-shortcut",
+          "status": "completed",
+          "error": null
+        },
+        {
+          "id": "room-code",
+          "status": "completed",
+          "error": null
+        },
+        {
+          "id": "spectate-room",
+          "status": "completed",
+          "error": null
+        },
+        {
+          "id": "spectating",
+          "status": "completed",
+          "error": null
+        }
+      ],
+      "events": {
+        "dropped": 0,
+        "items": [],
+        "omissions": {
+          "by_kind": [],
+          "network_transaction_range": null,
+          "network_transactions": []
+        },
+        "retained": 0
+      }
+    },
+    {
+      "evidenceId": "ev_39fdc5523450828b62fa1b21b7bfe6e238fb8960baabf4e762e87a48c228549b",
+      "viewport": {
+        "device_scale_factor": 1,
+        "height": 1074,
+        "width": 1913
+      },
+      "steps": [
+        {
+          "id": "scenario_start",
+          "status": "completed",
+          "error": null
+        },
+        {
+          "id": "connected",
+          "status": "completed",
+          "error": null
+        },
+        {
+          "id": "open-join-panel",
+          "status": "completed",
+          "error": null
+        }
+      ],
+      "events": {
+        "dropped": 0,
+        "items": [],
+        "omissions": {
+          "by_kind": [],
+          "network_transaction_range": null,
+          "network_transactions": []
+        },
+        "retained": 0
+      }
+    },
+    {
+      "evidenceId": "ev_742609e23829c52ee93be82ecbd32817597111c76dd3877642e0f9575c50ad78",
+      "viewport": {
+        "device_scale_factor": 1,
+        "height": 720,
+        "width": 1280
+      },
+      "steps": [
+        {
+          "id": "scenario_start",
+          "status": "completed",
+          "error": null
+        },
+        {
+          "id": "connected",
+          "status": "completed",
+          "error": null
+        },
+        {
+          "id": "open-play",
+          "status": "completed",
+          "error": null
+        },
+        {
+          "id": "player-name",
+          "status": "completed",
+          "error": null
+        },
+        {
+          "id": "create",
+          "status": "completed",
+          "error": null
+        },
+        {
+          "id": "in-room",
+          "status": "completed",
+          "error": null
+        },
+        {
+          "id": "home-with-room",
+          "status": "completed",
+          "error": null
+        },
+        {
+          "id": "resume-visible",
+          "status": "completed",
+          "error": null
+        },
+        {
+          "id": "resume-room",
+          "status": "completed",
+          "error": null
+        },
+        {
+          "id": "resumed",
+          "status": "completed",
+          "error": null
+        },
+        {
+          "id": "leave",
+          "status": "completed",
+          "error": null
+        },
+        {
+          "id": "confirm-leave",
+          "status": "completed",
+          "error": null
+        },
+        {
+          "id": "home-again",
+          "status": "completed",
+          "error": null
+        }
+      ],
+      "events": {
+        "dropped": 0,
+        "items": [],
+        "omissions": {
+          "by_kind": [],
+          "network_transaction_range": null,
+          "network_transactions": []
+        },
+        "retained": 0
+      }
+    },
+    {
+      "evidenceId": "ev_8a887140d0203cf2e32f0163a47035ff4fc04f8cac1a2d19f100310dcf1063fd",
+      "viewport": {
+        "device_scale_factor": 1,
+        "height": 1074,
+        "width": 1913
+      },
+      "steps": [
+        {
+          "id": "scenario_start",
+          "status": "completed",
+          "error": null
+        },
+        {
+          "id": "connected",
+          "status": "completed",
+          "error": null
+        },
+        {
+          "id": "settings-open",
+          "status": "completed",
+          "error": null
+        },
+        {
+          "id": "enter-fullscreen",
+          "status": "completed",
+          "error": null
+        },
+        {
+          "id": "fullscreen-dialog-closed",
+          "status": "completed",
+          "error": null
+        },
+        {
+          "id": "settings-in-fullscreen",
+          "status": "completed",
+          "error": null
+        },
+        {
+          "id": "exit-fullscreen",
+          "status": "completed",
+          "error": null
+        },
+        {
+          "id": "fullscreen-exited",
+          "status": "completed",
+          "error": null
+        },
+        {
+          "id": "profile-open",
+          "status": "completed",
+          "error": null
+        },
+        {
+          "id": "profile-name",
+          "status": "completed",
+          "error": null
+        },
+        {
+          "id": "profile-save",
+          "status": "completed",
+          "error": null
+        },
+        {
+          "id": "profile-closed",
+          "status": "completed",
+          "error": null
+        }
+      ],
+      "events": {
+        "dropped": 0,
+        "items": [],
+        "omissions": {
+          "by_kind": [],
+          "network_transaction_range": null,
+          "network_transactions": []
+        },
+        "retained": 0
+      }
+    },
+    {
+      "evidenceId": "ev_8f2bbbb5ca9eab5a598b07c56247b4bc57aa060cd4e4f008ba5e1fd6088667c7",
+      "viewport": {
+        "device_scale_factor": 1,
+        "height": 1074,
+        "width": 1913
+      },
+      "steps": [
+        {
+          "id": "scenario_start",
+          "status": "completed",
+          "error": null
+        },
+        {
+          "id": "load-home",
+          "status": "completed",
+          "error": null
+        }
+      ],
+      "events": {
+        "dropped": 0,
+        "items": [],
+        "omissions": {
+          "by_kind": [],
+          "network_transaction_range": null,
+          "network_transactions": []
+        },
+        "retained": 0
+      }
+    },
+    {
+      "evidenceId": "ev_a16a3c1a5a582637fe43f901f48f632d2cdd1daccf2705476d06221146d64f4e",
+      "viewport": {
+        "device_scale_factor": 1,
+        "height": 844,
+        "width": 390
+      },
+      "steps": [
+        {
+          "id": "scenario_start",
+          "status": "completed",
+          "error": null
+        },
+        {
+          "id": "mobile-loaded",
+          "status": "completed",
+          "error": null
+        }
+      ],
+      "events": {
+        "dropped": 0,
+        "items": [],
+        "omissions": {
+          "by_kind": [],
+          "network_transaction_range": null,
+          "network_transactions": []
+        },
+        "retained": 0
+      }
+    },
+    {
+      "evidenceId": "ev_ec24c3908639e97e9e5a92c8385965d456587442de98e0c76e236e6c9adf4c50",
+      "viewport": {
+        "device_scale_factor": 1,
+        "height": 1074,
+        "width": 1913
+      },
+      "steps": [
+        {
+          "id": "scenario_start",
+          "status": "completed",
+          "error": null
+        },
+        {
+          "id": "home-loaded",
+          "status": "completed",
+          "error": null
+        }
+      ],
+      "events": {
+        "dropped": 0,
+        "items": [],
+        "omissions": {
+          "by_kind": [],
+          "network_transaction_range": null,
+          "network_transactions": []
+        },
+        "retained": 0
+      }
+    }
+  ]
+}

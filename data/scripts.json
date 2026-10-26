@@ -1,0 +1,5948 @@
+{
+  "01DE001": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "play",
+          "actions": [
+            {
+              "type": "buff",
+              "power": 1,
+              "health": 1,
+              "duration": "permanent",
+              "target": {
+                "type": "allOtherAllyUnits",
+                "filter": {}
+              },
+              "condition": null
+            }
+          ],
+          "condition": {
+            "type": "topDeckRegion",
+            "region": "Demacia"
+          },
+          "auto": false
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.957Z"
+  },
+  "01DE002": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "summon",
+          "actions": [
+            {
+              "type": "rally",
+              "condition": null
+            }
+          ],
+          "auto": false
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.958Z"
+  },
+  "01DE003": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "play",
+          "actions": [
+            {
+              "type": "buff",
+              "power": 2,
+              "health": 2,
+              "duration": "permanent",
+              "target": {
+                "type": "allyUnit",
+                "count": 1,
+                "filter": {}
+              },
+              "condition": null
+            }
+          ],
+          "auto": false
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.958Z"
+  },
+  "01DE004": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "play",
+          "actions": [
+            {
+              "type": "copy",
+              "target": {
+                "type": "self"
+              },
+              "condition": null
+            }
+          ],
+          "auto": false
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.958Z"
+  },
+  "01DE006": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "summon",
+          "actions": [
+            {
+              "type": "create",
+              "cardId": "01DE035",
+              "count": 1,
+              "destination": "hand",
+              "condition": null
+            }
+          ],
+          "auto": false
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.958Z"
+  },
+  "01DE010": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "death",
+          "actions": [
+            {
+              "type": "createRandom",
+              "count": 1,
+              "filter": {
+                "subtype": "ELITE"
+              },
+              "destination": "hand",
+              "condition": null
+            }
+          ],
+          "auto": false
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.959Z"
+  },
+  "01DE012": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "summon",
+          "actions": [
+            {
+              "type": "buff",
+              "power": 1,
+              "health": 1,
+              "duration": "round",
+              "target": {
+                "type": "allOtherAllyUnits",
+                "filter": {}
+              },
+              "condition": null
+            }
+          ],
+          "auto": false
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.959Z"
+  },
+  "01DE014": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "play",
+          "actions": [
+            {
+              "type": "summon",
+              "cardId": "01DE016",
+              "count": 2,
+              "condition": null
+            },
+            {
+              "type": "buff",
+              "power": 1,
+              "health": 1,
+              "duration": "permanent",
+              "target": {
+                "type": "allAllyUnits",
+                "filter": {
+                  "subtype": "ELITE"
+                }
+              },
+              "condition": null
+            }
+          ]
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.959Z"
+  },
+  "01DE018": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "play",
+          "actions": [
+            {
+              "type": "buff",
+              "power": 1,
+              "health": 1,
+              "duration": "round",
+              "target": {
+                "type": "allyUnit",
+                "count": 1,
+                "filter": {}
+              },
+              "condition": null
+            }
+          ]
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.959Z"
+  },
+  "01DE021": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "play",
+          "actions": [
+            {
+              "type": "rally",
+              "condition": null
+            }
+          ]
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.959Z"
+  },
+  "01DE024": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "death",
+          "actions": [
+            {
+              "type": "createRandom",
+              "count": 1,
+              "filter": {
+                "type": "Spell",
+                "minCost": 6
+              },
+              "destination": "hand",
+              "condition": null
+            }
+          ],
+          "auto": false
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.959Z"
+  },
+  "01DE027": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "play",
+          "actions": [
+            {
+              "type": "grantKeyword",
+              "keyword": "Challenger",
+              "duration": "round",
+              "target": {
+                "type": "allAllyUnits",
+                "count": 1,
+                "filter": {}
+              },
+              "condition": null
+            }
+          ]
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.960Z"
+  },
+  "01DE029": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "summonOther",
+          "actions": [
+            {
+              "type": "grantKeyword",
+              "keyword": "Challenger",
+              "duration": "permanent",
+              "target": {
+                "type": "self",
+                "count": 1,
+                "filter": {}
+              },
+              "condition": null
+            }
+          ],
+          "auto": false
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.960Z"
+  },
+  "01DE031": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "roundEnd",
+          "actions": [
+            {
+              "type": "buff",
+              "power": 1,
+              "health": 1,
+              "duration": "permanent",
+              "target": {
+                "type": "allOtherAllyUnits",
+                "filter": {}
+              },
+              "condition": null
+            }
+          ],
+          "condition": {
+            "type": "allyDiedThisRound"
+          },
+          "auto": false
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.960Z"
+  },
+  "01DE035": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "play",
+          "actions": [
+            {
+              "type": "buff",
+              "power": 3,
+              "health": 3,
+              "duration": "round",
+              "target": {
+                "type": "allAllyUnits",
+                "filter": {}
+              },
+              "condition": null
+            }
+          ]
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.960Z"
+  },
+  "01DE041": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "play",
+          "actions": [
+            {
+              "type": "buff",
+              "power": 3,
+              "health": 3,
+              "duration": "round",
+              "target": {
+                "type": "allyUnit",
+                "count": 2,
+                "filter": {}
+              },
+              "condition": null
+            }
+          ]
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.960Z"
+  },
+  "01DE047": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "play",
+          "actions": [
+            {
+              "type": "summon",
+              "cardId": "01DE016",
+              "count": 1,
+              "condition": null
+            }
+          ]
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.960Z"
+  },
+  "01DE050": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "play",
+          "actions": [
+            {
+              "type": "silence",
+              "target": {
+                "type": "anyUnit",
+                "count": 1,
+                "filter": {
+                  "type": "follower"
+                }
+              },
+              "condition": null
+            }
+          ]
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.960Z"
+  },
+  "01DE052": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "summon",
+          "actions": [
+            {
+              "type": "grantKeyword",
+              "keyword": "Barrier",
+              "duration": "round",
+              "target": {
+                "type": "allAllyUnits",
+                "count": 1,
+                "filter": {}
+              },
+              "condition": null
+            }
+          ],
+          "auto": false
+        },
+        {
+          "on": "attack",
+          "actions": [
+            {
+              "type": "grantKeyword",
+              "keyword": "Barrier",
+              "duration": "round",
+              "target": {
+                "type": "allAllyUnits",
+                "count": 1,
+                "filter": {}
+              },
+              "condition": null
+            }
+          ],
+          "auto": false
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.960Z"
+  },
+  "01DE053": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "strike",
+          "actions": [
+            {
+              "type": "createRandom",
+              "count": 1,
+              "filter": {
+                "type": "Unit"
+              },
+              "destination": "hand",
+              "condition": null
+            }
+          ],
+          "auto": false
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.960Z"
+  },
+  "01DE056": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "attack",
+          "actions": [
+            {
+              "type": "buff",
+              "power": 2,
+              "health": 2,
+              "duration": "permanent",
+              "target": {
+                "type": "self",
+                "count": 1,
+                "filter": {}
+              },
+              "condition": null
+            }
+          ],
+          "auto": false
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.960Z"
+  },
+  "01FR001": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "play",
+          "actions": [
+            {
+              "type": "frostbite",
+              "target": {
+                "type": "enemyUnit",
+                "count": 1,
+                "filter": {}
+              },
+              "condition": null
+            }
+          ]
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.960Z"
+  },
+  "01FR003": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "death",
+          "actions": [
+            {
+              "type": "draw",
+              "amount": 1,
+              "who": "ally",
+              "condition": null
+            }
+          ],
+          "auto": false
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.960Z"
+  },
+  "01FR004": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "play",
+          "actions": [
+            {
+              "type": "buff",
+              "power": 0,
+              "health": 2,
+              "duration": "round",
+              "target": {
+                "type": "allyUnit",
+                "count": 1,
+                "filter": {}
+              },
+              "condition": null
+            }
+          ]
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.960Z"
+  },
+  "01FR005": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "play",
+          "actions": [
+            {
+              "type": "buff",
+              "power": 8,
+              "health": 4,
+              "duration": "permanent",
+              "target": {
+                "type": "allyUnit",
+                "count": 1,
+                "filter": {}
+              },
+              "condition": null
+            }
+          ]
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.960Z"
+  },
+  "01FR010": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "play",
+          "actions": [
+            {
+              "type": "buff",
+              "power": 0,
+              "health": 3,
+              "duration": "permanent",
+              "target": {
+                "type": "allyUnit",
+                "count": 2,
+                "filter": {}
+              },
+              "condition": null
+            }
+          ]
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.960Z"
+  },
+  "01FR011": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "play",
+          "actions": [
+            {
+              "type": "frostbite",
+              "target": {
+                "type": "enemyUnit",
+                "count": 1,
+                "filter": {}
+              },
+              "condition": null
+            }
+          ],
+          "auto": false
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.960Z"
+  },
+  "01FR012": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "play",
+          "actions": [
+            {
+              "type": "emptyManaGem",
+              "condition": null
+            },
+            {
+              "type": "healNexus",
+              "who": "ally",
+              "amount": 3,
+              "condition": null
+            }
+          ]
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.960Z"
+  },
+  "01FR013": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "surviveDamage",
+          "actions": [
+            {
+              "type": "buff",
+              "power": 3,
+              "health": 0,
+              "duration": "permanent",
+              "target": {
+                "type": "self",
+                "count": 1,
+                "filter": {}
+              },
+              "condition": null
+            }
+          ],
+          "auto": false
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.960Z"
+  },
+  "01FR020": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "play",
+          "actions": [
+            {
+              "type": "damageAll",
+              "team": "ally",
+              "amount": 2,
+              "condition": null
+            },
+            {
+              "type": "damageAll",
+              "team": "enemy",
+              "amount": 2,
+              "condition": null
+            }
+          ]
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.961Z"
+  },
+  "01FR021": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "attack",
+          "actions": [
+            {
+              "type": "damageAll",
+              "team": "ally",
+              "amount": 1,
+              "condition": null
+            },
+            {
+              "type": "damageAll",
+              "team": "enemy",
+              "amount": 1,
+              "condition": null
+            }
+          ],
+          "auto": false
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.961Z"
+  },
+  "01FR035": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "surviveDamage",
+          "actions": [
+            {
+              "type": "buff",
+              "power": 3,
+              "health": 0,
+              "duration": "permanent",
+              "target": {
+                "type": "self",
+                "count": 1,
+                "filter": {}
+              },
+              "condition": null
+            }
+          ],
+          "auto": false
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.962Z"
+  },
+  "01FR036": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "play",
+          "actions": [
+            {
+              "type": "damage",
+              "amount": 1,
+              "target": {
+                "type": "enemyUnit",
+                "count": 1,
+                "filter": {}
+              },
+              "condition": null
+            }
+          ],
+          "auto": false
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.962Z"
+  },
+  "01FR038": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "attack",
+          "actions": [
+            {
+              "type": "frostbite",
+              "target": {
+                "type": "strongestEnemy",
+                "count": 1,
+                "filter": {}
+              },
+              "condition": null
+            }
+          ],
+          "auto": false
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.962Z"
+  },
+  "01FR040": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "roundStart",
+          "actions": [
+            {
+              "type": "frostbite",
+              "target": {
+                "type": "strongestEnemy",
+                "count": 1,
+                "filter": {}
+              },
+              "condition": null
+            }
+          ],
+          "auto": false
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.962Z"
+  },
+  "01FR045": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "surviveDamage",
+          "actions": [
+            {
+              "type": "buff",
+              "power": 3,
+              "health": 0,
+              "duration": "permanent",
+              "target": {
+                "type": "self",
+                "count": 1,
+                "filter": {}
+              },
+              "condition": null
+            }
+          ],
+          "auto": false
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.962Z"
+  },
+  "01FR050": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "play",
+          "actions": [
+            {
+              "type": "heal",
+              "amount": 3,
+              "target": {
+                "type": "anyTarget",
+                "count": 1,
+                "filter": {}
+              },
+              "condition": null
+            }
+          ],
+          "auto": false
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.963Z"
+  },
+  "01IO002": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "play",
+          "actions": [
+            {
+              "type": "recall",
+              "target": {
+                "type": "anyUnit",
+                "count": 1,
+                "filter": {}
+              },
+              "condition": null
+            }
+          ]
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.963Z"
+  },
+  "01IO004": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "play",
+          "actions": [
+            {
+              "type": "heal",
+              "amount": 3,
+              "target": {
+                "type": "anyTarget",
+                "count": 1,
+                "filter": {}
+              },
+              "condition": null
+            }
+          ]
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.963Z"
+  },
+  "01IO006": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "summonOther",
+          "actions": [
+            {
+              "type": "buff",
+              "power": 1,
+              "health": 0,
+              "duration": "round",
+              "target": {
+                "type": "self",
+                "count": 1,
+                "filter": {}
+              },
+              "condition": null
+            }
+          ],
+          "auto": false
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.963Z"
+  },
+  "01IO007": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "strike",
+          "actions": [
+            {
+              "type": "create",
+              "cardId": "01IO013",
+              "count": 1,
+              "destination": "hand",
+              "condition": null
+            }
+          ],
+          "auto": false
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.963Z"
+  },
+  "01IO011": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "play",
+          "actions": [
+            {
+              "type": "recall",
+              "target": {
+                "type": "allyUnit",
+                "count": 1,
+                "filter": {}
+              },
+              "condition": null
+            }
+          ]
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.965Z"
+  },
+  "01IO017": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "summon",
+          "actions": [
+            {
+              "type": "grantKeyword",
+              "keyword": "Elusive",
+              "duration": "round",
+              "target": {
+                "type": "self",
+                "count": 1,
+                "filter": {}
+              },
+              "condition": null
+            }
+          ],
+          "auto": false
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.965Z"
+  },
+  "01IO020": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "summon",
+          "actions": [
+            {
+              "type": "buff",
+              "power": 1,
+              "health": 0,
+              "duration": "round",
+              "target": {
+                "type": "allOtherAllyUnits",
+                "filter": {}
+              },
+              "condition": null
+            }
+          ],
+          "auto": false
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.965Z"
+  },
+  "01IO021": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "summon",
+          "actions": [
+            {
+              "type": "buff",
+              "power": 2,
+              "health": 2,
+              "duration": "round",
+              "target": {
+                "type": "allOtherAllyUnits",
+                "filter": {}
+              },
+              "condition": null
+            }
+          ],
+          "auto": false
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.965Z"
+  },
+  "01IO023": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "play",
+          "actions": [
+            {
+              "type": "buff",
+              "power": 3,
+              "health": 3,
+              "duration": "permanent",
+              "target": {
+                "type": "handCard",
+                "count": 1,
+                "filter": {}
+              },
+              "condition": null
+            }
+          ],
+          "auto": false
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.965Z"
+  },
+  "01IO026": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "play",
+          "actions": [
+            {
+              "type": "buff",
+              "power": 1,
+              "health": 0,
+              "duration": "permanent",
+              "target": {
+                "type": "handCard",
+                "count": 1,
+                "filter": {}
+              },
+              "condition": null
+            }
+          ],
+          "auto": false
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.966Z"
+  },
+  "01IO038": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "play",
+          "actions": [
+            {
+              "type": "recall",
+              "target": {
+                "type": "allAllyUnits",
+                "count": 1,
+                "filter": {}
+              },
+              "condition": null
+            }
+          ],
+          "auto": false
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.966Z"
+  },
+  "01IO041": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "roundEnd",
+          "actions": [
+            {
+              "type": "createRandom",
+              "count": 1,
+              "filter": {
+                "type": "Spell"
+              },
+              "destination": "hand",
+              "condition": null
+            }
+          ],
+          "auto": false
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.966Z"
+  },
+  "01IO042": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "summonOther",
+          "actions": [
+            {
+              "type": "buff",
+              "power": 1,
+              "health": 1,
+              "duration": "round",
+              "target": {
+                "type": "self",
+                "count": 1,
+                "filter": {}
+              },
+              "condition": null
+            }
+          ],
+          "auto": false
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.966Z"
+  },
+  "01IO057": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "summon",
+          "actions": [
+            {
+              "type": "draw",
+              "amount": 1,
+              "who": "ally",
+              "condition": null
+            }
+          ],
+          "auto": false
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.967Z"
+  },
+  "01NX002": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "play",
+          "actions": [
+            {
+              "type": "damage",
+              "amount": 4,
+              "target": {
+                "type": "enemyNexus",
+                "count": 1,
+                "filter": {}
+              },
+              "condition": null
+            }
+          ]
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.967Z"
+  },
+  "01NX007": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "attack",
+          "actions": [
+            {
+              "type": "buff",
+              "power": 1,
+              "health": 0,
+              "duration": "round",
+              "target": {
+                "type": "allOtherAllyUnits",
+                "filter": {}
+              },
+              "condition": null
+            }
+          ],
+          "auto": false
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.967Z"
+  },
+  "01NX008": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "play",
+          "actions": [
+            {
+              "type": "buff",
+              "power": 1,
+              "health": 1,
+              "duration": "permanent",
+              "target": {
+                "type": "self",
+                "count": 1,
+                "filter": {}
+              },
+              "condition": null
+            },
+            {
+              "type": "grantKeyword",
+              "keyword": "Overwhelm",
+              "duration": "permanent",
+              "target": {
+                "type": "self",
+                "count": 1,
+                "filter": {}
+              },
+              "condition": null
+            }
+          ],
+          "condition": {
+            "type": "topDeckRegion",
+            "region": "Noxus"
+          },
+          "auto": false
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.967Z"
+  },
+  "01NX020": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "summon",
+          "actions": [
+            {
+              "type": "create",
+              "cardId": "01NX020T1",
+              "count": 1,
+              "destination": "hand",
+              "condition": null
+            }
+          ],
+          "auto": false
+        },
+        {
+          "on": "strike",
+          "actions": [
+            {
+              "type": "create",
+              "cardId": "01NX020T1",
+              "count": 1,
+              "destination": "hand",
+              "condition": null
+            }
+          ],
+          "auto": false
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.967Z"
+  },
+  "01NX023": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "summon",
+          "actions": [
+            {
+              "type": "buff",
+              "power": 2,
+              "health": 0,
+              "duration": "permanent",
+              "target": {
+                "type": "allOtherAllyUnits",
+                "filter": {}
+              },
+              "condition": null
+            }
+          ],
+          "auto": false
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.967Z"
+  },
+  "01NX025": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "play",
+          "actions": [
+            {
+              "type": "buff",
+              "power": 2,
+              "health": 0,
+              "duration": "permanent",
+              "target": {
+                "type": "allyUnit",
+                "count": 2,
+                "filter": {}
+              },
+              "condition": null
+            }
+          ]
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.967Z"
+  },
+  "01NX027": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "play",
+          "actions": [
+            {
+              "type": "buff",
+              "power": 3,
+              "health": 0,
+              "duration": "round",
+              "target": {
+                "type": "allyUnit",
+                "count": 1,
+                "filter": {}
+              },
+              "condition": null
+            }
+          ]
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.967Z"
+  },
+  "01NX030": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "surviveDamage",
+          "actions": [
+            {
+              "type": "damage",
+              "amount": 1,
+              "target": {
+                "type": "enemyNexus",
+                "count": 1,
+                "filter": {}
+              },
+              "condition": null
+            }
+          ],
+          "auto": false
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.967Z"
+  },
+  "01NX032": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "summon",
+          "actions": [
+            {
+              "type": "damageAll",
+              "team": "ally",
+              "amount": 1,
+              "condition": null
+            }
+          ],
+          "auto": false
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.967Z"
+  },
+  "01NX036": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "roundStart",
+          "actions": [
+            {
+              "type": "stun",
+              "target": {
+                "type": "weakestEnemy",
+                "count": 1,
+                "filter": {}
+              },
+              "condition": null
+            }
+          ],
+          "auto": false
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.967Z"
+  },
+  "01NX037": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "death",
+          "actions": [
+            {
+              "type": "damage",
+              "amount": 1,
+              "target": {
+                "type": "enemyNexus",
+                "count": 1,
+                "filter": {}
+              },
+              "condition": null
+            }
+          ],
+          "auto": false
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.968Z"
+  },
+  "01NX040": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "attack",
+          "actions": [
+            {
+              "type": "damage",
+              "amount": 1,
+              "target": {
+                "type": "enemyNexus",
+                "count": 1,
+                "filter": {}
+              },
+              "condition": null
+            }
+          ],
+          "auto": false
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.968Z"
+  },
+  "01NX043": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "play",
+          "actions": [
+            {
+              "type": "damage",
+              "amount": 1,
+              "target": {
+                "type": "anyTarget",
+                "count": 1,
+                "filter": {}
+              },
+              "condition": null
+            }
+          ]
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.968Z"
+  },
+  "01NX044": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "attack",
+          "actions": [
+            {
+              "type": "buff",
+              "power": 4,
+              "health": 0,
+              "duration": "permanent",
+              "target": {
+                "type": "self",
+                "count": 1,
+                "filter": {}
+              },
+              "condition": null
+            }
+          ],
+          "auto": false
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.968Z"
+  },
+  "01NX046": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "play",
+          "actions": [
+            {
+              "type": "stun",
+              "target": {
+                "type": "enemyUnit",
+                "count": 1,
+                "filter": {}
+              },
+              "condition": null
+            }
+          ],
+          "auto": false
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.968Z"
+  },
+  "01NX048": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "surviveDamage",
+          "actions": [
+            {
+              "type": "createRandom",
+              "count": 1,
+              "filter": {
+                "type": "Unit"
+              },
+              "destination": "hand",
+              "condition": null
+            }
+          ],
+          "auto": false
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.968Z"
+  },
+  "01NX049": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "play",
+          "actions": [
+            {
+              "type": "stun",
+              "target": {
+                "type": "enemyUnit",
+                "count": 1,
+                "filter": {}
+              },
+              "condition": null
+            }
+          ]
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.968Z"
+  },
+  "01NX050": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "play",
+          "actions": [
+            {
+              "type": "damageAll",
+              "team": "ally",
+              "amount": 1,
+              "condition": null
+            },
+            {
+              "type": "damageAll",
+              "team": "enemy",
+              "amount": 1,
+              "condition": null
+            }
+          ]
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.968Z"
+  },
+  "01NX051": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "summon",
+          "actions": [
+            {
+              "type": "create",
+              "cardId": "01NX002",
+              "count": 2,
+              "destination": "hand",
+              "condition": null
+            }
+          ],
+          "auto": false
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.968Z"
+  },
+  "01NX055": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "summon",
+          "actions": [
+            {
+              "type": "summon",
+              "cardId": "01SI002",
+              "count": 1,
+              "condition": null
+            }
+          ],
+          "auto": false
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.968Z"
+  },
+  "01NX056": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "play",
+          "actions": [
+            {
+              "type": "damage",
+              "amount": 2,
+              "target": {
+                "type": "enemyUnit",
+                "count": 1,
+                "filter": {}
+              },
+              "condition": null
+            },
+            {
+              "type": "rally",
+              "condition": null
+            }
+          ]
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.968Z"
+  },
+  "01PZ003": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "castSpell",
+          "actions": [
+            {
+              "type": "buff",
+              "power": 1,
+              "health": 1,
+              "duration": "permanent",
+              "target": {
+                "type": "self",
+                "count": 1,
+                "filter": {}
+              },
+              "condition": null
+            }
+          ],
+          "auto": false
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.969Z"
+  },
+  "01PZ014": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "play",
+          "actions": [
+            {
+              "type": "summon",
+              "cardId": "01PZ014T1",
+              "count": 1,
+              "condition": null
+            }
+          ]
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.969Z"
+  },
+  "01PZ016": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "play",
+          "actions": [
+            {
+              "type": "createRandom",
+              "count": 1,
+              "filter": {
+                "type": "Spell",
+                "minCost": 6
+              },
+              "destination": "hand",
+              "condition": null
+            },
+            {
+              "type": "spellMana",
+              "amount": 3,
+              "condition": null
+            }
+          ]
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.969Z"
+  },
+  "01PZ017": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "summon",
+          "actions": [
+            {
+              "type": "summon",
+              "cardId": "01PZ047",
+              "count": 2,
+              "condition": null
+            }
+          ],
+          "auto": false
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.969Z"
+  },
+  "01PZ021": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "nexusStrike",
+          "actions": [
+            {
+              "type": "copy",
+              "target": {
+                "type": "self"
+              },
+              "condition": null
+            }
+          ],
+          "auto": false
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.969Z"
+  },
+  "01PZ044": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "play",
+          "actions": [
+            {
+              "type": "damageAll",
+              "team": "enemy",
+              "amount": 1,
+              "condition": null
+            }
+          ],
+          "auto": false
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.970Z"
+  },
+  "01PZ052": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "play",
+          "actions": [
+            {
+              "type": "damage",
+              "amount": 2,
+              "target": {
+                "type": "anyTarget",
+                "count": 1,
+                "filter": {}
+              },
+              "condition": null
+            }
+          ]
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.970Z"
+  },
+  "01PZ053": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "summon",
+          "actions": [
+            {
+              "type": "create",
+              "cardId": "01PZ010",
+              "count": 1,
+              "destination": "hand",
+              "condition": null
+            }
+          ],
+          "auto": false
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.970Z"
+  },
+  "01PZ054": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "attack",
+          "actions": [
+            {
+              "type": "damage",
+              "amount": 2,
+              "target": {
+                "type": "enemyNexus",
+                "count": 1,
+                "filter": {}
+              },
+              "condition": null
+            }
+          ],
+          "auto": false
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.970Z"
+  },
+  "01PZ057": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "play",
+          "actions": [
+            {
+              "type": "summon",
+              "cardId": "01PZ032",
+              "count": 2,
+              "condition": null
+            }
+          ]
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.970Z"
+  },
+  "01PZ058": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "summon",
+          "actions": [
+            {
+              "type": "create",
+              "cardId": "01PZ010",
+              "count": 2,
+              "destination": "hand",
+              "condition": null
+            }
+          ],
+          "auto": false
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.970Z"
+  },
+  "01SI001": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "play",
+          "actions": [
+            {
+              "type": "kill",
+              "target": {
+                "type": "anyUnit",
+                "count": 1,
+                "filter": {}
+              },
+              "condition": null
+            }
+          ]
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.971Z"
+  },
+  "01SI007": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "play",
+          "actions": [
+            {
+              "type": "summon",
+              "cardId": "01SI007T1",
+              "count": 3,
+              "condition": null
+            }
+          ]
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.971Z"
+  },
+  "01SI010": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "play",
+          "actions": [
+            {
+              "type": "summon",
+              "cardId": "01SI024",
+              "count": 2,
+              "condition": null
+            }
+          ]
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.971Z"
+  },
+  "01SI015": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "play",
+          "actions": [
+            {
+              "type": "kill",
+              "target": {
+                "type": "allUnits",
+                "count": 1,
+                "filter": {}
+              },
+              "condition": null
+            }
+          ]
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.971Z"
+  },
+  "01SI016": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "play",
+          "actions": [
+            {
+              "type": "summon",
+              "cardId": "01SI014",
+              "count": 1,
+              "condition": null
+            }
+          ],
+          "condition": {
+            "type": "topDeckRegion",
+            "region": "ShadowIsles"
+          },
+          "auto": false
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.971Z"
+  },
+  "01SI022": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "play",
+          "actions": [
+            {
+              "type": "buff",
+              "power": 2,
+              "health": 2,
+              "duration": "permanent",
+              "target": {
+                "type": "allyUnit",
+                "count": 1,
+                "filter": {}
+              },
+              "condition": null
+            },
+            {
+              "type": "grantKeyword",
+              "keyword": "Ephemeral",
+              "duration": "permanent",
+              "target": {
+                "type": "allyUnit",
+                "count": 1,
+                "filter": {}
+              },
+              "condition": null
+            }
+          ]
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.971Z"
+  },
+  "01SI026": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "death",
+          "actions": [
+            {
+              "type": "createRandom",
+              "count": 1,
+              "filter": {
+                "type": "Unit",
+                "maxCost": 3
+              },
+              "destination": "hand",
+              "condition": null
+            }
+          ],
+          "auto": false
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.971Z"
+  },
+  "01SI034": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "play",
+          "actions": [
+            {
+              "type": "damage",
+              "amount": 4,
+              "target": {
+                "type": "anyUnit",
+                "count": 1,
+                "filter": {}
+              },
+              "condition": null
+            }
+          ],
+          "condition": {
+            "type": "allyDiedThisRound"
+          }
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.971Z"
+  },
+  "01SI036": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "play",
+          "actions": [
+            {
+              "type": "summon",
+              "cardId": "01SI002",
+              "count": 2,
+              "condition": null
+            }
+          ],
+          "condition": {
+            "type": "allyDiedThisRound"
+          }
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.971Z"
+  },
+  "01SI038": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "allyDeath",
+          "actions": [
+            {
+              "type": "damage",
+              "amount": 1,
+              "target": {
+                "type": "enemyNexus",
+                "count": 1,
+                "filter": {}
+              },
+              "condition": null
+            }
+          ],
+          "auto": false
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.971Z"
+  },
+  "01SI043": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "death",
+          "actions": [
+            {
+              "type": "summon",
+              "cardId": "01SI002",
+              "count": 1,
+              "condition": null
+            }
+          ],
+          "auto": false
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.971Z"
+  },
+  "01SI048": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "death",
+          "actions": [
+            {
+              "type": "summon",
+              "cardId": "01SI048T1",
+              "count": 1,
+              "condition": null
+            }
+          ],
+          "auto": false
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.971Z"
+  },
+  "02BW004": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "summon",
+          "actions": [
+            {
+              "type": "summon",
+              "cardId": "02BW032T1",
+              "count": 1,
+              "condition": null
+            }
+          ],
+          "auto": false
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.972Z"
+  },
+  "02BW012": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "play",
+          "actions": [
+            {
+              "type": "summon",
+              "cardId": "02BW032T1",
+              "count": 2,
+              "condition": null
+            }
+          ]
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.972Z"
+  },
+  "02BW014": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "summon",
+          "actions": [
+            {
+              "type": "createRandom",
+              "count": 1,
+              "filter": {
+                "type": "Spell"
+              },
+              "destination": "hand",
+              "condition": null
+            }
+          ],
+          "auto": false
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.972Z"
+  },
+  "02BW020": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "play",
+          "actions": [
+            {
+              "type": "damage",
+              "amount": 1,
+              "target": {
+                "type": "enemyNexus",
+                "count": 1,
+                "filter": {}
+              },
+              "condition": null
+            }
+          ]
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.972Z"
+  },
+  "02BW029": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "play",
+          "actions": [
+            {
+              "type": "toss",
+              "amount": 2,
+              "condition": null
+            },
+            {
+              "type": "draw",
+              "amount": 2,
+              "who": "ally",
+              "condition": null
+            }
+          ]
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.972Z"
+  },
+  "02BW032": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "summon",
+          "actions": [
+            {
+              "type": "summon",
+              "cardId": "02BW032T1",
+              "count": 1,
+              "condition": null
+            }
+          ],
+          "auto": false
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.972Z"
+  },
+  "02BW037": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "nexusStrike",
+          "actions": [
+            {
+              "type": "draw",
+              "amount": 1,
+              "who": "ally",
+              "condition": null
+            }
+          ],
+          "auto": false
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.972Z"
+  },
+  "02BW044": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "play",
+          "actions": [
+            {
+              "type": "toss",
+              "amount": 4,
+              "condition": null
+            }
+          ]
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.972Z"
+  },
+  "02BW047": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "summon",
+          "actions": [
+            {
+              "type": "toss",
+              "amount": 3,
+              "condition": null
+            }
+          ],
+          "auto": false
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.972Z"
+  },
+  "02BW058": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "play",
+          "actions": [
+            {
+              "type": "buff",
+              "power": 1,
+              "health": 1,
+              "duration": "permanent",
+              "target": {
+                "type": "self",
+                "count": 1,
+                "filter": {}
+              },
+              "condition": null
+            }
+          ],
+          "condition": {
+            "type": "plunder"
+          },
+          "auto": false
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.972Z"
+  },
+  "02BW059": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "play",
+          "actions": [
+            {
+              "type": "toss",
+              "amount": 3,
+              "condition": null
+            },
+            {
+              "type": "damage",
+              "amount": 7,
+              "target": {
+                "type": "anyUnit",
+                "count": 1,
+                "filter": {}
+              },
+              "condition": null
+            }
+          ]
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.972Z"
+  },
+  "02DE002": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "play",
+          "actions": [
+            {
+              "type": "summon",
+              "cardId": "02DE006T2",
+              "count": 1,
+              "condition": null
+            }
+          ]
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.973Z"
+  },
+  "02DE006": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "summon",
+          "actions": [
+            {
+              "type": "summon",
+              "cardId": "02DE006T2",
+              "count": 1,
+              "condition": null
+            }
+          ],
+          "auto": false
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.973Z"
+  },
+  "02DE007": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "play",
+          "actions": [
+            {
+              "type": "grantKeyword",
+              "keyword": "Tough",
+              "duration": "round",
+              "target": {
+                "type": "allAllyUnits",
+                "count": 1,
+                "filter": {}
+              },
+              "condition": null
+            }
+          ]
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.973Z"
+  },
+  "02DE009": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "death",
+          "actions": [
+            {
+              "type": "summon",
+              "cardId": "02DE003",
+              "count": 1,
+              "condition": null
+            }
+          ],
+          "auto": false
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.973Z"
+  },
+  "02DE010": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "summon",
+          "actions": [
+            {
+              "type": "buff",
+              "power": 1,
+              "health": 1,
+              "duration": "round",
+              "target": {
+                "type": "allOtherAllyUnits",
+                "filter": {}
+              },
+              "condition": null
+            }
+          ],
+          "auto": false
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.973Z"
+  },
+  "02FR007": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "play",
+          "actions": [
+            {
+              "type": "buff",
+              "power": 3,
+              "health": 4,
+              "duration": "round",
+              "target": {
+                "type": "allyUnit",
+                "count": 1,
+                "filter": {}
+              },
+              "condition": null
+            }
+          ]
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.973Z"
+  },
+  "02FR009": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "play",
+          "actions": [
+            {
+              "type": "emptyManaGem",
+              "condition": null
+            }
+          ],
+          "condition": {
+            "type": "plunder"
+          },
+          "auto": false
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.973Z"
+  },
+  "02IO002": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "summon",
+          "actions": [
+            {
+              "type": "create",
+              "cardId": "02IO002T1",
+              "count": 1,
+              "destination": "hand",
+              "condition": null
+            }
+          ],
+          "auto": false
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.973Z"
+  },
+  "02NX002": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "attack",
+          "actions": [
+            {
+              "type": "stun",
+              "target": {
+                "type": "allEnemyUnits",
+                "count": 1,
+                "filter": {}
+              },
+              "condition": null
+            }
+          ],
+          "auto": false
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.973Z"
+  },
+  "02NX006": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "roundStart",
+          "actions": [
+            {
+              "type": "damage",
+              "amount": 1,
+              "target": {
+                "type": "enemyNexus",
+                "count": 1,
+                "filter": {}
+              },
+              "condition": null
+            }
+          ],
+          "auto": false
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.973Z"
+  },
+  "02NX007": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "nexusStrike",
+          "actions": [
+            {
+              "type": "damage",
+              "amount": 3,
+              "target": {
+                "type": "enemyNexus",
+                "count": 1,
+                "filter": {}
+              },
+              "condition": null
+            }
+          ],
+          "auto": false
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.973Z"
+  },
+  "02SI005": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "play",
+          "actions": [
+            {
+              "type": "toss",
+              "amount": 3,
+              "condition": null
+            },
+            {
+              "type": "heal",
+              "amount": 3,
+              "target": {
+                "type": "allAllyUnits",
+                "count": 1,
+                "filter": {}
+              },
+              "condition": null
+            }
+          ]
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.973Z"
+  },
+  "02SI010": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "summon",
+          "actions": [
+            {
+              "type": "toss",
+              "amount": 3,
+              "condition": null
+            }
+          ],
+          "auto": false
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.974Z"
+  },
+  "03BW002": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "roundStart",
+          "actions": [
+            {
+              "type": "damage",
+              "amount": 2,
+              "target": {
+                "type": "self",
+                "count": 1,
+                "filter": {}
+              },
+              "condition": null
+            }
+          ],
+          "auto": false
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.974Z"
+  },
+  "03BW006": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "roundStart",
+          "actions": [
+            {
+              "type": "create",
+              "cardId": "03BW006T1",
+              "count": 1,
+              "destination": "hand",
+              "condition": null
+            }
+          ],
+          "auto": false
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.974Z"
+  },
+  "03BW007": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "play",
+          "actions": [
+            {
+              "type": "damage",
+              "amount": 3,
+              "target": {
+                "type": "self",
+                "count": 1,
+                "filter": {}
+              },
+              "condition": null
+            }
+          ],
+          "auto": false
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.974Z"
+  },
+  "03BW015": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "play",
+          "actions": [
+            {
+              "type": "damage",
+              "amount": 2,
+              "target": {
+                "type": "self",
+                "count": 1,
+                "filter": {}
+              },
+              "condition": null
+            }
+          ],
+          "auto": false
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.974Z"
+  },
+  "03DE011": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "attack",
+          "actions": [
+            {
+              "type": "buff",
+              "power": 1,
+              "health": 1,
+              "duration": "round",
+              "target": {
+                "type": "self",
+                "count": 1,
+                "filter": {}
+              },
+              "condition": null
+            }
+          ],
+          "auto": false
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.975Z"
+  },
+  "03FR003": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "play",
+          "actions": [
+            {
+              "type": "obliterate",
+              "target": {
+                "type": "allUnits",
+                "count": 1,
+                "filter": {}
+              },
+              "condition": null
+            }
+          ],
+          "auto": false
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.975Z"
+  },
+  "03FR006": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "summon",
+          "actions": [
+            {
+              "type": "create",
+              "cardId": "03FR006T1",
+              "count": 1,
+              "destination": "hand",
+              "condition": null
+            }
+          ],
+          "auto": false
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.975Z"
+  },
+  "03FR009": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "roundStart",
+          "actions": [
+            {
+              "type": "createRandom",
+              "count": 1,
+              "filter": {
+                "supertype": "Champion"
+              },
+              "destination": "hand",
+              "condition": null
+            }
+          ],
+          "auto": false
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.975Z"
+  },
+  "03IO006": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "roundStart",
+          "actions": [
+            {
+              "type": "create",
+              "cardId": "03IO016",
+              "count": 1,
+              "destination": "hand",
+              "condition": null
+            }
+          ],
+          "auto": false
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.975Z"
+  },
+  "03MT020": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "play",
+          "actions": [
+            {
+              "type": "heal",
+              "amount": 3,
+              "target": {
+                "type": "allyUnit",
+                "count": 1,
+                "filter": {}
+              },
+              "condition": null
+            },
+            {
+              "type": "heal",
+              "amount": 3,
+              "target": {
+                "type": "allyNexus",
+                "count": 1,
+                "filter": {}
+              },
+              "condition": null
+            }
+          ],
+          "auto": false
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.976Z"
+  },
+  "03MT028": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "play",
+          "actions": [
+            {
+              "type": "buff",
+              "power": 0,
+              "health": 4,
+              "duration": "round",
+              "target": {
+                "type": "self",
+                "count": 1,
+                "filter": {}
+              },
+              "condition": null
+            }
+          ],
+          "condition": {
+            "type": "daybreak"
+          },
+          "auto": false
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.976Z"
+  },
+  "03MT033": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "play",
+          "actions": [
+            {
+              "type": "buff",
+              "power": 0,
+              "health": 4,
+              "duration": "permanent",
+              "target": {
+                "type": "allyUnit",
+                "count": 2,
+                "filter": {}
+              },
+              "condition": null
+            }
+          ],
+          "auto": false
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.976Z"
+  },
+  "03MT035": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "play",
+          "actions": [
+            {
+              "type": "buff",
+              "power": 1,
+              "health": 1,
+              "duration": "round",
+              "target": {
+                "type": "allyUnit",
+                "count": 1,
+                "filter": {}
+              },
+              "condition": null
+            }
+          ]
+        },
+        {
+          "on": "play",
+          "actions": [
+            {
+              "type": "draw",
+              "amount": 1,
+              "who": "ally",
+              "condition": null
+            }
+          ],
+          "condition": {
+            "type": "nightfall"
+          },
+          "auto": false
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.976Z"
+  },
+  "03MT036": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "play",
+          "actions": [
+            {
+              "type": "buff",
+              "power": 3,
+              "health": 3,
+              "duration": "permanent",
+              "target": {
+                "type": "allyUnit",
+                "count": 1,
+                "filter": {}
+              },
+              "condition": null
+            }
+          ]
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.976Z"
+  },
+  "03MT048": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "summon",
+          "actions": [
+            {
+              "type": "create",
+              "cardId": "03MT092T1",
+              "count": 1,
+              "destination": "hand",
+              "condition": null
+            }
+          ],
+          "auto": false
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.976Z"
+  },
+  "03MT054": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "play",
+          "actions": [
+            {
+              "type": "stun",
+              "target": {
+                "type": "strongestEnemy",
+                "count": 1,
+                "filter": {}
+              },
+              "condition": null
+            }
+          ],
+          "condition": {
+            "type": "daybreak"
+          },
+          "auto": false
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.976Z"
+  },
+  "03MT057": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "play",
+          "actions": [
+            {
+              "type": "grantKeyword",
+              "keyword": "Lifesteal",
+              "duration": "round",
+              "target": {
+                "type": "self",
+                "count": 1,
+                "filter": {}
+              },
+              "condition": null
+            }
+          ],
+          "condition": {
+            "type": "daybreak"
+          },
+          "auto": false
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.976Z"
+  },
+  "03MT073": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "summon",
+          "actions": [
+            {
+              "type": "create",
+              "cardId": "03MT073T1",
+              "count": 1,
+              "destination": "hand",
+              "condition": null
+            }
+          ],
+          "auto": false
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.976Z"
+  },
+  "03MT080": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "summon",
+          "actions": [
+            {
+              "type": "create",
+              "cardId": "03MT080T1",
+              "count": 1,
+              "destination": "hand",
+              "condition": null
+            }
+          ],
+          "auto": false
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.976Z"
+  },
+  "03MT088": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "play",
+          "actions": [
+            {
+              "type": "buff",
+              "power": 1,
+              "health": 1,
+              "duration": "round",
+              "target": {
+                "type": "self",
+                "count": 1,
+                "filter": {}
+              },
+              "condition": null
+            }
+          ],
+          "condition": {
+            "type": "daybreak"
+          },
+          "auto": false
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.977Z"
+  },
+  "03MT089": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "play",
+          "actions": [
+            {
+              "type": "buff",
+              "power": 2,
+              "health": 0,
+              "duration": "permanent",
+              "target": {
+                "type": "self",
+                "count": 1,
+                "filter": {}
+              },
+              "condition": null
+            }
+          ],
+          "condition": {
+            "type": "nightfall"
+          },
+          "auto": false
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.977Z"
+  },
+  "03MT092": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "strike",
+          "actions": [
+            {
+              "type": "create",
+              "cardId": "03MT092T1",
+              "count": 1,
+              "destination": "hand",
+              "condition": null
+            }
+          ],
+          "auto": false
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.977Z"
+  },
+  "03MT094": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "play",
+          "actions": [
+            {
+              "type": "grantKeyword",
+              "keyword": "Elusive",
+              "duration": "permanent",
+              "target": {
+                "type": "self",
+                "count": 1,
+                "filter": {}
+              },
+              "condition": null
+            }
+          ],
+          "condition": {
+            "type": "nightfall"
+          },
+          "auto": false
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.977Z"
+  },
+  "03MT098": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "play",
+          "actions": [
+            {
+              "type": "buff",
+              "power": 0,
+              "health": 2,
+              "duration": "permanent",
+              "target": {
+                "type": "allyUnit",
+                "count": 1,
+                "filter": {}
+              },
+              "condition": null
+            }
+          ]
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.977Z"
+  },
+  "03NX005": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "summon",
+          "actions": [
+            {
+              "type": "grantKeyword",
+              "keyword": "Quick Attack",
+              "duration": "round",
+              "target": {
+                "type": "self",
+                "count": 1,
+                "filter": {}
+              },
+              "condition": null
+            }
+          ],
+          "auto": false
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.977Z"
+  },
+  "03NX014": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "play",
+          "actions": [
+            {
+              "type": "buff",
+              "power": 3,
+              "health": 2,
+              "duration": "round",
+              "target": {
+                "type": "allyUnit",
+                "count": 1,
+                "filter": {}
+              },
+              "condition": null
+            }
+          ]
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.977Z"
+  },
+  "03PZ003": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "summon",
+          "actions": [
+            {
+              "type": "create",
+              "cardId": "03PZ003T11",
+              "count": 1,
+              "destination": "hand",
+              "condition": null
+            }
+          ],
+          "auto": false
+        },
+        {
+          "on": "roundStart",
+          "actions": [
+            {
+              "type": "create",
+              "cardId": "03PZ003T11",
+              "count": 1,
+              "destination": "hand",
+              "condition": null
+            }
+          ],
+          "auto": false
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.977Z"
+  },
+  "03PZ005": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "roundStart",
+          "actions": [
+            {
+              "type": "create",
+              "cardId": "03PZ016",
+              "count": 1,
+              "destination": "hand",
+              "condition": null
+            }
+          ],
+          "auto": false
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.977Z"
+  },
+  "03SI013": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "play",
+          "actions": [
+            {
+              "type": "summon",
+              "cardId": "01SI014",
+              "count": 1,
+              "condition": null
+            }
+          ]
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.977Z"
+  },
+  "04BW014": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "play",
+          "actions": [
+            {
+              "type": "summon",
+              "cardId": "02BW032T1",
+              "count": 1,
+              "condition": null
+            },
+            {
+              "type": "create",
+              "cardId": "04BW014T1",
+              "count": 1,
+              "destination": "hand",
+              "condition": null
+            }
+          ]
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.978Z"
+  },
+  "04DE006": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "play",
+          "actions": [
+            {
+              "type": "buff",
+              "power": 1,
+              "health": 1,
+              "duration": "permanent",
+              "target": {
+                "type": "allyUnit",
+                "count": 1,
+                "filter": {}
+              },
+              "condition": null
+            }
+          ]
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.978Z"
+  },
+  "04FR011": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "play",
+          "actions": [
+            {
+              "type": "frostbite",
+              "target": {
+                "type": "enemyUnit",
+                "count": 1,
+                "filter": {}
+              },
+              "condition": null
+            },
+            {
+              "type": "summon",
+              "cardId": "04FR001",
+              "count": 1,
+              "condition": null
+            }
+          ]
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.979Z"
+  },
+  "04FR019": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "summon",
+          "actions": [
+            {
+              "type": "summon",
+              "cardId": "04FR019T1",
+              "count": 1,
+              "condition": null
+            }
+          ],
+          "auto": false
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.979Z"
+  },
+  "04IO006": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "summonOther",
+          "actions": [
+            {
+              "type": "buff",
+              "power": 2,
+              "health": 0,
+              "duration": "round",
+              "target": {
+                "type": "self",
+                "count": 1,
+                "filter": {}
+              },
+              "condition": null
+            }
+          ],
+          "auto": false
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.979Z"
+  },
+  "04MT004": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "death",
+          "actions": [
+            {
+              "type": "summon",
+              "cardId": "04MT004T1",
+              "count": 1,
+              "condition": null
+            }
+          ],
+          "auto": false
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.979Z"
+  },
+  "04MT008": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "play",
+          "actions": [
+            {
+              "type": "stun",
+              "target": {
+                "type": "enemyUnit",
+                "count": 1,
+                "filter": {}
+              },
+              "condition": null
+            }
+          ],
+          "auto": false
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.979Z"
+  },
+  "04MT012": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "play",
+          "actions": [
+            {
+              "type": "buff",
+              "power": 8,
+              "health": 8,
+              "duration": "permanent",
+              "target": {
+                "type": "handCard",
+                "count": 1,
+                "filter": {}
+              },
+              "condition": null
+            }
+          ]
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.979Z"
+  },
+  "04MT013": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "play",
+          "actions": [
+            {
+              "type": "stun",
+              "target": {
+                "type": "strongestEnemy",
+                "count": 1,
+                "filter": {}
+              },
+              "condition": null
+            }
+          ],
+          "condition": {
+            "type": "daybreak"
+          },
+          "auto": false
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.979Z"
+  },
+  "04NX009": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "play",
+          "actions": [
+            {
+              "type": "buff",
+              "power": 5,
+              "health": 0,
+              "duration": "round",
+              "target": {
+                "type": "allyUnit",
+                "count": 1,
+                "filter": {}
+              },
+              "condition": null
+            }
+          ]
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.979Z"
+  },
+  "04NX010": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "summon",
+          "actions": [
+            {
+              "type": "create",
+              "cardId": "01NX049",
+              "count": 1,
+              "destination": "hand",
+              "condition": null
+            }
+          ],
+          "auto": false
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.979Z"
+  },
+  "04NX017": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "play",
+          "actions": [
+            {
+              "type": "summon",
+              "cardId": "01NX021",
+              "count": 2,
+              "condition": null
+            }
+          ]
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.979Z"
+  },
+  "04NX022": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "summon",
+          "actions": [
+            {
+              "type": "create",
+              "cardId": "04NX022T1",
+              "count": 1,
+              "destination": "hand",
+              "condition": null
+            }
+          ],
+          "auto": false
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.979Z"
+  },
+  "04PZ016": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "summon",
+          "actions": [
+            {
+              "type": "create",
+              "cardId": "01PZ012",
+              "count": 1,
+              "destination": "hand",
+              "condition": null
+            }
+          ],
+          "auto": false
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.980Z"
+  },
+  "04SH001": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "play",
+          "actions": [
+            {
+              "type": "predict",
+              "count": 3,
+              "condition": null
+            }
+          ],
+          "auto": false
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.980Z"
+  },
+  "04SH015": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "attack",
+          "actions": [
+            {
+              "type": "buff",
+              "power": -2,
+              "health": 0,
+              "duration": "round",
+              "target": {
+                "type": "allEnemyUnits",
+                "filter": {}
+              },
+              "condition": null
+            }
+          ],
+          "auto": false
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.980Z"
+  },
+  "04SH026": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "summon",
+          "actions": [
+            {
+              "type": "summon",
+              "cardId": "04SH003T1",
+              "count": 1,
+              "condition": null
+            }
+          ],
+          "auto": false
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.980Z"
+  },
+  "04SH035": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "play",
+          "actions": [
+            {
+              "type": "create",
+              "cardId": "04SH098",
+              "count": 1,
+              "destination": "hand",
+              "condition": null
+            }
+          ]
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.981Z"
+  },
+  "04SH037": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "play",
+          "actions": [
+            {
+              "type": "summon",
+              "cardId": "04SH006",
+              "count": 2,
+              "condition": null
+            },
+            {
+              "type": "draw",
+              "amount": 1,
+              "who": "ally",
+              "condition": null
+            }
+          ]
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.981Z"
+  },
+  "04SH038": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "summon",
+          "actions": [
+            {
+              "type": "summon",
+              "cardId": "04SH006",
+              "count": 1,
+              "condition": null
+            }
+          ],
+          "auto": false
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.981Z"
+  },
+  "04SH043": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "play",
+          "actions": [
+            {
+              "type": "damage",
+              "amount": 4,
+              "target": {
+                "type": "anyUnit",
+                "count": 1,
+                "filter": {}
+              },
+              "condition": null
+            },
+            {
+              "type": "summon",
+              "cardId": "04SH003T1",
+              "count": 2,
+              "condition": null
+            }
+          ]
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.981Z"
+  },
+  "04SH054": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "summon",
+          "actions": [
+            {
+              "type": "create",
+              "cardId": "04SH118",
+              "count": 1,
+              "destination": "hand",
+              "condition": null
+            }
+          ],
+          "auto": false
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.981Z"
+  },
+  "04SH056": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "summon",
+          "actions": [
+            {
+              "type": "create",
+              "cardId": "04SH098",
+              "count": 1,
+              "destination": "hand",
+              "condition": null
+            }
+          ],
+          "auto": false
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.981Z"
+  },
+  "04SH068": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "play",
+          "actions": [
+            {
+              "type": "predict",
+              "count": 3,
+              "condition": null
+            }
+          ],
+          "auto": false
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.981Z"
+  },
+  "04SH079": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "play",
+          "actions": [
+            {
+              "type": "predict",
+              "count": 3,
+              "condition": null
+            },
+            {
+              "type": "buff",
+              "power": -2,
+              "health": 0,
+              "duration": "round",
+              "target": {
+                "type": "enemyUnit",
+                "count": 1,
+                "filter": {}
+              },
+              "condition": null
+            }
+          ]
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.981Z"
+  },
+  "04SH083": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "play",
+          "actions": [
+            {
+              "type": "predict",
+              "count": 3,
+              "condition": null
+            }
+          ]
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.981Z"
+  },
+  "04SH118": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "play",
+          "actions": [
+            {
+              "type": "summon",
+              "cardId": "04SH003T14",
+              "count": 1,
+              "condition": null
+            }
+          ]
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.982Z"
+  },
+  "04SH129": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "strike",
+          "actions": [
+            {
+              "type": "create",
+              "cardId": "04SH098",
+              "count": 1,
+              "destination": "hand",
+              "condition": null
+            }
+          ],
+          "auto": false
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.982Z"
+  },
+  "04SI003": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "summon",
+          "actions": [
+            {
+              "type": "summon",
+              "cardId": "04SI014",
+              "count": 1,
+              "condition": null
+            }
+          ],
+          "auto": false
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.983Z"
+  },
+  "04SI009": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "summon",
+          "actions": [
+            {
+              "type": "buff",
+              "power": 1,
+              "health": 1,
+              "duration": "permanent",
+              "target": {
+                "type": "self",
+                "count": 1,
+                "filter": {}
+              },
+              "condition": null
+            },
+            {
+              "type": "grantKeyword",
+              "keyword": "Fearsome",
+              "duration": "permanent",
+              "target": {
+                "type": "self",
+                "count": 1,
+                "filter": {}
+              },
+              "condition": null
+            }
+          ],
+          "condition": {
+            "type": "allyDiedThisRound"
+          },
+          "auto": false
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.983Z"
+  },
+  "04SI053": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "summon",
+          "actions": [
+            {
+              "type": "summon",
+              "cardId": "04SI045",
+              "count": 1,
+              "condition": null
+            }
+          ],
+          "auto": false
+        },
+        {
+          "on": "roundStart",
+          "actions": [
+            {
+              "type": "summon",
+              "cardId": "04SI045",
+              "count": 1,
+              "condition": null
+            }
+          ],
+          "auto": false
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.983Z"
+  },
+  "04SI054": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "summon",
+          "actions": [
+            {
+              "type": "summon",
+              "cardId": "04SI045",
+              "count": 1,
+              "condition": null
+            }
+          ],
+          "auto": false
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.983Z"
+  },
+  "05BC004": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "summon",
+          "actions": [
+            {
+              "type": "create",
+              "cardId": "05BC195",
+              "count": 1,
+              "destination": "hand",
+              "condition": null
+            }
+          ],
+          "auto": false
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.983Z"
+  },
+  "05BC005": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "nexusStrike",
+          "actions": [
+            {
+              "type": "create",
+              "cardId": "05BC195",
+              "count": 1,
+              "destination": "hand",
+              "condition": null
+            }
+          ],
+          "auto": false
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.983Z"
+  },
+  "05BC050": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "summon",
+          "actions": [
+            {
+              "type": "create",
+              "cardId": "05BC195",
+              "count": 2,
+              "destination": "hand",
+              "condition": null
+            }
+          ],
+          "auto": false
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.983Z"
+  },
+  "05BC056": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "summon",
+          "actions": [
+            {
+              "type": "create",
+              "cardId": "05BC181",
+              "count": 1,
+              "destination": "hand",
+              "condition": null
+            }
+          ],
+          "auto": false
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.983Z"
+  },
+  "05BC058": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "summon",
+          "actions": [
+            {
+              "type": "create",
+              "cardId": "05BC058T5",
+              "count": 1,
+              "destination": "hand",
+              "condition": null
+            }
+          ],
+          "auto": false
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.983Z"
+  },
+  "05BC104": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "play",
+          "actions": [
+            {
+              "type": "buff",
+              "power": 2,
+              "health": 2,
+              "duration": "permanent",
+              "target": {
+                "type": "allyUnit",
+                "count": 1,
+                "filter": {}
+              },
+              "condition": null
+            },
+            {
+              "type": "grantKeyword",
+              "keyword": "Impact",
+              "duration": "permanent",
+              "target": {
+                "type": "allyUnit",
+                "count": 1,
+                "filter": {}
+              },
+              "condition": null
+            }
+          ]
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.984Z"
+  },
+  "05BC127": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "summon",
+          "actions": [
+            {
+              "type": "summon",
+              "cardId": "05BC127T1",
+              "count": 1,
+              "condition": null
+            }
+          ],
+          "auto": false
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.984Z"
+  },
+  "05BC141": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "play",
+          "actions": [
+            {
+              "type": "buff",
+              "power": 2,
+              "health": 1,
+              "duration": "round",
+              "target": {
+                "type": "allyUnit",
+                "count": 2,
+                "filter": {}
+              },
+              "condition": null
+            }
+          ]
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.984Z"
+  },
+  "05BC155": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "summonOther",
+          "actions": [
+            {
+              "type": "buff",
+              "power": 1,
+              "health": 0,
+              "duration": "permanent",
+              "target": {
+                "type": "self",
+                "count": 1,
+                "filter": {}
+              },
+              "condition": null
+            }
+          ],
+          "auto": false
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.985Z"
+  },
+  "05BC167": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "nexusStrike",
+          "actions": [
+            {
+              "type": "create",
+              "cardId": "05BC167T1",
+              "count": 1,
+              "destination": "hand",
+              "condition": null
+            }
+          ],
+          "auto": false
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.985Z"
+  },
+  "05BC184": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "summon",
+          "actions": [
+            {
+              "type": "create",
+              "cardId": "05BC167T1",
+              "count": 1,
+              "destination": "hand",
+              "condition": null
+            }
+          ],
+          "auto": false
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.985Z"
+  },
+  "05BC190": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "attack",
+          "actions": [
+            {
+              "type": "buff",
+              "power": 2,
+              "health": 0,
+              "duration": "round",
+              "target": {
+                "type": "allOtherAllyUnits",
+                "filter": {}
+              },
+              "condition": null
+            }
+          ],
+          "auto": false
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.985Z"
+  },
+  "05BC210": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "play",
+          "actions": [
+            {
+              "type": "buff",
+              "power": 2,
+              "health": 0,
+              "duration": "permanent",
+              "target": {
+                "type": "allyUnit",
+                "count": 1,
+                "filter": {}
+              },
+              "condition": null
+            },
+            {
+              "type": "grantKeyword",
+              "keyword": "Impact",
+              "duration": "permanent",
+              "target": {
+                "type": "allyUnit",
+                "count": 1,
+                "filter": {}
+              },
+              "condition": null
+            }
+          ]
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.985Z"
+  },
+  "05BC212": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "roundStart",
+          "actions": [
+            {
+              "type": "create",
+              "cardId": "05BC212T1",
+              "count": 1,
+              "destination": "hand",
+              "condition": null
+            }
+          ],
+          "auto": false
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.985Z"
+  },
+  "05BW008": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "castSpell",
+          "actions": [
+            {
+              "type": "buff",
+              "power": 2,
+              "health": 0,
+              "duration": "round",
+              "target": {
+                "type": "self",
+                "count": 1,
+                "filter": {}
+              },
+              "condition": null
+            }
+          ],
+          "auto": false
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.986Z"
+  },
+  "05DE009": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "summon",
+          "actions": [
+            {
+              "type": "buff",
+              "power": 0,
+              "health": 3,
+              "duration": "permanent",
+              "target": {
+                "type": "allOtherAllyUnits",
+                "filter": {}
+              },
+              "condition": null
+            }
+          ],
+          "auto": false
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.986Z"
+  },
+  "05DE012": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "summonOther",
+          "actions": [
+            {
+              "type": "grantKeyword",
+              "keyword": "Challenger",
+              "duration": "permanent",
+              "target": {
+                "type": "self",
+                "count": 1,
+                "filter": {}
+              },
+              "condition": null
+            }
+          ],
+          "auto": false
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.986Z"
+  },
+  "05DE014": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "play",
+          "actions": [
+            {
+              "type": "buff",
+              "power": 0,
+              "health": 1,
+              "duration": "permanent",
+              "target": {
+                "type": "allyUnit",
+                "count": 1,
+                "filter": {}
+              },
+              "condition": null
+            },
+            {
+              "type": "grantKeyword",
+              "keyword": "Tough",
+              "duration": "permanent",
+              "target": {
+                "type": "allyUnit",
+                "count": 1,
+                "filter": {}
+              },
+              "condition": null
+            }
+          ],
+          "auto": false
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.986Z"
+  },
+  "05FR004": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "summon",
+          "actions": [
+            {
+              "type": "create",
+              "cardId": "05FR010",
+              "count": 1,
+              "destination": "hand",
+              "condition": null
+            }
+          ],
+          "auto": false
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.986Z"
+  },
+  "05FR005": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "surviveDamage",
+          "actions": [
+            {
+              "type": "damage",
+              "amount": 1,
+              "target": {
+                "type": "enemyNexus",
+                "count": 1,
+                "filter": {}
+              },
+              "condition": null
+            }
+          ],
+          "auto": false
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.986Z"
+  },
+  "05IO006": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "play",
+          "actions": [
+            {
+              "type": "summon",
+              "cardId": "05IO006T1",
+              "count": 1,
+              "condition": null
+            }
+          ]
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.986Z"
+  },
+  "05IO020": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "play",
+          "actions": [
+            {
+              "type": "recall",
+              "target": {
+                "type": "anyUnit",
+                "count": 1,
+                "filter": {}
+              },
+              "condition": null
+            }
+          ],
+          "auto": false
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.986Z"
+  },
+  "05IO026": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "nexusStrike",
+          "actions": [
+            {
+              "type": "recall",
+              "target": {
+                "type": "self",
+                "count": 1,
+                "filter": {}
+              },
+              "condition": null
+            }
+          ],
+          "auto": false
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.986Z"
+  },
+  "05MT002": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "play",
+          "actions": [
+            {
+              "type": "buff",
+              "power": 1,
+              "health": 2,
+              "duration": "round",
+              "target": {
+                "type": "allyUnit",
+                "count": 2,
+                "filter": {}
+              },
+              "condition": null
+            }
+          ]
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.986Z"
+  },
+  "05MT009": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "play",
+          "actions": [
+            {
+              "type": "buff",
+              "power": 2,
+              "health": 2,
+              "duration": "permanent",
+              "target": {
+                "type": "allyUnit",
+                "count": 2,
+                "filter": {}
+              },
+              "condition": null
+            }
+          ]
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.986Z"
+  },
+  "05MT012": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "summon",
+          "actions": [
+            {
+              "type": "create",
+              "cardId": "03MT092T1",
+              "count": 1,
+              "destination": "hand",
+              "condition": null
+            }
+          ],
+          "auto": false
+        },
+        {
+          "on": "attack",
+          "actions": [
+            {
+              "type": "create",
+              "cardId": "03MT092T1",
+              "count": 1,
+              "destination": "hand",
+              "condition": null
+            }
+          ],
+          "auto": false
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.987Z"
+  },
+  "05PZ026": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "play",
+          "actions": [
+            {
+              "type": "summon",
+              "cardId": "05PZ023",
+              "count": 2,
+              "condition": null
+            }
+          ]
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.987Z"
+  },
+  "05SH011": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "death",
+          "actions": [
+            {
+              "type": "summon",
+              "cardId": "05SH011T2",
+              "count": 1,
+              "condition": null
+            }
+          ],
+          "auto": false
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.987Z"
+  },
+  "06BW045": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "play",
+          "actions": [
+            {
+              "type": "damage",
+              "amount": 1,
+              "target": {
+                "type": "anyTarget",
+                "count": 1,
+                "filter": {}
+              },
+              "condition": null
+            },
+            {
+              "type": "rally",
+              "condition": null
+            }
+          ]
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.990Z"
+  },
+  "06DE045": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "play",
+          "actions": [
+            {
+              "type": "grantKeyword",
+              "keyword": "Spirit",
+              "duration": "permanent",
+              "target": {
+                "type": "allAllyUnits",
+                "count": 1,
+                "filter": {}
+              },
+              "condition": null
+            }
+          ]
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.990Z"
+  },
+  "06FR033": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "death",
+          "actions": [
+            {
+              "type": "emptyManaGem",
+              "condition": null
+            }
+          ],
+          "auto": false
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.991Z"
+  },
+  "06IO003": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "play",
+          "actions": [
+            {
+              "type": "stun",
+              "target": {
+                "type": "enemyUnit",
+                "count": 1,
+                "filter": {}
+              },
+              "condition": null
+            }
+          ],
+          "auto": false
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.991Z"
+  },
+  "06MT044": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "play",
+          "actions": [
+            {
+              "type": "buff",
+              "power": 0,
+              "health": 2,
+              "duration": "round",
+              "target": {
+                "type": "allOtherAllyUnits",
+                "filter": {}
+              },
+              "condition": null
+            }
+          ],
+          "condition": {
+            "type": "daybreak"
+          },
+          "auto": false
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.991Z"
+  },
+  "06SI026": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "death",
+          "actions": [
+            {
+              "type": "create",
+              "cardId": "06SI009",
+              "count": 1,
+              "destination": "hand",
+              "condition": null
+            }
+          ],
+          "auto": false
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.993Z"
+  },
+  "06BW047": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "castSpell",
+          "actions": [
+            {
+              "type": "summon",
+              "cardId": "02BW032T1",
+              "count": 1,
+              "condition": null
+            }
+          ],
+          "auto": false
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.994Z"
+  },
+  "06FR012": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "summon",
+          "actions": [
+            {
+              "type": "create",
+              "cardId": "06FR012T1",
+              "count": 1,
+              "destination": "hand",
+              "condition": null
+            }
+          ],
+          "auto": false
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.995Z"
+  },
+  "06FR036": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "play",
+          "actions": [
+            {
+              "type": "emptyManaGem",
+              "condition": null
+            },
+            {
+              "type": "summon",
+              "cardId": "01FR047",
+              "count": 1,
+              "condition": null
+            }
+          ]
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.995Z"
+  },
+  "06IO001": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "summon",
+          "actions": [
+            {
+              "type": "create",
+              "cardId": "06IO001T1",
+              "count": 1,
+              "destination": "hand",
+              "condition": null
+            }
+          ],
+          "auto": false
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.995Z"
+  },
+  "06IO013": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "play",
+          "actions": [
+            {
+              "type": "buff",
+              "power": 2,
+              "health": 0,
+              "duration": "round",
+              "target": {
+                "type": "allyUnit",
+                "count": 1,
+                "filter": {}
+              },
+              "condition": null
+            },
+            {
+              "type": "create",
+              "cardId": "06IO013T1",
+              "count": 1,
+              "destination": "hand",
+              "condition": null
+            }
+          ]
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.995Z"
+  },
+  "06PZ006": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "play",
+          "actions": [
+            {
+              "type": "createRandom",
+              "count": 1,
+              "filter": {
+                "type": "Spell"
+              },
+              "destination": "hand",
+              "condition": null
+            }
+          ]
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.996Z"
+  },
+  "06PZ010": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "strike",
+          "actions": [
+            {
+              "type": "createRandom",
+              "count": 1,
+              "filter": {
+                "type": "Spell"
+              },
+              "destination": "hand",
+              "condition": null
+            }
+          ],
+          "auto": false
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.996Z"
+  },
+  "06PZ021": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "summon",
+          "actions": [
+            {
+              "type": "createRandom",
+              "count": 1,
+              "filter": {
+                "type": "Spell"
+              },
+              "destination": "hand",
+              "condition": null
+            }
+          ],
+          "auto": false
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.996Z"
+  },
+  "06SH038": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "strike",
+          "actions": [
+            {
+              "type": "create",
+              "cardId": "04SH098",
+              "count": 1,
+              "destination": "hand",
+              "condition": null
+            }
+          ],
+          "auto": false
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.996Z"
+  },
+  "06SI036": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "play",
+          "actions": [
+            {
+              "type": "kill",
+              "target": {
+                "type": "allAllyUnits",
+                "count": 1,
+                "filter": {}
+              },
+              "condition": null
+            }
+          ]
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.997Z"
+  },
+  "06SI046": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "death",
+          "actions": [
+            {
+              "type": "draw",
+              "amount": 1,
+              "who": "ally",
+              "condition": null
+            }
+          ],
+          "auto": false
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.997Z"
+  },
+  "07BW003": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "death",
+          "actions": [
+            {
+              "type": "create",
+              "cardId": "07IO011T5",
+              "count": 1,
+              "destination": "hand",
+              "condition": null
+            }
+          ],
+          "auto": false
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.997Z"
+  },
+  "07BW013": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "play",
+          "actions": [
+            {
+              "type": "create",
+              "cardId": "07IO011T5",
+              "count": 3,
+              "destination": "hand",
+              "condition": null
+            }
+          ],
+          "condition": {
+            "type": "plunder"
+          },
+          "auto": false
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.997Z"
+  },
+  "07BW041": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "strike",
+          "actions": [
+            {
+              "type": "create",
+              "cardId": "07IO011T5",
+              "count": 1,
+              "destination": "hand",
+              "condition": null
+            }
+          ],
+          "auto": false
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.998Z"
+  },
+  "07DE005": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "play",
+          "actions": [
+            {
+              "type": "buff",
+              "power": 2,
+              "health": 2,
+              "duration": "round",
+              "target": {
+                "type": "allyUnit",
+                "count": 1,
+                "filter": {}
+              },
+              "condition": null
+            }
+          ]
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.998Z"
+  },
+  "07IO009": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "nexusStrike",
+          "actions": [
+            {
+              "type": "create",
+              "cardId": "07IO011T5",
+              "count": 1,
+              "destination": "hand",
+              "condition": null
+            }
+          ],
+          "auto": false
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.998Z"
+  },
+  "07IO013": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "summon",
+          "actions": [
+            {
+              "type": "create",
+              "cardId": "07IO011T5",
+              "count": 1,
+              "destination": "hand",
+              "condition": null
+            }
+          ],
+          "auto": false
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.998Z"
+  },
+  "07MT003": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "roundStart",
+          "actions": [
+            {
+              "type": "heal",
+              "amount": 1,
+              "target": {
+                "type": "self",
+                "count": 1,
+                "filter": {}
+              },
+              "condition": null
+            },
+            {
+              "type": "heal",
+              "amount": 1,
+              "target": {
+                "type": "allyNexus",
+                "count": 1,
+                "filter": {}
+              },
+              "condition": null
+            }
+          ],
+          "auto": false
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.998Z"
+  },
+  "07NX008": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "play",
+          "actions": [
+            {
+              "type": "buff",
+              "power": 2,
+              "health": 0,
+              "duration": "permanent",
+              "target": {
+                "type": "self",
+                "count": 1,
+                "filter": {}
+              },
+              "condition": null
+            }
+          ],
+          "condition": {
+            "type": "plunder"
+          },
+          "auto": false
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.998Z"
+  },
+  "07NX015": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "play",
+          "actions": [
+            {
+              "type": "buff",
+              "power": 1,
+              "health": 0,
+              "duration": "permanent",
+              "target": {
+                "type": "allAllyUnits",
+                "filter": {}
+              },
+              "condition": null
+            }
+          ],
+          "condition": {
+            "type": "plunder"
+          },
+          "auto": false
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.998Z"
+  },
+  "07FR017": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "play",
+          "actions": [
+            {
+              "type": "damageAll",
+              "team": "ally",
+              "amount": 2,
+              "condition": null
+            },
+            {
+              "type": "damageAll",
+              "team": "enemy",
+              "amount": 2,
+              "condition": null
+            }
+          ],
+          "auto": false
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.999Z"
+  },
+  "08FR002": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "summon",
+          "actions": [
+            {
+              "type": "summon",
+              "cardId": "08FR002T1",
+              "count": 1,
+              "condition": null
+            }
+          ],
+          "auto": false
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:31.000Z"
+  },
+  "08FR003": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "castSpell",
+          "actions": [
+            {
+              "type": "summon",
+              "cardId": "08FR002T1",
+              "count": 1,
+              "condition": null
+            }
+          ],
+          "auto": false
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:31.000Z"
+  },
+  "08FR008": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "play",
+          "actions": [
+            {
+              "type": "damageAll",
+              "team": "ally",
+              "amount": 4,
+              "condition": null
+            }
+          ]
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:31.000Z"
+  },
+  "08FR012": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "play",
+          "actions": [
+            {
+              "type": "draw",
+              "amount": 1,
+              "who": "ally",
+              "condition": null
+            },
+            {
+              "type": "summon",
+              "cardId": "08FR002T1",
+              "count": 1,
+              "condition": null
+            }
+          ]
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:31.000Z"
+  },
+  "08FR019": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "play",
+          "actions": [
+            {
+              "type": "buff",
+              "power": 1,
+              "health": 3,
+              "duration": "round",
+              "target": {
+                "type": "allyUnit",
+                "count": 1,
+                "filter": {}
+              },
+              "condition": null
+            }
+          ]
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:31.000Z"
+  },
+  "08IO019": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "summon",
+          "actions": [
+            {
+              "type": "summon",
+              "cardId": "08IO019T1",
+              "count": 1,
+              "condition": null
+            }
+          ],
+          "auto": false
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:31.000Z"
+  },
+  "08PZ005": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "play",
+          "actions": [
+            {
+              "type": "buff",
+              "power": 2,
+              "health": 0,
+              "duration": "round",
+              "target": {
+                "type": "allyUnit",
+                "count": 1,
+                "filter": {}
+              },
+              "condition": null
+            },
+            {
+              "type": "draw",
+              "amount": 2,
+              "who": "ally",
+              "condition": null
+            }
+          ]
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:31.001Z"
+  },
+  "08PZ026": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "play",
+          "actions": [
+            {
+              "type": "summon",
+              "cardId": "08PZ026T1",
+              "count": 1,
+              "condition": null
+            }
+          ]
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:31.001Z"
+  },
+  "08SI040": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "summon",
+          "actions": [
+            {
+              "type": "grantKeyword",
+              "keyword": "Deathless",
+              "duration": "permanent",
+              "target": {
+                "type": "self",
+                "count": 1,
+                "filter": {}
+              },
+              "condition": null
+            }
+          ],
+          "auto": false
+        },
+        {
+          "on": "attack",
+          "actions": [
+            {
+              "type": "buff",
+              "power": -1,
+              "health": 0,
+              "duration": "round",
+              "target": {
+                "type": "allEnemyUnits",
+                "filter": {}
+              },
+              "condition": null
+            }
+          ],
+          "auto": false
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:31.001Z"
+  },
+  "09BC011": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "strike",
+          "actions": [
+            {
+              "type": "grantKeyword",
+              "keyword": "Impact",
+              "duration": "permanent",
+              "target": {
+                "type": "self",
+                "count": 1,
+                "filter": {}
+              },
+              "condition": null
+            }
+          ],
+          "auto": false
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:31.001Z"
+  },
+  "09IO053": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "summon",
+          "actions": [
+            {
+              "type": "draw",
+              "amount": 1,
+              "who": "ally",
+              "condition": null
+            }
+          ],
+          "auto": false
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:31.002Z"
+  },
+  "09IO055": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "summon",
+          "actions": [
+            {
+              "type": "summon",
+              "cardId": "09DE033",
+              "count": 1,
+              "condition": null
+            }
+          ],
+          "auto": false
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:31.002Z"
+  },
+  "09SI012": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "play",
+          "actions": [
+            {
+              "type": "grantKeyword",
+              "keyword": "Gloom",
+              "duration": "permanent",
+              "target": {
+                "type": "allEnemyUnits",
+                "count": 1,
+                "filter": {}
+              },
+              "condition": null
+            }
+          ]
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:31.002Z"
+  },
+  "C343DC2": {
+    "script": {
+      "triggers": [
+        {
+          "on": "play",
+          "actions": [
+            {
+              "type": "draw",
+              "amount": 1
+            }
+          ]
+        }
+      ]
+    },
+    "status": "manual",
+    "updatedAt": "2026-10-26T01:03:45.486Z"
+  }
+}

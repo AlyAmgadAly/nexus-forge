@@ -1,0 +1,23 @@
+{
+  "name": "nexus-forge",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Nexus Forge - a self-hosted Runeterra-style card game with a card forge admin panel",
+  "scripts": {
+    "start": "node server/index.js",
+    "dev": "node --watch server/index.js",
+    "import:cards": "node scripts/import-cards.mjs",
+    "autoscript": "node scripts/autoscript.mjs",
+    "fetch:art": "node scripts/fetch-art.mjs",
+    "test": "node --test test/*.test.mjs"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "express": "^4.21.2",
+    "sharp": "^0.35.5",
+    "ws": "^8.18.0"
+  }
+}

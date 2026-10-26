@@ -1,0 +1,18 @@
+node_modules/
+
+# Machine-specific settings include the Card Forge admin token.
+/data/settings.json
+/data/art/
+/data/*.tmp
+
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.log
+coverage/
+dist/
+release/
+.DS_Store
+Thumbs.db

@@ -1,0 +1,45 @@
+[
+  {
+    "id": "C343DC2",
+    "code": "C343DC2",
+    "name": "Smoke Test Sentinel",
+    "cost": 3,
+    "attack": 3,
+    "health": 3,
+    "type": "Unit",
+    "supertype": "",
+    "subtypes": [],
+    "regions": [
+      "Demacia"
+    ],
+    "rarity": "COMMON",
+    "rarityName": "Common",
+    "keywords": [
+      "Tough"
+    ],
+    "rawKeywords": [
+      "Tough"
+    ],
+    "text": "Play: Draw 1.",
+    "levelup": "",
+    "flavor": "",
+    "artist": "",
+    "set": "Custom",
+    "setName": "Custom Forge",
+    "collectible": true,
+    "spellSpeed": "",
+    "formats": [
+      "Standard"
+    ],
+    "associatedCardRefs": [],
+    "art": null,
+    "fullArt": null,
+    "source": "custom",
+    "enabled": true,
+    "script": null,
+    "scriptStatus": "manual",
+    "notes": "",
+    "createdAt": "2026-10-26T01:02:32.048Z",
+    "updatedAt": "2026-10-26T01:02:32.049Z"
+  }
+]
