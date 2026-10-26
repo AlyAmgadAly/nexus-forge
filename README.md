@@ -6,6 +6,8 @@ A Runeterra-inspired card game with a scenic home screen, deck builder, Card For
 
 The desktop and internet multiplayer migration is planned, not implemented. See the [detailed roadmap](ROADMAP.md) for architecture, dependencies, milestones, and acceptance criteria.
 
+Track implementation through [GitHub milestones](https://github.com/AlyAmgadAly/nexus-forge/milestones) and [issues](https://github.com/AlyAmgadAly/nexus-forge/issues).
+
 ## Run the current application
 
 Install Node.js 20 or newer, then run:

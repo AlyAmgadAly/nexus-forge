@@ -41,25 +41,27 @@ Avoid a second game engine in the renderer. Separate message dispatch from WebSo
 
 ## Milestones and tracking
 
-| Milestone | Deliverable | Depends on | Status |
-| --- | --- | --- | --- |
-| M0 | GitHub repository, reproducible baseline, and this roadmap | Existing project | In progress |
-| M1 | Desktop runtime, writable data, lifecycle, and development checks | M0 | Not started |
-| M2 | PeerJS connection proof across separate internet networks | M1 | Not started |
-| M3 | Authoritative rooms and gameplay through the peer transport | M2 | Not started |
-| M4 | Player decks, room content synchronization, and version checks | M3 | Not started |
-| M5 | Reconnects, host departure, and clear connection states | M3, M4 | Not started |
-| M6 | Automated regression coverage and real-network release testing | M1-M5 | Not started |
-| M7 | Portable Windows release and player instructions | M6 | Not started |
+| Milestone | Deliverable | Depends on | Status | Tracking |
+| --- | --- | --- | --- | --- |
+| M0 | GitHub repository, reproducible baseline, and this roadmap | Existing project | Complete | Source and documentation on `main` |
+| [M1](https://github.com/AlyAmgadAly/nexus-forge/milestone/1) | Desktop runtime, writable data, lifecycle, and development checks | M0 | Not started | [#1](https://github.com/AlyAmgadAly/nexus-forge/issues/1) |
+| [M2](https://github.com/AlyAmgadAly/nexus-forge/milestone/2) | PeerJS connection proof across separate internet networks | M1 | Not started | [#2](https://github.com/AlyAmgadAly/nexus-forge/issues/2) |
+| [M3](https://github.com/AlyAmgadAly/nexus-forge/milestone/3) | Authoritative rooms and gameplay through the peer transport | M2 | Not started | [#3](https://github.com/AlyAmgadAly/nexus-forge/issues/3) |
+| [M4](https://github.com/AlyAmgadAly/nexus-forge/milestone/4) | Player decks, room content synchronization, and version checks | M3 | Not started | [#4](https://github.com/AlyAmgadAly/nexus-forge/issues/4) |
+| [M5](https://github.com/AlyAmgadAly/nexus-forge/milestone/5) | Reconnects, host departure, and clear connection states | M3, M4 | Not started | [#5](https://github.com/AlyAmgadAly/nexus-forge/issues/5) |
+| [M6](https://github.com/AlyAmgadAly/nexus-forge/milestone/6) | Automated regression coverage and real-network release testing | M1-M5 | Not started | [#6](https://github.com/AlyAmgadAly/nexus-forge/issues/6) |
+| [M7](https://github.com/AlyAmgadAly/nexus-forge/milestone/7) | Portable Windows release and player instructions | M6 | Not started | [#7](https://github.com/AlyAmgadAly/nexus-forge/issues/7) |
 
 GitHub issues and milestones mirror M1-M7. Completing an issue requires its acceptance criteria and recorded evidence, not just code being merged.
 
 ### M0 - Repository and baseline
 
-- [ ] Create a private `AlyAmgadAly/nexus-forge` GitHub repository and push the current source.
-- [ ] Add setup instructions, this roadmap, and linked GitHub tracking issues.
-- [ ] Exclude `node_modules/`, local settings/admin tokens, art cache, temporary files, and release outputs.
-- [ ] Run the existing tests and verify a clean source snapshot with no application rule changes.
+- [x] Create a private `AlyAmgadAly/nexus-forge` GitHub repository and push the current source.
+- [x] Add setup instructions, this roadmap, and linked GitHub tracking issues.
+- [x] Exclude `node_modules/`, local settings/admin tokens, art cache, temporary files, and release outputs.
+- [x] Run the existing tests and verify a clean source snapshot with no application rule changes.
+
+Baseline verification: all 12 engine tests and the home/app JavaScript syntax checks passed. Local Markdown links resolved, the staged files contained no matches for the checked credential patterns or the actual local admin token, and settings/cache/dependencies were confirmed ignored. This does not establish desktop or internet multiplayer support; those remain M1-M7 work.
 
 ### M1 - Desktop foundation and local data
 
