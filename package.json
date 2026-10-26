@@ -1,23 +1,80 @@
 {
   "name": "nexus-forge",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "type": "module",
   "description": "Nexus Forge - a self-hosted Runeterra-style card game with a card forge admin panel",
+  "main": "desktop/main.js",
   "scripts": {
     "start": "node server/index.js",
     "dev": "node --watch server/index.js",
+    "desktop": "electron .",
+    "desktop:dev": "electron . --dev",
     "import:cards": "node scripts/import-cards.mjs",
     "autoscript": "node scripts/autoscript.mjs",
-    "fetch:art": "node scripts/fetch-art.mjs",
-    "test": "node --test test/*.test.mjs"
+    "vendor:peerjs": "node scripts/vendor-peerjs.mjs",
+    "migrate:data": "node scripts/migrate-data.mjs",
+    "check:syntax": "node scripts/check-syntax.mjs",
+    "test": "node --test test/*.test.mjs",
+    "test:all": "npm run check:syntax && npm test",
+    "build:win": "npm run test:all && electron-builder --win portable"
   },
   "engines": {
     "node": ">=20"
   },
   "dependencies": {
     "express": "^4.21.2",
+    "peerjs": "1.5.5",
     "sharp": "^0.35.5",
     "ws": "^8.18.0"
+  },
+  "devDependencies": {
+    "electron": "45.0.0",
+    "electron-builder": "26.18.0"
+  },
+  "build": {
+    "appId": "com.nexusforge.game",
+    "productName": "Nexus Forge",
+    "asar": true,
+    "compression": "maximum",
+    "npmRebuild": false,
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "desktop/**/*",
+      "server/**/*",
+      "shared/**/*",
+      "public/**/*",
+      "package.json"
+    ],
+    "extraResources": [
+      {
+        "from": "data/cards.json",
+        "to": "seed/cards.json"
+      },
+      {
+        "from": "data/scripts.json",
+        "to": "seed/scripts.json"
+      }
+    ],
+    "asarUnpack": [
+      "node_modules/sharp/**/*",
+      "node_modules/@img/**/*"
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "portable",
+          "arch": [
+            "x64"
+          ]
+        }
+      ]
+    },
+    "portable": {
+      "artifactName": "NexusForge-${version}-portable.${ext}",
+      "requestExecutionLevel": "user"
+    }
   }
 }

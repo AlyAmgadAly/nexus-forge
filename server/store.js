@@ -1,13 +1,16 @@
-import { mkdir, readFile, writeFile, rename, access } from 'node:fs/promises';
+import { mkdir, readFile, writeFile, rename, access, copyFile } from 'node:fs/promises';
 import path from 'node:path';
 import crypto from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import { CardDB } from './engine/carddb.js';
 import { makeStarterDecks, randomDeck, validateDeck, findDeckRegions } from './decks.js';
+import { contentManifest } from './content.js';
+import { MAX_CUSTOM_ART_BYTES } from '../shared/protocol.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 export const ROOT = path.resolve(__dirname, '..');
 export const DATA_DIR = process.env.NEXUS_DATA_DIR ? path.resolve(process.env.NEXUS_DATA_DIR) : path.join(ROOT, 'data');
+export const SEED_DIR = process.env.NEXUS_SEED_DIR ? path.resolve(process.env.NEXUS_SEED_DIR) : DATA_DIR;
 export const ART_DIR = path.join(DATA_DIR, 'art');
 
 const DEFAULT_RULES = {
@@ -39,7 +42,10 @@ async function writeJsonAtomic(file, value) {
 }
 
 export class Store {
-  constructor() {
+  constructor({ dataDir = DATA_DIR, seedDir = SEED_DIR, artDir = null } = {}) {
+    this.dataDir = path.resolve(dataDir);
+    this.seedDir = path.resolve(seedDir || dataDir);
+    this.artDir = artDir ? path.resolve(artDir) : path.join(this.dataDir, 'art');
     this.ready = false;
     this.cardsPayload = null;
     this.customCards = [];
@@ -49,23 +55,54 @@ export class Store {
     this.settings = null;
     this.decks = [];
     this.cardDB = null;
+    this.revision = 0;
+    this._manifestRevision = -1;
+    this._manifest = null;
+  }
+
+  file(name) { return path.join(this.dataDir, name); }
+  seedFile(name) { return path.join(this.seedDir, name); }
+
+  async ensureSeedFile(name) {
+    const target = this.file(name);
+    try {
+      await access(target);
+      return;
+    } catch {}
+    try {
+      await copyFile(this.seedFile(name), target);
+    } catch (err) {
+      if (err.code !== 'ENOENT') throw err;
+    }
   }
 
   async init() {
-    await mkdir(DATA_DIR, { recursive: true });
-    await mkdir(ART_DIR, { recursive: true });
+    await mkdir(this.dataDir, { recursive: true });
+    await mkdir(this.artDir, { recursive: true });
+    const cardsFile = await (async () => {
+      const seedCards = this.seedFile('cards.json');
+      try {
+        await access(seedCards);
+        return seedCards;
+      } catch {
+        return this.file('cards.json');
+      }
+    })();
     try {
-      await access(path.join(DATA_DIR, 'cards.json'));
+      await access(cardsFile);
     } catch {
-      throw new Error(`Card data is missing. Run "npm run import:cards" first (expected ${path.join(DATA_DIR, 'cards.json')}).`);
+      throw new Error(`Card data is missing. Run "npm run import:cards" first (expected ${cardsFile}).`);
     }
-    this.cardsPayload = await readJson(path.join(DATA_DIR, 'cards.json'), null);
+    // scripts.json is writable (Card Forge), but starts from the packaged seed.
+    await this.ensureSeedFile('scripts.json');
+    this.cardsPayload = await readJson(cardsFile, null);
     if (!this.cardsPayload?.cards?.length) throw new Error('data/cards.json is empty or invalid.');
-    this.customCards = await readJson(path.join(DATA_DIR, 'custom-cards.json'), []);
-    this.scripts = await readJson(path.join(DATA_DIR, 'scripts.json'), {});
-    this.mechanics = await readJson(path.join(DATA_DIR, 'mechanics.json'), []);
-    this.keywords = await readJson(path.join(DATA_DIR, 'keywords.json'), []);
-    this.settings = await readJson(path.join(DATA_DIR, 'settings.json'), null);
+    this.customCards = await readJson(this.file('custom-cards.json'), []);
+    this.scripts = await readJson(this.file('scripts.json'), {});
+    this.mechanics = await readJson(this.file('mechanics.json'), []);
+    this.keywords = await readJson(this.file('keywords.json'), []);
+    await this.refreshTransferCards();
+    this.settings = await readJson(this.file('settings.json'), null);
     if (!this.settings) {
       this.settings = {
         gameName: 'Nexus Forge',
@@ -79,7 +116,7 @@ export class Store {
     if (!this.settings.rules) this.settings.rules = { ...DEFAULT_RULES };
     if (!this.settings.pool) this.settings.pool = { disabledCards: [], disabledSets: [], bannedCards: [] };
     if (!this.settings.adminToken) this.settings.adminToken = process.env.ADMIN_TOKEN || crypto.randomBytes(9).toString('hex');
-    this.decks = await readJson(path.join(DATA_DIR, 'decks.json'), []);
+    this.decks = await readJson(this.file('decks.json'), []);
     this.rebuild();
     if (!this.decks.length) {
       this.decks = makeStarterDecks(this.cardDB, this.settings.rules);
@@ -98,7 +135,51 @@ export class Store {
       settings: this.settings,
       mechanics: this.mechanics,
     });
+    this.revision++;
+    this._manifestRevision = -1;
     return this.cardDB;
+  }
+
+  contentManifest() {
+    if (this._manifestRevision !== this.revision || !this._manifest) {
+      this._manifest = contentManifest(this);
+      this._manifestRevision = this.revision;
+    }
+    return this._manifest;
+  }
+
+  // Uploaded art is stored as a local /art path, but peers can only render data
+  // URLs from a bounded, sanitized content offer. Keep a non-persisted transfer
+  // copy so room snapshots and exports carry the image without bloating JSON on
+  // disk or letting a path escape the art directory.
+  async inlineArt(value) {
+    if (typeof value !== 'string' || !value) return null;
+    if (/^data:image\/(?:png|jpeg|jpg|webp);base64,/i.test(value)) {
+      return Buffer.byteLength(value) <= MAX_CUSTOM_ART_BYTES ? value : null;
+    }
+    const match = /^\/art\/([A-Za-z0-9_-]+)$/.exec(value);
+    if (!match) return null;
+    const name = path.basename(match[1]);
+    for (const ext of ['webp', 'png', 'jpg', 'jpeg']) {
+      try {
+        const data = await readFile(path.join(this.artDir, `${name}.${ext}`));
+        if (data.length > MAX_CUSTOM_ART_BYTES) return null;
+        const mime = ext === 'jpg' || ext === 'jpeg' ? 'jpeg' : ext;
+        return `data:image/${mime};base64,${data.toString('base64')}`;
+      } catch {
+        // try the next extension
+      }
+    }
+    return null;
+  }
+
+  async refreshTransferCards() {
+    this.transferCards = await Promise.all((this.customCards || []).map(async (card) => {
+      const art = await this.inlineArt(card.art);
+      const fullArt = await this.inlineArt(card.fullArt);
+      return { ...card, art, fullArt: fullArt || art };
+    }));
+    return this.transferCards;
   }
 
   get adminToken() { return this.settings?.adminToken || ''; }
@@ -111,16 +192,16 @@ export class Store {
     return a.length === b.length && crypto.timingSafeEqual(a, b);
   }
 
-  async saveSettings() { await writeJsonAtomic(path.join(DATA_DIR, 'settings.json'), this.settings); }
-  async saveScripts() { await writeJsonAtomic(path.join(DATA_DIR, 'scripts.json'), this.scripts); }
-  async saveCustomCards() { await writeJsonAtomic(path.join(DATA_DIR, 'custom-cards.json'), this.customCards); }
-  async saveMechanics() { await writeJsonAtomic(path.join(DATA_DIR, 'mechanics.json'), this.mechanics); }
-  async saveKeywords() { await writeJsonAtomic(path.join(DATA_DIR, 'keywords.json'), this.keywords); }
-  async saveDecks() { await writeJsonAtomic(path.join(DATA_DIR, 'decks.json'), this.decks); }
+  async saveSettings() { await writeJsonAtomic(this.file('settings.json'), this.settings); }
+  async saveScripts() { await writeJsonAtomic(this.file('scripts.json'), this.scripts); }
+  async saveCustomCards() { await writeJsonAtomic(this.file('custom-cards.json'), this.customCards); }
+  async saveMechanics() { await writeJsonAtomic(this.file('mechanics.json'), this.mechanics); }
+  async saveKeywords() { await writeJsonAtomic(this.file('keywords.json'), this.keywords); }
+  async saveDecks() { await writeJsonAtomic(this.file('decks.json'), this.decks); }
 
   async saveCardData(payload) {
     this.cardsPayload = payload;
-    await writeJsonAtomic(path.join(DATA_DIR, 'cards.json'), payload);
+    await writeJsonAtomic(this.file('cards.json'), payload);
     this.rebuild();
   }
 

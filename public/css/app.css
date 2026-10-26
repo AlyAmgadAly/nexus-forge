@@ -1640,4 +1640,48 @@ body.game-mode #view { height: 100vh; height: 100dvh; }
   .lor-arena-bg, .mulligan-atmosphere, .gameover-rays { animation: none !important; }
   .lor-round-splash { animation-duration: .01s; }
   .lor-nexus.low .nexus-crystal, .lor-round-medallion.combat { animation: none !important; }
+  .net-spinner { animation: none !important; }
+}
+
+/* ---------------------------------------------------------------- internet multiplayer */
+.net-chip.net-on { border-color: rgba(116,214,147,.3); color: var(--green); background: rgba(116,214,147,.08); }
+.net-chip.net-warn { border-color: rgba(217,184,92,.35); color: var(--gold2); background: var(--gold-dim); }
+.net-chip.net-off { border-color: rgba(224,107,107,.3); color: #ffadad; background: rgba(224,107,107,.08); }
+
+.net-banner { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 14px; line-height: 1.5; }
+.net-banner .btn { margin-left: auto; }
+
+.content-review .panel-head { border-bottom-color: rgba(217,184,92,.2); }
+.content-offer { padding: 12px 0; border-top: 1px solid var(--line); }
+.content-offer:first-of-type { border-top: 0; padding-top: 0; }
+.content-offer-cards { display: flex; gap: 6px; flex-wrap: wrap; margin: 9px 0; }
+.content-offer .tag { text-transform: none; letter-spacing: 0; font-size: .72rem; }
+.content-offer .notice { margin-top: 8px; }
+
+.net-overlay {
+  position: fixed; inset: 0; z-index: 12000;
+  display: grid; place-items: center; padding: 24px;
+  background: rgba(3,7,15,.82); backdrop-filter: blur(7px);
+}
+.net-overlay-panel {
+  width: min(430px, 100%); padding: 30px 28px; text-align: center;
+  border: 1px solid rgba(217,184,92,.32); border-radius: 14px;
+  background: radial-gradient(circle at 50% 0%, rgba(217,184,92,.1), transparent 62%), #0a111d;
+  box-shadow: 0 30px 80px rgba(0,0,0,.65);
+}
+.net-overlay-kicker { color: var(--gold); font-size: .56rem; letter-spacing: .24em; margin-bottom: 8px; }
+.net-overlay-panel h2 { margin: 0 0 8px; color: #f1e8ce; font-family: var(--serif); font-size: 1.55rem; }
+.net-overlay-panel p { margin: 0 auto 18px; max-width: 330px; color: var(--muted); font-size: .8rem; line-height: 1.6; }
+.net-spinner {
+  width: 36px; height: 36px; margin: 0 auto 14px;
+  border: 2px solid rgba(217,184,92,.2); border-top-color: var(--gold2); border-radius: 50%;
+  animation: net-spin .9s linear infinite;
+}
+@keyframes net-spin { to { transform: rotate(360deg); } }
+
+.net-signal-note {
+  position: fixed; top: 58px; left: 50%; transform: translateX(-50%); z-index: 11000;
+  padding: 7px 13px; border-radius: 999px;
+  border: 1px solid rgba(217,184,92,.35); background: rgba(9,16,28,.94); color: #f1e2b5;
+  font-size: .64rem; letter-spacing: .03em; box-shadow: 0 8px 24px rgba(0,0,0,.45);
 }

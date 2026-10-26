@@ -93,7 +93,12 @@ export function deckFromCode(code, cardDB) {
 }
 
 export function deckToCode(cards) {
-  return encodeDeckCode(cards.map((c) => ({ cardId: c.cardId || c.id, count: c.count })));
+  const normalized = cards.map((c) => ({ cardId: c.cardId || c.id, count: c.count }));
+  // Riot deck codes can only represent official card codes. Card Forge cards
+  // still live in the saved deck JSON and can be submitted to a room; only the
+  // optional share code is unavailable for those decks.
+  if (normalized.some((card) => !parseCardCode(card.cardId))) return '';
+  return encodeDeckCode(normalized);
 }
 
 export function normalizeCards(cards) {

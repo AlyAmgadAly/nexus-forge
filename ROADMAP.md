@@ -1,6 +1,6 @@
 # Nexus Forge roadmap
 
-Planning baseline: **26 October 2026**. This roadmap records agreed direction, not completed networking features. Milestones are ordered by dependency; no delivery dates are committed.
+Planning baseline: **26 October 2026**. This roadmap records agreed direction and current verification state. Milestones are ordered by dependency; no delivery dates are committed.
 
 ## Intended outcome
 
@@ -12,13 +12,16 @@ Each player runs their own copy. The host's computer owns the room and authorita
 
 Already present:
 
-- Vanilla JavaScript UI and an Express/WebSocket Node.js server.
+- Vanilla JavaScript UI and an Express/WebSocket Node.js server, retained as the browser/LAN development route.
 - A reference-based scenic home screen, with browser QA and screenshots in `docs/qa/lobby/`.
 - Deck building and deck-code import/export; Card Forge and configurable local rules.
 - Room creation, joining, spectating, chat, readiness, host controls, and 1v1/2v2 engine paths.
 - Player-specific game views and 12 existing engine tests. Card-effect automation remains partial.
+- Electron 0.2.0 desktop shell, per-user writable data with backup migration, loopback service lifecycle, and portable Windows packaging.
+- PeerJS/WebRTC host and guest transports, room content manifests, filtered peer views, validated deck submissions, host-approved custom content, reconnect tokens, host-close behavior, and desktop connection UI.
+- 23 automated tests covering the engine, data migration, peer rooms/service lifecycle, manifests, content sanitization, deck payloads, and deck-code fallback for Card Forge cards.
 
-The current client connects to the server serving its page through `/ws`; its room code is only meaningful to that server. Electron packaging and PeerJS internet discovery do not exist yet. The earlier home-screen browser checks do not count as cross-network multiplayer verification.
+The desktop path for M1-M5 and M7 packaging is implemented and was exercised locally with two Electron instances on one Windows machine: host/join over PeerJS, ready/mulligan/start, bidirectional game actions, guest reconnect and cancel, host close, custom deck/content approval, clipboard copy, data persistence, portable launch, and clean shutdown. The real separate-network matrix in M6 has not been run. Local two-instance evidence is adapter/UI smoke evidence only and does not prove internet reachability.
 
 Preserve the existing game rules, deck builder, Card Forge, room roles, and completed home layout during migration. Keep the browser/Node development route working. Future deck-selection and battlefield visual redesigns can use the other supplied references after this networking work; they are not prerequisites for the desktop internet release. Rewards, Battle Pass, and Store remain unavailable.
 
@@ -44,13 +47,13 @@ Avoid a second game engine in the renderer. Separate message dispatch from WebSo
 | Milestone | Deliverable | Depends on | Status | Tracking |
 | --- | --- | --- | --- | --- |
 | M0 | GitHub repository, reproducible baseline, and this roadmap | Existing project | Complete | Source and documentation on `main` |
-| [M1](https://github.com/AlyAmgadAly/nexus-forge/milestone/1) | Desktop runtime, writable data, lifecycle, and development checks | M0 | Not started | [#1](https://github.com/AlyAmgadAly/nexus-forge/issues/1) |
-| [M2](https://github.com/AlyAmgadAly/nexus-forge/milestone/2) | PeerJS connection proof across separate internet networks | M1 | Not started | [#2](https://github.com/AlyAmgadAly/nexus-forge/issues/2) |
-| [M3](https://github.com/AlyAmgadAly/nexus-forge/milestone/3) | Authoritative rooms and gameplay through the peer transport | M2 | Not started | [#3](https://github.com/AlyAmgadAly/nexus-forge/issues/3) |
-| [M4](https://github.com/AlyAmgadAly/nexus-forge/milestone/4) | Player decks, room content synchronization, and version checks | M3 | Not started | [#4](https://github.com/AlyAmgadAly/nexus-forge/issues/4) |
-| [M5](https://github.com/AlyAmgadAly/nexus-forge/milestone/5) | Reconnects, host departure, and clear connection states | M3, M4 | Not started | [#5](https://github.com/AlyAmgadAly/nexus-forge/issues/5) |
-| [M6](https://github.com/AlyAmgadAly/nexus-forge/milestone/6) | Automated regression coverage and real-network release testing | M1-M5 | Not started | [#6](https://github.com/AlyAmgadAly/nexus-forge/issues/6) |
-| [M7](https://github.com/AlyAmgadAly/nexus-forge/milestone/7) | Portable Windows release and player instructions | M6 | Not started | [#7](https://github.com/AlyAmgadAly/nexus-forge/issues/7) |
+| [M1](https://github.com/AlyAmgadAly/nexus-forge/milestone/1) | Desktop runtime, writable data, lifecycle, and development checks | M0 | Complete (local) | [#1](https://github.com/AlyAmgadAly/nexus-forge/issues/1) |
+| [M2](https://github.com/AlyAmgadAly/nexus-forge/milestone/2) | PeerJS connection proof across separate internet networks | M1 | Implemented; external proof pending | [#2](https://github.com/AlyAmgadAly/nexus-forge/issues/2) |
+| [M3](https://github.com/AlyAmgadAly/nexus-forge/milestone/3) | Authoritative rooms and gameplay through the peer transport | M2 | Implemented; local 1v1 play verified, full match/2v2/spectator pending | [#3](https://github.com/AlyAmgadAly/nexus-forge/issues/3) |
+| [M4](https://github.com/AlyAmgadAly/nexus-forge/milestone/4) | Player decks, room content synchronization, and version checks | M3 | Implemented; local deck/content approval verified | [#4](https://github.com/AlyAmgadAly/nexus-forge/issues/4) |
+| [M5](https://github.com/AlyAmgadAly/nexus-forge/milestone/5) | Reconnects, host departure, and clear connection states | M3, M4 | Implemented; local reconnect/host-close verified | [#5](https://github.com/AlyAmgadAly/nexus-forge/issues/5) |
+| [M6](https://github.com/AlyAmgadAly/nexus-forge/milestone/6) | Automated regression coverage and real-network release testing | M1-M5 | Automated checks pass; external matrix pending | [#6](https://github.com/AlyAmgadAly/nexus-forge/issues/6) |
+| [M7](https://github.com/AlyAmgadAly/nexus-forge/milestone/7) | Portable Windows release and player instructions | M6 | Portable artifact built; clean-machine/external gates pending | [#7](https://github.com/AlyAmgadAly/nexus-forge/issues/7) |
 
 GitHub issues and milestones mirror M1-M7. Completing an issue requires its acceptance criteria and recorded evidence, not just code being merged.
 
@@ -81,10 +84,12 @@ Likely touch points: `package.json`, `server/index.js`, `server/store.js`, new d
 
 Acceptance criteria:
 
-- [ ] Desktop development launch reaches the same home screen and local deck/Card Forge features.
-- [ ] First-run data is created in a writable user location; a second launch preserves a deck/custom-card edit.
-- [ ] The desktop service does not listen on public network interfaces, and quits cleanly.
-- [ ] Browser development still works and all baseline tests pass.
+- [x] Desktop development launch reaches the same home screen and local deck/Card Forge features.
+- [x] First-run data is created in a writable user location; a second launch preserves a deck/custom-card edit.
+- [x] The desktop service does not listen on public network interfaces, and quits cleanly.
+- [x] Browser development still works and all baseline tests pass.
+
+Local evidence (26 October 2026, Windows, Electron 45.0.0): the desktop development launch reached the home screen with 1,647 base cards and working deck/Card Forge APIs. A saved custom card, deck, and generated admin token survived a full profile restart. The service bound `127.0.0.1` on an ephemeral port and quit without leaving Electron processes or listening service ports. Browser `npm start` still served `/api/health` with `desktop:false`. These checks ran on the build machine; the clean-machine launch is tracked under M7.
 
 ### M2 - Internet connection proof
 
@@ -101,10 +106,12 @@ Implementation:
 
 Acceptance criteria:
 
-- [ ] Two desktop instances on different internet connections exchange messages using only a room code.
-- [ ] At least one test uses home internet versus a mobile hotspot; record devices, builds, and connection path.
-- [ ] Occupied code, missing room, unavailable signaling, timeout, cancel, and retry leave a usable UI.
-- [ ] Evidence distinguishes a real external connection from two windows on the same computer/LAN.
+- [ ] **External gate:** two desktop instances on different internet connections exchange messages using only a room code.
+- [ ] **External gate:** at least one test uses home internet versus a mobile hotspot; record devices, builds, and connection path.
+- [ ] Occupied code, missing room, unavailable signaling, timeout, cancel, and retry leave a usable UI. *(Implemented with bounded retries, timeouts, cancellation, and error states; the full manual failure matrix is not recorded.)*
+- [ ] **External gate:** evidence distinguishes a real external connection from two windows on the same computer/LAN.
+
+Local evidence: two Electron instances with separate profiles registered `nexus-forge-v1-<CODE>` identities and joined with a five-character code. This proves the adapter and UI work on one machine; it is explicitly not separate-network evidence. No external row of the M6 matrix has been run.
 
 ### M3 - Authoritative peer rooms and gameplay
 
@@ -123,10 +130,12 @@ Likely touch points: `public/js/app.js`, `server/index.js`, `server/rooms.js`, a
 
 Acceptance criteria:
 
-- [ ] Host and guest complete an existing 1v1 match over the peer adapter using shared starter content.
+- [ ] Host and guest complete an existing 1v1 match over the peer adapter using shared starter content. *(Lobby join, readiness, mulligan, start, a unit play, a pass, and bidirectional updates verified; a match played through to completion is pending.)*
 - [ ] Four players can join the 2v2 flow with the correct seats/teams; spectators receive updates.
-- [ ] Host-only controls and private state remain restricted, including during rematches.
+- [ ] Host-only controls and private state remain restricted, including during rematches. *(Automated coverage rejects guest host controls and hides opponent hands; rematch enforcement is not yet exercised live.)*
 - [ ] Equivalent WebSocket and peer action sequences produce equivalent authoritative results.
+
+Local evidence: host and guest reached the filtered lobby, readied, locked in mulligan hands, started the match, played a unit, passed priority, and received each other's authoritative updates. Automated integration coverage verifies host-only rejection, hidden opponent hand details, content approval, reconnect, and host close. The remaining M3 acceptance items are not claimed.
 
 ### M4 - Decks, custom cards, and content compatibility
 
@@ -146,10 +155,12 @@ Likely touch points: `public/js/api.js`, deck builder/lobby views, `server/decks
 
 Acceptance criteria:
 
-- [ ] Players with different local deck IDs can submit valid decks and play.
-- [ ] A host-approved custom card missing on a guest is rendered and resolves consistently.
-- [ ] Invalid decks, unknown/unsupported definitions, incompatible versions, corrupt transfers, and oversized payloads fail clearly before match start.
+- [x] Players with different local deck IDs can submit valid decks and play.
+- [ ] A host-approved custom card missing on a guest is rendered and resolves consistently. *(Guest-authored content was approved by the host and the submitted deck started a match; the reverse host-authored direction and in-match resolution still need recorded evidence.)*
+- [ ] Invalid decks, unknown/unsupported definitions, incompatible versions, corrupt transfers, and oversized payloads fail clearly before match start. *(Automated coverage exists for deck payload limits, unknown content, script validation, manifests, and oversized offers; corrupt-transfer and full pre-start UI handling remain unrecorded.)*
 - [ ] Joining/leaving a room does not overwrite local decks, admin settings, or custom cards.
+
+Local evidence: a guest saved a Card Forge card and a deck, submitted the deck, was told custom content was required, sent the content, and the host approved it through the lobby review panel. The approved room catalog updated for both sides and the submitted deck started a game. Room content is snapshotted per room, so approval does not modify the host's saved collection.
 
 ### M5 - Recovery and connection UX
 
@@ -167,10 +178,12 @@ Implementation:
 
 Acceptance criteria:
 
-- [ ] A temporarily disconnected guest returns to the same authorized seat and current filtered game state while the host stays alive.
-- [ ] Disconnect/reconnect does not apply an action twice, leak private state, or create an extra seat.
-- [ ] Host departure, expired session, kick, and failed reconnect lead to a clear route back to Home.
+- [x] A temporarily disconnected guest returns to the same authorized seat and current filtered game state while the host stays alive.
+- [x] Disconnect/reconnect does not apply an action twice, leak private state, or create an extra seat.
+- [ ] Host departure, expired session, kick, and failed reconnect lead to a clear route back to Home. *(Graceful host departure and reconnect cancellation were verified; expired-session, kick, and exhausted-retry UI still need recorded checks.)*
 - [ ] Home/lobby/game remain usable with keyboard controls and at previously checked screen sizes.
+
+Local/automated evidence: forcing the guest data channel closed showed the reconnect overlay and bounded attempt count; automatic resume restored the same seat, a fresh filtered game view, and a rotated token. Reusing the old token was rejected, duplicate commands were not replayed, and no extra seat was created. Host leave sent `roomClosed` and returned the guest Home; cancelling reconnect also returned Home.
 
 ### M6 - Regression and real-network validation
 
@@ -195,14 +208,16 @@ Network acceptance matrix:
 | Guest internet loss/recovery | Seat recovery and authoritative state resynchronization |
 | Host loss or signaling outage | Correct status, bounded recovery, and usable exit/retry |
 
-Use REA/runtime capture for desktop/browser flows where supported, alongside test logs and screenshots. Record build/commit, devices, network arrangement, direct/relay path, scenario outcome, and relevant errors. Redact reconnect credentials and admin tokens. Human-run separate-device tests remain pending until actually performed.
+Use REA/runtime capture for desktop/browser flows where supported, alongside test logs and screenshots. Record build/commit, devices, network arrangement, direct/relay path, scenario outcome, and relevant errors. Redact reconnect credentials and admin tokens. Human-run separate-device tests remain pending until actually performed. The full automated, local desktop, packaged-app, and external-network procedure is in `docs/testing.md`.
 
 Acceptance criteria:
 
-- [ ] Automated checks pass and relevant UI flows have runtime evidence.
-- [ ] The external 1v1, four-player 2v2, spectator, and reconnect scenarios have recorded results.
-- [ ] Any network limitations are explicit; unresolved blocking failures prevent release sign-off.
-- [ ] No paid server, VPN, shared LAN, or manual port forwarding was needed for the supported acceptance paths.
+- [x] Automated checks pass and relevant UI flows have runtime evidence.
+- [ ] **External gate:** the external 1v1, four-player 2v2, spectator, and reconnect scenarios have recorded results.
+- [x] Any network limitations are explicit; unresolved blocking failures prevent release sign-off.
+- [ ] **External gate:** no paid server, VPN, shared LAN, or manual port forwarding was needed for the supported acceptance paths. *(The same-machine path used none of these, but the external paths have not been exercised.)*
+
+Local evidence: `npm run check:syntax` passes 34 files and `npm test` passes 23/23 (12 engine, 3 migration, 2 service/peer, 6 protocol/content). The two-instance UI checks listed under M1-M5 provide local runtime evidence. A Windows CI workflow for `npm ci`, syntax checks, and tests exists but has not run on GitHub. Every row that requires a separate device, separate network, or relay observation remains open.
 
 ### M7 - Portable Windows release
 
@@ -221,8 +236,10 @@ Implementation:
 Acceptance criteria:
 
 - [ ] The downloaded `.exe` launches on a clean Windows setup, preserves data after restart, and exits cleanly.
-- [ ] Two friends on separate internet connections host/join and play with the release artifact.
+- [ ] **External gate:** two friends on separate internet connections host/join and play with the release artifact.
 - [ ] The release links to a matching commit/checksum and documents supported paths and remaining limitations.
+
+Local evidence: `release/NexusForge-0.2.0-portable.exe` was built for Windows x64 with packaged seed content and unpacked `sharp` native files. On the build machine it launched with fresh per-user data, loaded 1,647 base cards, registered a PeerJS host room, and exited without leaving processes or listening service ports. It has not run on a clean Windows machine/account, has not been published to GitHub Releases, and has not been used between separate networks. All M7 acceptance boxes remain open.
 
 ## Definition of the first desktop internet release
 

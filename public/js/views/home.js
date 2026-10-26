@@ -24,6 +24,13 @@ export function renderHome(root, ctx) {
   const pool = state.pool || [];
   const champions = pool.filter((card) => card.supertype === 'Champion').length;
   const online = state.connected ? '' : 'disabled';
+  const internet = !!state.desktop;
+  const createHelp = internet
+    ? 'Open an internet room and share its five-character code. Friends join from their own Nexus Forge desktop app — no LAN, VPN, or port forwarding.'
+    : 'Open a table for a duel or 2v2 Team Clash. Choose your mode and deck in the room, then share the code with players connected to this server.';
+  const joinHelp = internet
+    ? 'Enter the five-character code from your host. Internet rooms work across different networks.'
+    : 'Enter the code from your host. You can take a seat or watch as a spectator.';
   const name = () => state.playerName || 'Set your name';
   const saveName = (value) => {
     state.playerName = String(value).replace(/\s+/g, ' ').trim().slice(0, 22);
@@ -87,10 +94,10 @@ export function renderHome(root, ctx) {
         </div>
         <form id="home-room-form">
           <label class="home-field" for="home-name">Your display name<input class="input" id="home-name" name="playerName" maxlength="22" autocomplete="nickname" required value="${esc(state.playerName)}" placeholder="Summoner name"></label>
-          <p class="home-room-help" id="home-create-help">Open a table for a duel or 2v2 Team Clash. Choose your mode and deck in the room, then share the code with your friends.</p>
+          <p class="home-room-help" id="home-create-help">${esc(createHelp)}</p>
           <div id="home-join-fields" hidden>
-            <label class="home-field" for="home-code">Room code<input class="input home-code" id="home-code" name="roomCode" minlength="5" maxlength="8" pattern="[A-Za-z0-9]{5,8}" autocomplete="off" spellcheck="false" value="${esc(state.pendingJoin || '')}" placeholder="ABC12"></label>
-            <p class="home-room-help">Enter the code from your host. You can take a seat or watch as a spectator.</p>
+            <label class="home-field" for="home-code">Room code<input class="input home-code" id="home-code" name="roomCode" minlength="5" maxlength="${internet ? 5 : 8}" pattern="${internet ? '[A-Za-z2-9]{5}' : '[A-Za-z0-9]{5,8}'}" autocomplete="off" spellcheck="false" value="${esc(state.pendingJoin || '')}" placeholder="ABC12"></label>
+            <p class="home-room-help">${esc(joinHelp)}</p>
           </div>
           <div class="home-room-actions">
             <button class="home-gold-button home-online-action" id="home-room-submit" type="submit" ${state.connected ? '' : 'disabled'}>Create room</button>
@@ -115,13 +122,20 @@ export function renderHome(root, ctx) {
           modal.querySelector('#home-room-submit').textContent = mode === 'join' ? 'Join room' : 'Create room';
         };
         modal.querySelectorAll('[data-room-mode]').forEach((tab) => tab.addEventListener('click', () => selectMode(tab.dataset.roomMode)));
-        codeInput.addEventListener('input', () => { codeInput.value = codeInput.value.toUpperCase(); });
+        codeInput.addEventListener('input', () => { codeInput.value = codeInput.value.toUpperCase(); codeInput.setCustomValidity(''); });
         form.addEventListener('submit', async (event) => {
           event.preventDefault();
           if (!state.connected) { toast('Reconnecting to the server. Try again in a moment.', 'error'); return; }
           if (!nameInput.value.trim()) { nameInput.setCustomValidity('Enter your display name.'); nameInput.reportValidity(); return; }
           saveName(nameInput.value);
           const code = codeInput.value.trim().toUpperCase();
+          if (mode === 'join' && !(internet ? /^[A-Z2-9]{5}$/.test(code) : /^[A-Z0-9]{5,8}$/.test(code))) {
+            codeInput.setCustomValidity(internet
+              ? 'Internet room codes are five characters using A–Z and 2–9.'
+              : 'Enter the room code from your host.');
+            codeInput.reportValidity();
+            return;
+          }
           const spectate = event.submitter?.id === 'home-spectate';
           state.pendingJoin = '';
           close();
@@ -156,7 +170,9 @@ export function renderHome(root, ctx) {
       title: 'Nexus Forge',
       subtitle: 'Your Runeterra card table',
       className: 'home-dialog home-settings-dialog',
-      body: `<p class="home-room-help">Build a deck from the complete card pool, create a private room, and invite friends connected to your server.</p>
+      body: `<p class="home-room-help">${internet
+        ? 'Build a deck from the complete card pool, open an internet room, and invite friends from their own desktop app. Your data stays on this machine.'
+        : 'Build a deck from the complete card pool, create a private room, and invite friends connected to your server.'}</p>
         <button class="home-secondary-button" id="home-fullscreen">${icon('fullscreen')}<span>${document.fullscreenElement ? 'Exit full screen' : 'Enter full screen'}</span></button>
         <a class="home-secondary-button" href="#/admin" id="home-open-forge">${icon('forge')}<span>Open Card Forge</span></a>
         <p class="home-settings-note">Rewards, Battle Pass, and Store are unavailable in Nexus Forge.</p>`,

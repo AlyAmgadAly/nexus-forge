@@ -2,67 +2,121 @@
 
 A Runeterra-inspired card game with a scenic home screen, deck builder, Card Forge, private rooms, spectators, and an existing engine for 1v1 and 2v2.
 
-**Current version: browser client + local Node.js server. Planned direction: a portable Windows desktop game with free room-code multiplayer over the internet, using Electron and PeerJS/WebRTC, following the connection model used in Codenames Masry.**
+**Current version: 0.2.0 — portable Windows desktop build with room-code multiplayer over the internet.** The original browser/local Node development route still works. Desktop internet play uses Electron, PeerJS/WebRTC, and the host's authoritative game process. Real separate-network acceptance testing is still a human-run release gate; see [Limits and pending validation](#limits-and-pending-validation).
 
-The desktop and internet multiplayer migration is planned, not implemented. See the [detailed roadmap](ROADMAP.md) for architecture, dependencies, milestones, and acceptance criteria.
+## Play on Windows
 
-Track implementation through [GitHub milestones](https://github.com/AlyAmgadAly/nexus-forge/milestones) and [issues](https://github.com/AlyAmgadAly/nexus-forge/issues).
+1. Download `NexusForge-0.2.0-portable.exe` from the project's Releases page, or build it locally with `npm run build:win` (see [Build the Windows release](#build-the-windows-release)). No Node.js installation is required.
+2. Launch the game. The executable is portable, but user data is stored per Windows account (see [Data and backups](#data-and-backups)). The build is unsigned, so Windows SmartScreen may warn on first launch; use **More info → Run anyway** only for a build you trust.
+3. Choose **Create a room**, then share the five-character room code.
+4. Friends launch their own copy, choose **Join a room** or **Spectate**, and enter the code.
 
-## Run the current application
+If the repository or release is private, each friend needs GitHub access before they can download the build. The executable is portable, but user data is stored per Windows account; replacing the `.exe` with a newer build does not remove it.
 
-Install Node.js 20 or newer, then run:
+Internet rooms use public PeerJS signaling and public STUN. They do not require a VPN, a shared LAN, router port forwarding, or a paid game server. The host's computer owns the room and must stay open for the session. Host migration and host-crash resume are not supported. Some restrictive networks may require a TURN relay; no free relay is bundled or guaranteed yet, so connectivity can still fail on those networks.
+
+The desktop app binds its internal service to `127.0.0.1` and exposes no LAN or public HTTP port. Guests reach the host through WebRTC after finding the room's namespaced PeerJS identity.
+
+## Develop
+
+Install Node.js 20 or newer, then:
 
 ```powershell
 npm ci
 npm start
 ```
 
-Open <http://localhost:3000>. `PORT` can select a different port. The current server binds to `0.0.0.0`, so local-network access depends on the host's firewall. A room code currently resolves within that running server; it does not provide internet discovery.
+Open <http://localhost:3000>. This is the browser development mode: the server binds to `0.0.0.0`, rooms are local to that server, and internet hosting/joining is desktop-only. `PORT` can select a different port.
 
-The required card data is checked in. On first launch, the application creates `data/settings.json` and generates a local Card Forge admin token, printed in the server console. That settings file is excluded from Git. Existing local settings are preserved.
+Run the desktop app against the working tree:
 
-Card art is downloaded from configured upstream sources on demand and cached in `data/art/`. The cache is excluded from Git; uncached art needs an internet connection. The home-screen artwork and its provenance are documented in [the lobby notes](docs/lobby-ui.md).
+```powershell
+npm run desktop
+```
+
+Use a separate per-user data directory for an isolated test instance:
+
+```powershell
+$env:NEXUS_DATA_DIR = "$env:TEMP\nexus-forge-test\data"
+npm run desktop
+```
+
+`NEXUS_DATA_DIR` and `NEXUS_SEED_DIR` also exist for test harnesses. In development, the first desktop launch migrates writable project data (`settings.json`, decks, custom cards, scripts, mechanics, keywords, and cached art) into the user-data folder and writes a backup first. Seed card data remains immutable.
+
+## Data and backups
+
+On Windows, the default desktop data directory is:
+
+```text
+%APPDATA%\Nexus Forge\data
+```
+
+It contains the local admin token, local rules/settings, decks, custom cards, Card Forge scripts, and cached art. The packaged seed (`cards.json`, `scripts.json`) lives beside the executable resources and is copied into writable storage only where needed.
+
+Migration backups are written under `%APPDATA%\Nexus Forge\backups\data-<timestamp>\`. Back up the `data` folder before deleting the app or moving to another machine. Cached card art is downloaded on demand and is not part of the release artifact.
 
 ## Verify
 
 ```powershell
+npm run check:syntax
 npm test
 ```
 
-The baseline contains 12 engine tests. Browser verification and reference-resolution screenshots for the completed home redesign are recorded in [the lobby notes](docs/lobby-ui.md) and [QA results](docs/qa/lobby/verification.json).
+The suite currently contains 23 automated tests: 12 engine tests, 3 data-migration tests, 2 peer/service integration tests, and 6 protocol/content tests. `npm run build:win` runs all checks before packaging the portable Windows x64 artifact into `release/`.
 
-## Existing functionality and limits
+For the complete test procedure, including local two-instance checks and the separate-network release gate, see [docs/testing.md](docs/testing.md).
 
-- Home screen: profile name, live data counters, create/join/spectate actions, and working navigation.
-- Decks: browsing, editing, deck codes, and validation.
-- Card Forge: custom cards, declarative effects, keywords, and local rule configuration.
-- Rooms and game engine: host controls, ready state, 1v1, 2v2, spectators, and per-player game views.
-- Card effect coverage is partial. Having a card in the catalog does not mean all of its original behavior is automated.
-- Rewards, Battle Pass, and Store are visibly unavailable. Only the home screen has received the supplied reference-based redesign.
-- There is no packaged desktop executable or PeerJS transport yet.
+Local evidence recorded for 0.2.0:
+
+- Two Electron instances with separate profiles completed host/guest lobby flow over PeerJS, including filtered guest state.
+- Ready, mulligan, game start, card play, and pass flow worked in both directions.
+- A guest's custom-deck submission triggered content review; host approval merged the card, and the submitted deck started a game.
+- A deck containing a Card Forge card saved and reloaded normally. Its optional Riot share code is blank rather than blocking the save.
+- Forced data-channel loss showed the reconnect overlay and recovered the same seat with a rotated token; cancel returned Home.
+- Host departure closed the room and returned the guest Home.
+- Clipboard room-code copy worked in Electron after the narrow clipboard-write permission allowance.
+- A dev-profile restart preserved the admin token, a custom card, and a saved deck.
+- The packaged portable executable launched with fresh seed data, served 1,647 cards, registered a PeerJS host room, and exited without leaving processes or listening ports.
+
+These are same-machine checks. They do not prove reachability across separate internet connections.
+
+## Limits and pending validation
+
+- **External network gate pending:** home broadband versus mobile hotspot and friends on separate networks have not been run on this machine. Those results must be recorded before claiming internet play is release-verified.
+- **Relay/TURN gate pending:** public STUN is configured; no working free TURN relay has been proven. Restrictive NAT may prevent a connection.
+- 2v2 and spectator flows over the peer transport have automated server coverage but still need a recorded external session.
+- Card-effect automation remains partial. A card being present does not mean every original behavior is scripted.
+- Rewards, Battle Pass, and Store remain visibly unavailable.
+- macOS/Linux/mobile packaging, automatic updates, accounts, matchmaking, host migration, and cloud saves are out of scope for this release.
 
 ## Source map
 
 | Path | Responsibility |
 | --- | --- |
-| `public/js/app.js` | Client state, navigation, and current WebSocket connection |
+| `desktop/main.js` | Electron lifecycle, loopback service, validated IPC, security, clean shutdown |
+| `desktop/preload.cjs` | Narrow renderer bridge for config, admin token, and peer relay |
+| `public/js/app.js` | Client navigation, room/transport orchestration, reconnect, content offers |
+| `public/js/net/peer.js` | Host/guest PeerJS transports, namespacing, buffering, status |
 | `public/js/views/` | Home, room lobby, deck builder, Card Forge, and battlefield |
-| `public/js/api.js` | Local HTTP API client |
-| `server/index.js` | Express routes, art proxy/cache, WebSocket dispatch, and process startup |
-| `server/rooms.js` | Room membership, roles, readiness, matches, and filtered broadcasts |
+| `server/service.js` | Express API, static client, WebSocket/peer dispatch, art, shutdown |
+| `server/rooms.js` | Authoritative rooms, snapshots, roles, decks, content approval, reconnect |
+| `server/peerhub.js` | Host-side peer sessions, handshakes, limits, resume tokens |
+| `server/dispatch.js` | Transport-neutral allowlisted client message dispatch |
+| `server/content.js` | Custom card/script/deck sanitization and transfer-safe content |
+| `server/data-migration.js` | Backed-up migration into per-user writable data |
 | `server/engine/` | Game state, rules, card database, and declarative effects |
-| `server/store.js` | JSON persistence and local settings |
-| `shared/deckcode.js` | Deck-code encoding and decoding |
-| `data/` | Card catalog, scripts, and the current deck/custom-card snapshot |
-| `test/` | Engine tests and deck-code fixtures |
+| `server/store.js` | Seed/writable data separation and persistence |
+| `shared/` | Protocol versions, manifest compatibility, deck codes |
+| `test/` | Engine, migration, multiplayer, and protocol regression coverage |
+| `docs/testing.md` | Automated, local desktop, packaged-app, and external-network test procedure |
+| `docs/release-0.2.0.md` | Release artifact, checksum, evidence, and open gates |
 
-## Planned player experience
+## Build the Windows release
 
-1. Download the Windows executable and launch the game without installing Node.js.
-2. Choose **Host**, then share a short room code with friends.
-3. Friends launch their own copy, choose **Join** or **Spectate**, and enter the code from another internet connection.
-4. Select decks, ready up, and play while the host keeps the game open.
+```powershell
+npm run build:win
+```
 
-The target avoids a paid dedicated game server. It still uses public connection services, with relay assistance where available, and must be validated across real networks. The host owns the active match; host migration is outside the first release.
+Output: `release/NexusForge-0.2.0-portable.exe`. The build is unsigned; Windows SmartScreen may warn on first launch. Signing is not configured. Release notes record the checksum for the built artifact; rebuilds produce a different hash.
 
-Development work follows [ROADMAP.md](ROADMAP.md). Run instructions above describe the application available today.
+Development work and milestone evidence are tracked in [ROADMAP.md](ROADMAP.md).

@@ -754,6 +754,27 @@ function openGameMenu(view, state, ctx, root) {
   });
 }
 
+function netOverlayHtml(state) {
+  if (!state.desktop) return '';
+  const net = state.net || {};
+  if (net.role === 'guest' && (net.status === 'reconnecting' || net.status === 'joining')) {
+    const attempt = Math.min(Math.max(Number(net.retries) || 1, 1), 4);
+    return `<div class="net-overlay" role="alertdialog" aria-modal="true" aria-labelledby="net-overlay-title">
+      <div class="net-overlay-panel">
+        <div class="net-spinner" aria-hidden="true"></div>
+        <div class="net-overlay-kicker">CONNECTION INTERRUPTED</div>
+        <h2 id="net-overlay-title">Reconnecting to the host</h2>
+        <p>Your seat is held for two minutes. Reconnect attempt ${attempt} of 4.</p>
+        <button class="btn btn-ghost" id="net-cancel-reconnect">Cancel and leave</button>
+      </div>
+    </div>`;
+  }
+  if (net.role === 'guest' && net.status === 'connected' && net.signalingLost) {
+    return '<div class="net-signal-note" role="status">Signaling is unavailable, but your current match is still connected.</div>';
+  }
+  return '';
+}
+
 export function renderGame(root, ctx) {
   const { state } = ctx;
   const view = state.game;
@@ -892,6 +913,7 @@ export function renderGame(root, ctx) {
     ${roundSplashHtml(view)}
     ${isMulligan ? mulliganScreen(view, state) : ''}
     ${gameOverHtml(view, state, ctx)}
+    ${netOverlayHtml(state)}
   </div>`;
 
   // ---------------------------------------------------------------- interactions
@@ -960,6 +982,7 @@ export function renderGame(root, ctx) {
   root.querySelector('#history-scrim')?.addEventListener('click', () => { historyOpen = false; renderGame(root, ctx); });
   root.querySelector('#game-help')?.addEventListener('click', openHelp);
   root.querySelector('#game-menu')?.addEventListener('click', () => openGameMenu(view, state, ctx, root));
+  root.querySelector('#net-cancel-reconnect')?.addEventListener('click', () => ctx.cancelReconnect());
   root.querySelector('#mulligan-leave')?.addEventListener('click', async () => {
     const ok = await modalConfirm('Leave the table?', 'Your seat will be removed from the room.', { danger: true, confirmLabel: 'Leave' });
     if (ok) ctx.leaveRoom();
