@@ -233,7 +233,8 @@ export class Game {
     const handBuffs = (opts.handEntry?.buffs || [])
       .filter((buff) => buff.duration !== 'round' || buff.round === this.round)
       .map((buff) => ({ ...buff }));
-    return {
+    const handKeywords = [...(opts.handEntry?.keywords || [])];
+    const unit = {
       uid: `u${++this.uidSeq}`,
       cardId: card.id,
       card,
@@ -271,12 +272,20 @@ export class Game {
       damageTakenThisRound: 0,
       damageSurvived: 0,
       kills: 0,
+      counters: {},
       dead: false,
       equipment: [],
       attachedTo: null,
       captured: [],
       summonedBy: opts.source?.uid || null,
     };
+    for (const keyword of handKeywords) {
+      const kw = canonicalKeyword(keyword);
+      if (!kw) continue;
+      unit.grantedKeywords.add(kw);
+      unit.keywordCounts[kw] = Math.max(unit.keywordCounts[kw] || 0, 1);
+    }
+    return unit;
   }
 
   hasKeyword(unit, kw) {
@@ -489,6 +498,48 @@ export class Game {
     return removed;
   }
 
+  equipCard(unit, card, player, { source = null, fromHand = false } = {}) {
+    if (!unit || unit.dead || !player || unit.team !== player.team || !card || card.type !== 'Equipment') return false;
+    const attachment = {
+      cardId: card.id,
+      name: card.name,
+      card,
+      attack: card.attack || 0,
+      health: card.health || 0,
+      keywords: (card.keywords || []).map(canonicalKeyword).filter(Boolean),
+      source: source?.uid || null,
+    };
+    unit.equipment.push(attachment);
+    player.stats.equipsThisGame++;
+    this.recalcAuras();
+    this.log(`${player.name} equips ${card.name} to ${unit.name}.`, 'equip', player.id);
+    const playCardEntries = this.watcherEntries(EVENTS.PLAY_CARD, {
+      eventCtx: { card, equipped: unit, player, fromHand },
+    });
+    const equipEntries = this.watcherEntries(EVENTS.EQUIP, {
+      eventCtx: { equipped: unit, equipment: card, player, fromHand },
+    });
+    this.deferEvents(() => {
+      this.emitEvents(playCardEntries);
+      this.emitEvents(equipEntries);
+      const virtual = {
+        id: null,
+        uid: null,
+        name: card.name,
+        card,
+        owner: player.id,
+        team: player.team,
+        isSpell: false,
+        isEquipment: true,
+      };
+      this.runScript(card.script, EVENTS.PLAY, virtual, player, {
+        presetTargets: [],
+        eventCtx: { equipped: unit, equipment: card },
+      });
+    });
+    return true;
+  }
+
   buffUnit(unit, power, health, duration = 'permanent', source = null) {
     if (!unit || unit.dead) return;
     unit.buffs.push({ power, health, duration, source: source?.uid || null, round: this.round });
@@ -511,6 +562,20 @@ export class Game {
     const owner = [...this.players.values()].find((player) => player.hand.includes(handCard));
     const suffix = `gets ${sign(power)}|${sign(health)}${duration === 'round' ? ' this round' : ''}.`;
     this.log(`${card?.name || 'Card'} in hand ${suffix}`, 'buff', owner?.id || null, {
+      privateTo: owner?.id || null, publicText: `A card in hand ${suffix}`,
+    });
+  }
+
+  grantKeywordToHandCard(handCard, keyword) {
+    if (!handCard) return;
+    const kw = canonicalKeyword(keyword);
+    if (!kw) return;
+    handCard.keywords = handCard.keywords || [];
+    if (!handCard.keywords.includes(kw)) handCard.keywords.push(kw);
+    const card = this.cardDB.get(handCard.cardId);
+    const owner = [...this.players.values()].find((player) => player.hand.includes(handCard));
+    const suffix = `gains ${kw} in hand.`;
+    this.log(`${card?.name || 'Card'} ${suffix}`, 'keyword', owner?.id || null, {
       privateTo: owner?.id || null, publicText: `A card in hand ${suffix}`,
     });
   }
@@ -733,14 +798,13 @@ export class Game {
         if (blk === unit || att === unit.uid) delete this.combat.blockMap[att];
       }
     }
-    // Return attached equipment and captured cards.
+    // Return attached equipment. Captured cards are released to their owner's
+    // board as a fresh summon once the captor leaves play.
     for (const eq of unit.equipment || []) {
       if (owner) this.addCardToHand(owner, eq.cardId, { fromEquipment: true });
     }
     unit.equipment = [];
-    for (const cap of unit.captured || []) {
-      if (owner) this.addCardToHand(owner, cap, { fromCapture: true });
-    }
+    this.releaseCaptured(unit);
     this.log(`${unit.name} dies.`, 'death');
     if (source?.uid) {
       const killer = this.unitById(source.uid);
@@ -826,17 +890,18 @@ export class Game {
   }
 
   recallUnit(unit, source = null) {
-    if (!unit || unit.dead || unit.isLandmark) return;
+    if (!unit || unit.dead || unit.isLandmark) return null;
     const owner = this.player(unit.owner);
-    if (!owner) return;
+    if (!owner) return null;
+    this.releaseCaptured(unit);
     if (owner.hand.length >= this.rules.handMax) {
       this.obliterateUnit(unit);
       this.log(`${unit.name} is recalled but hand is full - Obliterated.`, 'death');
-      return;
+      return null;
     }
     unit.dead = true;
     this.teams[unit.team].board = this.teams[unit.team].board.filter((u) => u !== unit);
-    this.addCardToHand(owner, unit.cardId, { fromRecall: true });
+    const iid = this.addCardToHand(owner, unit.cardId, { fromRecall: true });
     owner.stats.stunnedOrRecalled++;
     this.log(`${unit.name} is Recalled.`, 'recall');
     const eventCtx = { recalled: unit, player: owner, source };
@@ -845,6 +910,8 @@ export class Game {
       ...this.watcherEntries(EVENTS.RECALL, { eventCtx, exclude: unit }),
     ]);
     this.recalcAuras();
+    const handCard = iid ? owner.hand.find((h) => h.iid === iid) || null : null;
+    return handCard ? { iid, handCard, player: owner } : null;
   }
 
   moveUnitToDeck(unit, { source = null, position = 'shuffle' } = {}) {
@@ -875,6 +942,99 @@ export class Game {
     this.log(`${unit.name} is placed into ${owner.name}'s deck${position === 'top' ? ' on top' : position === 'bottom' ? ' on the bottom' : ''}.`, 'effect');
     this.recalcAuras();
     this.touch();
+  }
+
+  captureUnit(captor, captured, source = null) {
+    if (!captor || !captured || captor.dead || captured.dead || captor === captured) return false;
+    this.releaseCaptured(captured);
+    this.detachEquipment(captured, { source, reason: 'capture' });
+    captor.captured = captor.captured || [];
+    captor.captured.push({ cardId: captured.cardId, ownerId: captured.owner });
+    captured.dead = true;
+    captured.capturedBy = captor.uid;
+    this.teams[captured.team].board = this.teams[captured.team].board.filter((u) => u !== captured);
+    if (this.combat) {
+      this.combat.attackers = this.combat.attackers.filter((u) => u !== captured);
+      this.combat.blockers = this.combat.blockers.filter((u) => u !== captured);
+      for (const [att, blk] of Object.entries(this.combat.blockMap || {})) {
+        if (blk === captured || att === captured.uid) delete this.combat.blockMap[att];
+      }
+      for (const [supporter, supported] of Object.entries(this.combat.supports || {})) {
+        if (supporter === captured.uid || supported === captured.uid) delete this.combat.supports[supporter];
+      }
+    }
+    this.log(`${captor.name} captures ${captured.name}.`, 'capture', captor.owner);
+    this.recalcAuras();
+    this.touch();
+    return true;
+  }
+
+  releaseCaptured(unit) {
+    const captured = unit?.captured || [];
+    if (!captured.length) return;
+    unit.captured = [];
+    for (const entry of captured) {
+      const cardId = typeof entry === 'string' ? entry : entry?.cardId;
+      const owner = this.player(typeof entry === 'string' ? unit.owner : entry?.ownerId || unit.owner);
+      const card = cardId ? this.cardDB.get(cardId) : null;
+      if (!owner || !card) continue;
+      if (this.unitsOnTeam(owner.team).length >= this.rules.boardMax) {
+        this.log(`${card.name} is released but ${owner.name}'s board is full - Obliterated.`, 'death', owner.id);
+        continue;
+      }
+      this.summonUnit(card, owner, { token: true });
+      this.log(`${unit.name} releases ${card.name}.`, 'release', unit.owner);
+    }
+  }
+
+  swapUnits(first, second) {
+    if (!first || !second || first.dead || second.dead || first.team !== second.team) return false;
+    const board = this.teams[first.team].board;
+    const i = board.indexOf(first);
+    const j = board.indexOf(second);
+    if (i < 0 || j < 0 || i === j) return false;
+    [board[i], board[j]] = [board[j], board[i]];
+    this.log(`${first.name} and ${second.name} swap positions.`, 'effect');
+    this.touch();
+    return true;
+  }
+
+  setNextSummon(player, { keywords = [], power = 0, health = 0, source = null, name = 'Next summon' } = {}) {
+    if (!player) return;
+    player.nextSummons = player.nextSummons || [];
+    player.nextSummons.push({
+      keywords: keywords.map((kw) => canonicalKeyword(kw)).filter(Boolean),
+      power,
+      health,
+      source: source?.uid || null,
+      name,
+      round: this.round,
+    });
+    const label = keywords.length ? keywords.join(', ') : `+${power}|+${health}`;
+    this.log(`${player.name}'s next summoned ally gains ${label}.`, 'effect', player.id, {
+      privateTo: player.id, publicText: `${player.name}'s next summon is empowered.`,
+    });
+  }
+
+  addCounter(unit, counter, amount = 1) {
+    if (!unit || !counter) return;
+    unit.counters = unit.counters || {};
+    unit.counters[counter] = Math.max(0, (unit.counters[counter] || 0) + amount);
+    this.log(`${unit.name} tracks ${counter}: ${unit.counters[counter]}.`, 'effect', unit.owner);
+    this.checkLevelUps();
+  }
+
+  transformHandCard(handCard, cardId) {
+    if (!handCard) return false;
+    const card = this.cardDB.get(cardId);
+    if (!card) return false;
+    const owner = [...this.players.values()].find((player) => player.hand.includes(handCard));
+    if (!owner) return false;
+    handCard.cardId = cardId;
+    this.log(`${card.name} transforms in ${owner.name}'s hand.`, 'transform', owner.id, {
+      privateTo: owner.id, publicText: `${owner.name}'s card transforms in hand.`,
+    });
+    return true;
   }
 
   // ---------------------------------------------------------------- cards & zones
@@ -1167,6 +1327,10 @@ export class Game {
       }
     }
     for (const p of this.players.values()) {
+      if (p.nextSummons?.length) {
+        this.log(`${p.name}'s unused summon buff expires.`, 'effect', p.id);
+        p.nextSummons = [];
+      }
       const fleeting = p.hand.filter((h) => h.fleeting);
       if (fleeting.length) {
         p.hand = p.hand.filter((h) => !h.fleeting);
@@ -1358,45 +1522,17 @@ export class Game {
         team.cardsPlayedThisRound--;
         return { ok: false, error: 'Equipment needs an allied unit target' };
       }
-      const attachment = {
-        cardId: card.id,
-        name: card.name,
-        card,
-        attack: card.attack || 0,
-        health: card.health || 0,
-        keywords: (card.keywords || []).map(canonicalKeyword).filter(Boolean),
-      };
-      targetUnit.equipment.push(attachment);
-      p.stats.equipsThisGame++;
-      this.recalcAuras();
+      if (!this.equipCard(targetUnit, card, p, { fromHand: true })) {
+        team.mana += cost;
+        p.hand.splice(handIndex, 0, h);
+        p.stats.cardsPlayed--;
+        p.stats.unitsPlayed--;
+        team.cardsPlayedThisRound--;
+        return { ok: false, error: 'Equipment needs an allied unit target' };
+      }
       this.addMana(team, 0);
       this.passed.clear();
       this.priorityTeam = this.otherTeam(p.team);
-      this.log(`${p.name} equips ${card.name} to ${targetUnit.name}.`, 'equip', p.id);
-      const playCardEntries = this.watcherEntries(EVENTS.PLAY_CARD, {
-        eventCtx: { card, equipped: targetUnit, player: p },
-      });
-      const equipEntries = this.watcherEntries(EVENTS.EQUIP, {
-        eventCtx: { equipped: targetUnit, equipment: card, player: p },
-      });
-      this.deferEvents(() => {
-        this.emitEvents(playCardEntries);
-        this.emitEvents(equipEntries);
-        const virtual = {
-          id: null,
-          uid: null,
-          name: card.name,
-          card,
-          owner: p.id,
-          team: p.team,
-          isSpell: false,
-          isEquipment: true,
-        };
-        this.runScript(card.script, EVENTS.PLAY, virtual, p, {
-          presetTargets: [],
-          eventCtx: { equipped: targetUnit, equipment: card },
-        });
-      });
       this.checkLevelUps();
       this.checkWin();
       this.touch();
@@ -1443,6 +1579,28 @@ export class Game {
       return null;
     }
     const unit = this.makeUnit(card, controller, { source, handEntry });
+    const pendingSummons = (controller.nextSummons || []).filter((entry) => entry.round === this.round);
+    if (pendingSummons.length) {
+      controller.nextSummons = (controller.nextSummons || []).filter((entry) => entry.round !== this.round);
+      for (const pending of pendingSummons) {
+        if (pending.power || pending.health) {
+          unit.buffs.push({
+            power: pending.power || 0,
+            health: pending.health || 0,
+            duration: 'permanent',
+            source: pending.source || null,
+            round: this.round,
+          });
+        }
+        for (const keyword of pending.keywords || []) {
+          const kw = canonicalKeyword(keyword);
+          if (!kw) continue;
+          unit.grantedKeywords.add(kw);
+          unit.keywordCounts[kw] = Math.max(unit.keywordCounts[kw] || 0, 1);
+        }
+      }
+      this.log(`${controller.name}'s next summon is empowered (${pendingSummons.map((entry) => entry.name).join(', ')}).`, 'effect', controller.id);
+    }
     team.board.push(unit);
     this.log(`${controller.name} summons ${card.name} (${this.power(unit)}|${this.health(unit)}).`, 'summon', controller.id);
     if (this.hasKeyword(unit, 'Attune')) {
@@ -2021,6 +2179,7 @@ export class Game {
     if (!t) return;
     t.attackToken = true;
     t.hasAttacked = false;
+    this.teams[this.otherTeam(team)].attackToken = false;
     this.attackTokenTeam = team;
     if (this.phase === 'combat') this.phase = 'playing';
     this.priorityTeam = team;
@@ -2283,7 +2442,20 @@ export class Game {
       if (revealAll || p.id === playerId) {
         return p.hand.map((h) => {
           const c = this.cardDB.get(h.cardId);
-          return { iid: h.iid, ...cardView(c), fleeting: h.fleeting };
+          const buffs = (h.buffs || []).filter((buff) => buff.duration !== 'round' || buff.round === this.round);
+          const powerBuff = buffs.reduce((sum, buff) => sum + (buff.power || 0), 0);
+          const healthBuff = buffs.reduce((sum, buff) => sum + (buff.health || 0), 0);
+          const keywords = [...new Set([...(c?.keywords || []), ...(h.keywords || [])])];
+          return {
+            iid: h.iid,
+            ...cardView(c),
+            attack: (c?.attack || 0) + powerBuff,
+            health: (c?.health || 0) + healthBuff,
+            keywords,
+            grantedKeywords: [...(h.keywords || [])],
+            buffs,
+            fleeting: h.fleeting,
+          };
         });
       }
       return p.hand.map((h) => ({ iid: null, hidden: true, fleeting: h.fleeting }));
@@ -2304,6 +2476,11 @@ export class Game {
       isChampion: u.isChampion,
       leveled: u.leveled,
       isLandmark: u.isLandmark,
+      equipped: (u.equipment || []).length > 0,
+      equipment: (u.equipment || []).map((e) => ({
+        cardId: e.cardId, name: e.name, attack: e.attack || 0, health: e.health || 0, keywords: e.keywords || [],
+      })),
+      capturedCount: (u.captured || []).length,
       keywords: [...new Set([
         ...(u.baseKeywords || []),
         ...(u.grantedKeywords || []),

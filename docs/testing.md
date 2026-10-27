@@ -1,4 +1,4 @@
-# Testing Nexus Forge 0.2.0
+# Testing Nexus Forge 0.3.0
 
 This guide covers automated checks, local desktop smoke tests, and the external-network release gate. Always record the exact build, commit, checksum, devices, and networks used. A same-machine test does not prove internet reachability.
 
@@ -15,10 +15,10 @@ npm test
 
 Expected for this release:
 
-- Syntax check: 46 files.
-- Seed script lint: 249 entries, 0 errors, 0 warnings.
-- Tests: 128 passing across engine, event ordering and dispatch, state/equipment/support mechanics, migration, protocol/content, deck validation, script vocabulary, verification metadata, seed upgrades, authoring tooling, and coverage reporting.
-- Coverage report: 248 scripts present (16.0% of 1,552 text cards), 0 verified, 1,304 missing. Run `npm run scripts:coverage` to reproduce it.
+- Syntax check: 47 files.
+- Seed script lint: 276 entries, 0 errors, 0 warnings.
+- Tests: 195 passing across engine, event ordering and dispatch, state/equipment/support mechanics, migration, protocol/content, deck validation, script vocabulary, verification metadata, seed upgrades, authoring tooling, and coverage reporting.
+- Coverage report: 270 scripts present (17.4% of 1,552 text cards), 38 verified (2.4%), 1,282 missing. All 29 Vanguard Disciplines text cards are verified. Run `npm run scripts:coverage` to reproduce it.
 - `npm run build:win` reruns the checks before packaging.
 
 Record:
@@ -60,13 +60,13 @@ $root = "$env:TEMP\nexus-forge-local-test"
 
 # Host instance
 $env:NEXUS_DATA_DIR = "$root\host-data"
-Start-Process -FilePath ".\release\NexusForge-0.2.0-portable.exe" `
+Start-Process -FilePath ".\release\NexusForge-0.3.0-portable.exe" `
   -ArgumentList "--user-data-dir=$root\host-profile"
 
 # Guest instance, run in a second terminal
 $root = "$env:TEMP\nexus-forge-local-test"
 $env:NEXUS_DATA_DIR = "$root\guest-data"
-Start-Process -FilePath ".\release\NexusForge-0.2.0-portable.exe" `
+Start-Process -FilePath ".\release\NexusForge-0.3.0-portable.exe" `
   -ArgumentList "--user-data-dir=$root\guest-profile"
 ```
 
@@ -96,6 +96,7 @@ Use the exact executable and checksum being evaluated.
 - [ ] Launch the `.exe` on Windows. No Node.js installation is required.
 - [ ] Windows SmartScreen may warn because the build is unsigned; use **More info → Run anyway** only for a build you trust.
 - [ ] Home screen loads with 1,647 base cards on a fresh data directory.
+- [ ] Fresh user data installs 275 seed scripts (43 curated entries, including generated/level-2 cards) and reports app version 0.3.0.
 - [ ] Create a room; the app registers a PeerJS host room.
 - [ ] Save a deck, including one Card Forge card. The deck should save; its optional Riot share code may be blank.
 - [ ] Close the app and confirm no `Nexus Forge` or Electron processes remain.

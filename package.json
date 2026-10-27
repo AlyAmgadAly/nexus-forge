@@ -1,6 +1,6 @@
 {
   "name": "nexus-forge",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "private": true,
   "type": "module",
   "description": "Nexus Forge - a self-hosted Runeterra-style card game with a card forge admin panel",

@@ -1,7 +1,7 @@
 // Shared wire constants. Keep these stable: they define the peer namespace,
 // message limits and the compatibility surface between desktop installations.
 
-export const APP_VERSION = '0.2.0';
+export const APP_VERSION = '0.3.0';
 export const ENGINE_SCHEMA = 1;
 export const PROTOCOL_VERSION = 1;
 

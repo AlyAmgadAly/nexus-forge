@@ -51,7 +51,7 @@ export const TRIGGER_NAMES = Object.freeze(Object.values(EVENTS));
 export const KNOWN_TRIGGERS = new Set(TRIGGER_NAMES);
 
 // Control flow is executed by EffectRunner.pump, not by execute().
-export const CONTROL_FLOW_ACTIONS = new Set(['if', 'random', 'repeat', 'choose']);
+export const CONTROL_FLOW_ACTIONS = new Set(['if', 'random', 'repeat', 'choose', 'pickFromTop']);
 
 // Every action type accepted by EffectRunner, including aliases and control
 // flow. `then` is a field on an action, not an action type.
@@ -66,6 +66,7 @@ export const ACTION_TYPES = new Set([
   'strike', 'fight', 'levelUp', 'transform', 'copy',
   'toss', 'predict', 'counter', 'shuffle', 'addToHandFromDeck',
   'destroyEquipment', 'detach', 'moveToDeck',
+  'equipFromHand', 'pickFromTop', 'capture', 'swap', 'nextSummon', 'addCounter',
   'log', 'noop',
   ...CONTROL_FLOW_ACTIONS,
 ]);
@@ -89,6 +90,7 @@ export const AUTO_TARGETS = new Set([
   'allUnits', 'allBattlingUnits', 'allAttackingUnits', 'allDefendingUnits',
   'allDamagedAllyUnits', 'allDamagedEnemyUnits',
   'allChampionAllies', 'allChampionEnemies',
+  'lastTargets', 'lastRecalled', 'eventUnit',
 ]);
 
 export const TARGET_TYPES = new Set([...CHOICE_TARGETS, ...AUTO_TARGETS]);
@@ -106,6 +108,7 @@ export const CONDITION_TYPES = new Set([
   'stunnedOrRecalled', 'enlightened', 'deep', 'topDeckRegion',
   'plunder', 'daybreak', 'nightfall', 'round',
   'sourceAttacking', 'sourceBlocking', 'sourceLeveled', 'targetChampion',
+  'selfStrikesThisGame', 'counter', 'eventTeam', 'eventNotSource', 'lastTargetFollower',
   'event', 'eventCard', 'firstTimeThisRound', 'firstTimeThisGame',
   'cardsPlayedThisRound', 'cardsDrawnThisRound', 'cardsDrawnInARoundThisGame',
   'damageTakenThisRound', 'damageDealtThisRound', 'equipsThisGame',
@@ -125,10 +128,12 @@ export const SCRIPT_STATUSES = new Set(['none', 'manual', 'auto', 'partial', 'cu
 export const UNIT_FILTER_FIELDS = new Set([
   'type', 'keyword', 'notKeyword', 'minPower', 'maxPower', 'minHealth', 'maxHealth',
   'minCost', 'maxCost', 'damaged', 'region', 'subtype', 'supertype', 'excludeSource', 'excludeUid',
-  'champion',
+  'champion', 'equipped', 'excludeChosen', 'types',
 ]);
 
-export const HAND_FILTER_FIELDS = new Set(['maxCost', 'minCost', 'type']);
+export const HAND_FILTER_FIELDS = new Set([
+  'maxCost', 'minCost', 'type', 'types', 'keyword', 'notKeyword', 'region', 'subtype', 'supertype',
+]);
 
 export const DURATIONS = new Set(['permanent', 'round']);
 

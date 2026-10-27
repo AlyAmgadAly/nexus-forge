@@ -5,7 +5,7 @@
 > `server/engine/game.js`, `server/script-validation.js`, or `scripts/autoscript.mjs`.
 >
 > Last audited: **2026-10-27**
-> Baseline release: **0.2.0** (`release/NexusForge-0.2.0-portable.exe`)
+> Baseline release: **0.3.0** (`release/NexusForge-0.3.0-portable.exe`)
 >
 > Re-measure every count in this file before trusting it. Counts are a snapshot,
 > not a contract. The contracts are the exit gates in [Section 7](#7-roadmap).
@@ -69,7 +69,7 @@ trade them for speed.
 | Path | Responsibility | Change policy |
 | --- | --- | --- |
 | `data/cards.json` | Pinned Data Dragon card payload (2,512 records) | Read-only source data |
-| `data/scripts.json` | Script entries shipped with releases (249; exclude custom-card entries from packages) | Batch edits only, with validation |
+| `data/scripts.json` | Script entries shipped with releases (276; 270 collectible text + 5 generated/level-2 + 1 local custom excluded from packages) | Batch edits only, with validation |
 | `server/engine/carddb.js` | Loads cards, scripts, settings; derives `script`, `scriptStatus`, `level2Id`, `hasSkill` | Status/metric fixes allowed |
 | `server/engine/effects.js` | DSL interpreter: targets, conditions, action execution, choice prompts, resolution stack | Core engine work |
 | `server/engine/game.js` | Game state, combat, death, level-up, stack, actual trigger dispatch | Core engine work |
@@ -217,10 +217,11 @@ mismatch must downgrade the card to `partial` in reports until re-verified.
 
 ---
 
-## 4. Measured baseline (2026-10-27)
+## 4. Measured baseline (2026-10-27, 0.3.0)
 
 Generated from `data/cards.json`, `data/scripts.json`, and the effective
-`CardDB.decorate()` status logic.
+`CardDB.decorate()` status logic. Full report:
+`docs/scripts/coverage-0.3.0.md`.
 
 ### Catalog
 
@@ -230,48 +231,50 @@ Generated from `data/cards.json`, `data/scripts.json`, and the effective
 | Collectible / enabled | 1,647 |
 | Collectible with rules text | 1,552 |
 | Collectible without rules text | 95 |
-| Entries in `data/scripts.json` | 249 (248 pinned + 1 custom-card entry) |
-| Scripts attached to a pinned collectible text card | 248 |
-| Text cards lacking a script | **1,304** |
-| Coverage | **16.0%** |
-| Verified (`curated` + metadata + test) | **0** |
-| Effective status `auto` | 248 |
-| Effective status `manual` | 1,304 |
+| Entries in `data/scripts.json` | 276 (270 collectible text + 5 generated/level-2 + 1 custom-card entry) |
+| Scripts attached to a pinned collectible text card | 270 |
+| Text cards lacking a script | **1,282** |
+| Coverage | **17.4%** |
+| Verified (`curated` + metadata + test) | **38** (2.4%) |
+| Effective status `auto` | 232 |
+| Effective status `manual` | 1,282 |
 | Effective status `none` | 95 |
 | Effective status `partial` | 0 |
-| Effective status `curated` | 0 |
+| Effective status `curated` | 38 |
 
-One seed entry, `C343DC2`, belongs to the local custom card "Smoke Test
-Sentinel" in `data/custom-cards.json`, which is not part of the pinned seed
-catalog. It is a local `manual` entry, not a card from `data/cards.json`. Seed
-builds must exclude custom-card entries; do not delete the user's custom card.
+The packaged seed contains 275 pinned entries: 270 collectible text scripts plus
+five generated/level-2 scripts. One local seed entry, `C343DC2`, belongs to the
+custom card "Smoke Test Sentinel" in `data/custom-cards.json`, which is not part
+of the pinned catalog. It is a local `custom` entry, not a card from
+`data/cards.json`. Seed builds must exclude custom-card entries; do not delete
+the user's custom card.
 
 ### Text cards by type
 
 | Type | Total text cards | Scripted | Missing |
 | --- | ---: | ---: | ---: |
-| Unit | 773 | 148 | 625 |
-| Spell | 566 | 81 | 485 |
-| Champion | 105 | 15 | 90 |
+| Unit | 773 | 159 | 614 |
+| Spell | 566 | 91 | 475 |
+| Champion | 105 | 16 | 89 |
 | Landmark | 81 | 2 | 79 |
 | Equipment | 27 | 2 | 25 |
-| **Total** | **1,552** | **248** | **1,304** |
+| **Total** | **1,552** | **270** | **1,282** |
 
 ### Missing scripts by set
 
-| Set | Missing | Approx. text cards |
-| --- | ---: | ---: |
-| Set5 | 191 | 219 |
-| Set1 | 184 | 279 |
-| Set4 | 179 | 211 |
-| Set6cde | 160 | 171 |
-| Set3 | 147 | 176 |
-| Set6 | 107 | 113 |
-| Set8 | 97 | 106 |
-| Set2 | 86 | 110 |
-| Set9 | 54 | 58 |
-| Set7b | 51 | 52 |
-| Set7 | 48 | 57 |
+| Set | Text cards | Scripted | Missing |
+| --- | ---: | ---: | ---: |
+| Set1 | 279 | 101 | 178 |
+| Set2 | 110 | 24 | 86 |
+| Set3 | 176 | 31 | 145 |
+| Set4 | 211 | 36 | 175 |
+| Set5 | 219 | 28 | 191 |
+| Set6 | 113 | 9 | 104 |
+| Set6cde | 171 | 17 | 154 |
+| Set7 | 57 | 9 | 48 |
+| Set7b | 52 | 1 | 51 |
+| Set8 | 106 | 9 | 97 |
+| Set9 | 58 | 5 | 53 |
 
 Set order is **not** the implementation order. Use mechanic frequency and the
 starter-deck cohort.
@@ -280,7 +283,7 @@ starter-deck cohort.
 
 Six starter decks:
 
-1. Vanguard Disciplines (Demacia + Ionia)
+1. Vanguard Disciplines (Demacia + Ionia) — **complete 29/29 verified**
 2. Reckless Revenants (Noxus + Shadow Isles)
 3. Frost & Flame (Freljord + Piltover & Zaun)
 4. Tides of the Peak (Bilgewater + Targon)
@@ -291,13 +294,15 @@ Six starter decks:
 | --- | ---: |
 | Unique cards across the six starter decks | 206 |
 | Unique cards with rules text | 179 |
-| Text cards already scripted | 44 |
-| Text cards missing scripts | **135** |
-| Scripted cards marked `curated` | 0 |
+| Text cards already scripted | 61 |
+| Text cards missing scripts | **118** |
+| Scripted cards marked `curated` | 29 |
 
-The cohort grew from the 0.2.0 audit because the uncommitted deck-builder work
-regenerates the six starter decks. Re-run `npm run scripts:coverage` before
-using these numbers; they are a snapshot, not a contract.
+The cohort total is unique across decks; per-deck counts can double-count a card
+that appears in more than one starter. All 29 Vanguard Disciplines text cards
+are verified with 0 missing. The other five decks contain 118 text cards without
+scripts and 32 unverified scripts. Re-run `npm run scripts:coverage` before using
+these numbers; they are a snapshot, not a contract.
 
 This cohort is small enough to finish and broad enough to exercise every region.
 
@@ -307,38 +312,51 @@ Trigger frequency in `data/scripts.json` (the custom-card entry has no triggers)
 
 | Trigger | Entries |
 | --- | ---: |
-| `play` | 121 |
-| `summon` | 60 |
-| `death` | 14 |
+| `play` | 131 |
+| `summon` | 65 |
 | `attack` | 14 |
-| `roundStart` | 12 |
+| `death` | 14 |
+| `roundStart` | 13 |
 | `strike` | 9 |
-| `nexusStrike` | 7 |
-| `summonOther` | 6 |
+| `nexusStrike` | 8 |
+| `summonOther` | 8 |
 | `surviveDamage` | 6 |
 | `castSpell` | 4 |
+| `barrier` | 3 |
+| `support` | 3 |
 | `roundEnd` | 2 |
 | `allyDeath` | 1 |
+| `equip` | 1 |
+| `playCard` | 1 |
+| `recall` | 1 |
+| `supported` | 1 |
 
 Action frequency:
 
 | Action | Uses | Action | Uses |
 | --- | ---: | --- | ---: |
-| `buff` | 66 | `create` | 47 |
-| `summon` | 45 | `damage` | 21 |
-| `grantKeyword` | 20 | `createRandom` | 12 |
-| `draw` | 11 | `damageAll` | 11 |
-| `stun` | 8 | `heal` | 7 |
-| `toss` | 6 | `frostbite` | 5 |
-| `recall` | 5 | `rally` | 4 |
-| `emptyManaGem` | 4 | `predict` | 4 |
+| `buff` | 75 | `create` | 54 |
+| `summon` | 46 | `grantKeyword` | 22 |
+| `damage` | 21 | `draw` | 14 |
+| `createRandom` | 12 | `damageAll` | 11 |
+| `stun` | 8 | `heal` | 8 |
+| `recall` | 7 | `toss` | 6 |
+| `rally` | 5 | `frostbite` | 5 |
+| `barrier` | 4 | `emptyManaGem` | 4 |
+| `predict` | 4 | `choose` | 3 |
 | `kill` | 3 | `copy` | 2 |
-| `silence` | 1 | `healNexus` | 1 |
-| `spellMana` | 1 | `obliterate` | 1 |
+| `silence` | 2 | `addCounter` | 1 |
+| `capture` | 1 | `destroyEquipment` | 1 |
+| `equipFromHand` | 1 | `healNexus` | 1 |
+| `if` | 1 | `nextSummon` | 1 |
+| `obliterate` | 1 | `pickFromTop` | 1 |
+| `spellMana` | 1 | `strike` | 1 |
+| `swap` | 1 | `transform` | 1 |
 
-No seed script contains a `levelUp` block. Champion level-up conditions are
-therefore entirely unimplemented even though the engine reads
-`unit.script.levelUp.condition`.
+Garen (`01DE012`) and Shen (`01IO032`) now carry verified `levelUp` conditions
+and level-two scripts. The broader champion level-up requirement remains a
+Phase 3 item; do not assume other champions have conditions just because the
+engine supports them.
 
 ---
 
@@ -368,24 +386,26 @@ they drift.
 `healNexus`, `buff` / `give`, `debuff`, `grantKeyword`, `removeKeyword`,
 `barrier`, `spellShield`, `stun`, `frostbite`, `recall`, `silence`, `kill`,
 `obliterate`, `draw`, `discard`, `summon`, `create`, `createRandom`, `mana`,
-`spellMana`, `emptyManaGem`, `rally`, `strike`, `fight`, `levelUp`, `transform`,
-`copy`, `toss`, `predict`, `counter`, `shuffle`, `addToHandFromDeck`,
-`destroyEquipment`, `detach`, `moveToDeck`, `log`, `noop`, plus control flow
-`if`, `random`, `repeat`, and `then`.
+`spellMana`, `emptyManaGem`, `rally`, `strike`, `fight`, `levelUp`, `transform`
+(unit or hand card), `copy`, `toss`, `predict`, `counter`, `shuffle`,
+`addToHandFromDeck`, `destroyEquipment`, `detach`, `moveToDeck`, `equipFromHand`,
+`pickFromTop`, `capture`, `swap`, `nextSummon`, `addCounter`, `log`, `noop`,
+plus control flow `if`, `random`, `repeat`, `choose`, and `pickFromTop`.
 
 ### Target types implemented by `targetOptions`
 
 Choice targets: `allyUnit`, `otherAllyUnit`, `enemyUnit`, `anyUnit`,
-`anyNexus`, `anyTarget`, `allyChampion`, `enemyChampion`, `allyFollower`,
-`enemyFollower`, `allyLandmark`, `enemyLandmark`, `handCard`.
+`anyNexus`, `anyTarget`, `allyTarget`, `allyChampion`, `enemyChampion`,
+`allyFollower`, `enemyFollower`, `allyLandmark`, `enemyLandmark`, `handCard`.
 
-Automatic targets: `self`, `allyNexus`, `enemyNexus`, `attacker`, `blocker`,
-`strikeTarget`, `supporter`, `supported`, `strongestAlly`, `weakestAlly`,
-`strongestEnemy`, `weakestEnemy`, `randomAllyUnit`, `randomOtherAllyUnit`,
-`randomEnemyUnit`, `randomUnit`, `allAllyUnits`, `allOtherAllyUnits`,
-`allEnemyUnits`, `allOtherEnemyUnits`, `allUnits`, `allBattlingUnits`,
-`allAttackingUnits`, `allDefendingUnits`, `allDamagedAllyUnits`,
-`allDamagedEnemyUnits`, `allChampionAllies`, `allChampionEnemies`.
+Automatic targets: `none`, `self`, `allyNexus`, `enemyNexus`, `attacker`,
+`blocker`, `strikeTarget`, `supporter`, `supported`, `strongestAlly`,
+`weakestAlly`, `strongestEnemy`, `weakestEnemy`, `randomAllyUnit`,
+`randomOtherAllyUnit`, `randomEnemyUnit`, `randomUnit`, `allAllyUnits`,
+`allOtherAllyUnits`, `allEnemyUnits`, `allOtherEnemyUnits`, `allUnits`,
+`allBattlingUnits`, `allAttackingUnits`, `allDefendingUnits`,
+`allDamagedAllyUnits`, `allDamagedEnemyUnits`, `allChampionAllies`,
+`allChampionEnemies`, `lastTargets`, `lastRecalled`, `eventUnit`.
 
 ### Reserved target names
 
@@ -405,28 +425,31 @@ all units.
 `manaSpentOnSpellsThisGame`, `stunnedOrRecalled`, `enlightened`, `deep`,
 `topDeckRegion`, `plunder`, `daybreak`, `nightfall`, `round`,
 `sourceAttacking`, `sourceBlocking`, `sourceLeveled`, `targetChampion`,
-`event`, `firstTimeThisRound`, `firstTimeThisGame`, `cardsPlayedThisRound`,
-`cardsDrawnThisRound`, `cardsDrawnInARoundThisGame`, `damageTakenThisRound`,
-`damageDealtThisRound`, `equipsThisGame`, `sourceEquipped`, `attackerEquipped`,
-`behold`, `healWasDamaged`, `reputation`, `allegiance`, `lurkActive`, `fated`,
-`flow`, `evolve`, `augment`, `hallowed`, `brash`, `formidable`.
+`selfStrikesThisGame`, `counter`, `eventTeam`, `eventNotSource`,
+`lastTargetFollower`, `event`, `eventCard`, `firstTimeThisRound`,
+`firstTimeThisGame`, `cardsPlayedThisRound`, `cardsDrawnThisRound`,
+`cardsDrawnInARoundThisGame`, `damageTakenThisRound`, `damageDealtThisRound`,
+`equipsThisGame`, `sourceEquipped`, `attackerEquipped`, `behold`,
+`healWasDamaged`, `reputation`, `allegiance`, `lurkActive`, `fated`, `flow`,
+`evolve`, `augment`, `hallowed`, `brash`, `formidable`.
 
 `firstTimeThisRound` consumes a per-player flag and resets at round start;
-`firstTimeThisGame` consumes a per-game flag. `custom` was removed from the
-vocabulary; it is rejected by lint and returns `false` with an error if
-hand-edited into a script.
+`firstTimeThisGame` consumes a per-game flag and accepts `"scope": "source"` for
+per-card once-per-game effects. `custom` was removed from the vocabulary; it is
+rejected by lint and returns `false` with an error if hand-edited into a script.
 
 ### Filters
 
 `targetOptions` and `damageAll` accept a `filter` object. Implemented fields:
 
-`type` (`champion`, `follower`, `landmark`, `unit`, `equipment`), `keyword`,
-`notKeyword`, `minPower`, `maxPower`, `minHealth`, `maxHealth`, `minCost`,
-`maxCost`, `damaged`, `region`, `subtype`, `supertype`, `excludeSource`,
-`excludeUid`, `champion`.
+`type` (`champion`, `follower`, `landmark`, `unit`, `equipment`), `types`,
+`keyword`, `notKeyword`, `minPower`, `maxPower`, `minHealth`, `maxHealth`,
+`minCost`, `maxCost`, `damaged`, `region`, `subtype`, `supertype`,
+`excludeSource`, `excludeUid`, `champion`, `equipped`, `excludeChosen`.
 
 Filters apply to units only. `handCard` has its own smaller filter path
-(`maxCost`, `minCost`, `type`).
+(`maxCost`, `minCost`, `type`, `types`, `keyword`, `notKeyword`, `region`,
+`subtype`, `supertype`).
 
 ### Known semantic limitations in current actions
 
@@ -567,9 +590,10 @@ add flag setters, and add tests for every condition.
 
 ### 6.9 Stale test/documentation counts
 
-`docs/testing.md` previously said 34 syntax files and 23 tests. Current
-measured state after Phase 1.3 is 46 syntax files and 128 tests. `README.md` and
-`docs/testing.md` now carry the current measured counts.
+`docs/testing.md` previously said 34 syntax files and 23 tests. At the Phase 1.3
+audit the measured state was 46 syntax files and 128 tests; the 0.3.0 state is
+47 files and 195 tests. `README.md` and `docs/testing.md` carry the current
+measured counts.
 
 **Fix:** update both when Phase 0 lands, and add a check that documentation
 counts are generated or explicitly dated.
@@ -769,6 +793,7 @@ Implement only those proven by a batch:
 - [x] `allDamagedAllyUnits`, `allDamagedEnemyUnits`
 - [x] `allChampionAllies`, `allChampionEnemies`
 - [x] `supporter`, `supported` for Support linkage
+- [x] `lastTargets`, `lastRecalled`, `eventUnit` for trigger-context effects
 
 For each, add the implementation, registry entry, choice/auto behavior, and
 tests. Remove it from `AUTO_TARGETS` until implemented.
@@ -778,9 +803,17 @@ tests. Remove it from `AUTO_TARGETS` until implemented.
 Implement only those proven by a batch:
 
 - [x] `detach` / `destroyEquipment` (attach is still handled by playing an Equipment card)
+- [x] `equipFromHand` with ownership and card-cost filtering (Catch!)
+- [x] `pickFromTop` filtered selection from the top of the deck (Tempting Prospect)
+- [x] `capture` / release lifecycle (Detain)
+- [x] `swap` two allied units (Stand United)
+- [x] `nextSummon` temporary keyword/stat buff for the next summon (Tattered Banner)
+- [x] `addCounter` and counter conditions (Shen)
+- [x] `transform` a unit or a card in hand (Vastayan Disciple / Shimon Wind)
 - [ ] `advanceCountdown` / `destroyLandmark`
 - [ ] Non-random discard from hand (player choice)
-- [ ] Choose from deck with a predicate
+- [ ] Choose from deck with a predicate beyond the top N (`pickFromTop` covers
+      the current starter-deck need)
 - [ ] `setStats`, `swapStats`
 - [ ] `reveal`
 - [ ] `predictChoose`
@@ -788,9 +821,11 @@ Implement only those proven by a batch:
 - [ ] `strikeNexus`
 - [x] `moveToDeck` (`moveToHand` still uses `recall`)
 - [x] Declarative `choose` branches, including nested choices and continuations
-      (Tellstones batch; invalid choices are rejected without advancing).
+      (Tellstones and Vanguard batches; invalid choices are rejected without
+      advancing).
 - [ ] `increaseMaxMana`, `refillMana`
-- [ ] `copyCard`, `transformCardInHand`
+- [x] `transformCardInHand` (via `transform`)
+- [ ] `copyCard`
 - [ ] `createInDeck`
 - [ ] `obliterateDeck`
 - [ ] `silenceAll`, `stunAll`
@@ -807,8 +842,9 @@ current batch and the primitive is general enough to be named clearly.
       declare `levelUp`; the cohort-wide requirement waits for Phase 3 card work.)
 - [x] Ensure level-up swaps card data, keywords, stats, and script atomically.
 - [x] Fire the `levelUp` trigger after the swap and before further actions.
-- [x] Add a generic level-up regression test; per-champion tests land with the
-      Phase 3 champion batch.
+- [x] Add a generic level-up regression test; Garen and Shen now have verified
+      per-champion level-up tests. The cohort-wide champion sweep remains a
+      Phase 3 item.
 
 **Phase 1 exit gate**
 
@@ -826,22 +862,23 @@ current batch and the primitive is general enough to be named clearly.
 Goal: every text card in the six starter decks is verified. This is the first
 user-visible milestone and the best regression suite.
 
-Cohort: 206 unique cards, 179 with text, 44 already scripted, **135 missing**,
-0 curated. Re-measure before starting; the deck-builder work can change this
+Cohort: 206 unique cards, 179 with text, 61 already scripted, **118 missing**,
+29 curated. Re-measure before starting; the deck-builder work can change this
 cohort.
 
 #### 2.1 Cohort inventory
 
 - [x] Generate `docs/scripts/starter-cohort.md` from the coverage report.
 - [x] Group by deck and by mechanic.
-- [ ] Mark cards blocked by Phase 1 gaps.
-      Vanguard blockers are tracked in `docs/scripts/blocked.md`; the other
-      decks still need clause-by-clause triage.
+- [x] Mark Vanguard blockers by Phase 1 gap; all are resolved in 0.3.0.
+- [ ] Clause-by-clause triage for the other five starter decks. Remaining
+      blockers are summarized in `docs/scripts/blocked.md`.
 
-#### 2.2 Verify the 32 existing scripts
+#### 2.2 Verify the remaining existing scripts
 
-- [ ] Audit each script against printed text clause by clause.
-- [ ] Mark `curated` only after tests pass.
+- [x] Audit all 29 Vanguard Disciplines text cards against printed text and mark
+      them `curated` after tests pass.
+- [ ] Audit the 32 remaining scripts in other starter decks.
 - [ ] Fix `auto` scripts that are approximations. Record the approximation in
       the verification notes. Example: `topDeckRegion` is used as a stand-in for
       Allegiance on three mono-region cards (`01DE001`, `01NX008`, `01SI016`);
@@ -849,11 +886,11 @@ cohort.
 - [ ] Remove generator noise such as `count: 1` on `allAllyUnits` targets
       (for example `01DE052`); count is ignored for "all" targets.
 
-#### 2.3 Implement the 135 missing cards
+#### 2.3 Implement the 118 missing cards
 
 Suggested batch order, one deck at a time:
 
-1. [ ] Vanguard Disciplines
+1. [x] Vanguard Disciplines — 29/29 verified in 0.3.0
 2. [ ] Reckless Revenants
 3. [ ] Frost & Flame
 4. [ ] Tides of the Peak
@@ -871,13 +908,13 @@ level-ups, then complex multi-clause cards.
 - [ ] Every distinct effect has a regression test.
 - [ ] A deterministic smoke test plays each starter deck for several rounds
       with no engine error, no unresolved choice, and no unknown action log.
-- [ ] `npm run test:all` and a packaged build pass.
+- [x] `npm run test:all` and a packaged build pass for the Vanguard batch.
 
 **Phase 2 exit gate**
 
 - 0 `manual` and 0 `auto` cards in the starter cohort.
 - 179/179 starter text cards verified or explicitly blocked.
-- Coverage impact: at least +135 scripts, approximately 24.7% present and a
+- Coverage impact: at least +118 scripts, approximately 25.0% present and a
   meaningful verified percentage.
 - No new engine warnings in a 10-round starter-deck simulation.
 
@@ -916,10 +953,10 @@ Each family must ship with a test matrix, not one happy-path test.
 
 #### 3.3 Champions and level-ups
 
-There are 117 collectible champions, 105 with text, 15 scripted, **90 missing**.
+There are 117 collectible champions, 105 with text, 16 scripted, **89 missing**.
 Champions are deck-defining and should not wait for set sweeps.
 
-- [ ] Implement all 90 missing champion scripts.
+- [ ] Implement all 89 missing champion scripts.
 - [ ] Add level-up conditions and level-2 behavior for all 117 champions
       with a `level2Id`.
 - [ ] Test the pre-level and post-level state, keywords, stats, and script.
@@ -1098,8 +1135,8 @@ Rules:
 
 | Command | Purpose |
 | --- | --- |
-| `npm run check:syntax` | Syntax check; currently 46 files |
-| `npm test` | Node test runner; currently 128 tests |
+| `npm run check:syntax` | Syntax check; currently 47 files |
+| `npm test` | Node test runner; currently 195 tests |
 | `npm run test:all` | Syntax + seed lint + tests; required before every batch commit |
 | `npm run scripts:coverage` | Read-only coverage report; supports `--json`, `--markdown`, `--set`, `--type`, `--starter`, `--missing`, `--out` |
 | `npm run scripts:lint` | Semantic lint of the packaged seed; zero warnings required |
@@ -1139,7 +1176,7 @@ Therefore:
 
 ### `data/scripts.json` size
 
-At 249 entries the file is about 122 KB. A complete file could approach
+At 276 entries the file is about 154 KB. A complete file could approach
 0.8–1.2 MB. `MAX_SCRIPT_BYTES` is per script (64 KB), not per file, so this is
 acceptable, but:
 
@@ -1165,11 +1202,11 @@ scripts must:
 
 Use this order unless data proves otherwise:
 
-1. **Starter-deck text cards** (135 missing). User-visible, bounded, and a
+1. **Starter-deck text cards** (118 missing). User-visible, bounded, and a
    broad regression suite.
 2. **Engine primitives reused by 10+ cards.** One change unlocks many cards.
-3. **Champions and level-ups** (90 missing, 117 level-up conditions). Deck-
-   defining and highly visible.
+3. **Champions and level-ups** (89 missing text champions; 117 collectible
+   champions with a `level2Id`). Deck-defining and highly visible.
 4. **Mechanic families with the highest missing-card count.**
 5. **Landmarks and equipment.** High engine cost, smaller counts.
 6. **Exotic and set-specific cards.** Last.
@@ -1194,11 +1231,11 @@ Update this table after every phase gate. Counts are current as of 2026-10-27.
 | Phase | Scope | Exit metric | Status |
 | --- | --- | --- | --- |
 | 0 | Integrity, status, seed upgrade, registry, lint, docs | Honest metrics; safe upgrade; parity test | **Complete 2026-10-27** |
-| 1 | Events, state, primitives, level-up model | All new vocabulary implemented + tested | In progress — 1.1–1.3 complete; 1.4–1.6 partial 2026-10-27 |
-| 2 | Starter decks | 179/179 text cards verified or blocked | In progress — first Vanguard batches; 21/179 verified, 124 without scripts; remaining phase gates open |
-| 3 | Reuse families + champions | 90 champions + top 10 families; < 800 missing | Not started |
+| 1 | Events, state, primitives, level-up model | All new vocabulary implemented + tested | In progress — 1.1–1.3 complete; Vanguard-required 1.4–1.6 primitives complete 2026-10-27; broader model open |
+| 2 | Starter decks | 179/179 text cards verified or blocked | In progress — Vanguard 29/29 verified; 29/179 verified, 118 without scripts overall; remaining decks open |
+| 3 | Reuse families + champions | 89 champions + top 10 families; < 800 missing | Not started |
 | 4 | Remaining cards | < 78 missing; rest blocked with reasons | Not started |
-| 5 | Release hardening | Fresh + upgrade installs; coverage report | Not started |
+| 5 | Release hardening | Fresh + upgrade installs; coverage report | In progress — 0.3.0 build, packaged smoke, coverage report, and checksum recorded; cross-network and upgrade gates open |
 
 ### Phase 0 evidence (2026-10-27)
 
@@ -1342,6 +1379,44 @@ Update this table after every phase gate. Counts are current as of 2026-10-27.
   0 verified, 1,304 missing. Phase 1.3 is engine capability, not card coverage.
 - No runtime REA evidence was required: the state model and dispatch sites are
   established by source and deterministic tests.
+
+### 0.3.0 Vanguard batch evidence (2026-10-27)
+
+- Applied `scripts/batches/2026-10-27-vanguard-batch-01.json` with 19 curated
+  entries: 14 collectible Vanguard Disciplines text cards plus 5 generated or
+  level-2 cards (`01DE012T1`, `01IO032T1`, `04DE007T1`, `06IO013T1`,
+  `06IO014T1`).
+- Added engine support for `equipFromHand`, `pickFromTop`, `capture`, `swap`,
+  `nextSummon`, `addCounter`, unit/hand `transform`, hand-card keyword grants,
+  equipment-from-hand selection, `barrier`/`recall`/`support` dispatch, and the
+  `eventTeam`, `eventNotSource`, `lastTargetFollower`, `eventCard`,
+  `selfStrikesThisGame`, and `counter` conditions.
+- Vanguard Disciplines is complete: 29/29 text cards verified, 0 missing, 0
+  partial. All 29 print clauses have regression coverage in
+  `test/vanguard-batch.test.mjs`; the file contains 28 tests including Catch!
+  empty-hand/illegal-equipment cases, Silence and Suppress no-equipment and
+  champion cases, Steadfast Elkin multiple-copy/enemy-equip/repeat-equip cases,
+  and Shen's below-threshold and self-Barrier cases.
+- Fixed `rally()` to clear the opposing team's attack token.
+- `npm run check:syntax`: 47 files, syntax OK.
+- `npm test`: 195 passing, 0 failing.
+- `npm run scripts:lint`: 276 entries, 0 errors, 0 warnings.
+- Coverage: 270 scripts present (17.4% of 1,552 text cards), 38 verified (2.4%),
+  1,282 missing. Starter cohort: 61 scripted, 29 verified, 118 missing.
+- `npm run build:win` produced `release/NexusForge-0.3.0-portable.exe`
+  (121,460,358 bytes; SHA-256
+  `3E9EAD7832C7ABE9CB61E2B9CA914447966290030609C8169E4904AD79798C9A`) after the
+  protocol/app version bump to 0.3.0. An earlier 0.3.0 packaged build launched
+  with fresh data, installed 275 seed scripts (43 curated entries including five
+  generated/level-2 scripts), served 1,647 cards at version 0.3.0 with
+  `desktop: true`, and closed without leaving processes or listening ports. This
+  smoke evidence was recorded before the headless-only instruction. After the
+  final Steadfast Elkin seed-scope correction and batch metadata update, the
+  executable was rebuilt and the hash above recorded; it was not relaunched, so
+  the smoke evidence does not cover the exact final hash.
+- External-network, relay/TURN, clean-machine, 2v2, spectator, and reconnect
+  verification remain open. The user-reported mulligan stall remains under
+  investigation and is not claimed fixed.
 
 ### Batch ledger template
 
@@ -1551,16 +1626,17 @@ When reporting progress, always distinguish:
 - **Engine gaps:** missing vocabulary, not card count.
 
 Never say "all cards are implemented" because `data/scripts.json` has entries.
-Never say "16% of the game works" because 16% is coverage, not correctness.
+Never say "17% of the game works" because 17.4% is coverage, not correctness.
 
 A release note should look like:
 
-> Card effects: 248 scripts present (16.0% of text cards); 0 verified.
-> Starter decks: 0/175 text cards verified. See `docs/scripts/coverage-0.2.0.md`.
+> Card effects: 270 scripts present (17.4% of text cards); 38 verified (2.4%).
+> Starter decks: 29/179 text cards verified; Vanguard Disciplines is 29/29.
+> See `docs/scripts/coverage-0.3.0.md`.
 
 And after Phase 2:
 
-> Card effects: 383 scripts present (24.7%); 179 verified. All starter-deck text
+> Card effects: 388 scripts present (25.0%); 179 verified. All starter-deck text
 > cards are verified or explicitly blocked.
 
 ---
@@ -1575,3 +1651,5 @@ And after Phase 2:
 | 2026-10-27 | Phase 1.2 events partial: added block, damageUnit, damageNexus, heal, discard, playCard, spellCast/castSpell alias, equip, and countdown with dispatch sites and tests; separated eventSource from trigger source; deferred state-dependent events to Phase 1.3. Suite is 111 passing. |
 | 2026-10-27 | Phase 1.3 state complete: per-round/game flags and counters, support/supported linkage, equipment attachment/detach, pair-specific block context, Lurk dispatch, Behold and keyword conditions, target/damage/heal history, new target primitives, and `moveToDeck`/`destroyEquipment`/`detach`. Suite is 128 passing. |
 | 2026-10-27 | Resume audit: previous work had already started Phase 2 and stopped after adding an untested `choose` primitive. Finished both Tellstones creation scripts, rejected forged/excess choices, preserved nested continuations, repaired strict batch lint and stale coverage tests, and corrected public logs leaking hidden hand/choice names. Fixed Trusty Ramhound flags shared across copies; strengthened duration tests. Garen/Shen demoted to partial because level-ups are absent. Current evidence and blockers: `docs/scripts/resume-audit.md`, `docs/scripts/blocked.md`. Phase 1 and Phase 2 exit gates remain open. |
+| 2026-10-27 | Vanguard batch 01: applied 19 curated entries (14 collectible Vanguard cards + 5 generated/level-2 cards), added the engine primitives they proved, completed Garen/Shen level-ups, and verified all 29 Vanguard Disciplines text cards. Suite is 195 passing. Coverage is 270 present (17.4%), 38 verified (2.4%), 1,282 missing. |
+| 2026-10-27 | 0.3.0 release prep: bumped app/protocol metadata to 0.3.0, rebuilt the portable Windows artifact, recorded packaged fresh-seed smoke evidence, regenerated the starter cohort and coverage reports, and updated README/testing/DSL/release documentation. External-network, relay, clean-machine, 2v2, spectator, reconnect, and mulligan-stall gates remain open. |

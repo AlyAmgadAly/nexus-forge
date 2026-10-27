@@ -143,7 +143,7 @@
     "updatedAt": "2026-10-26T00:23:30.959Z"
   },
   "01DE012": {
-    "status": "partial",
+    "status": "curated",
     "script": {
       "triggers": [
         {
@@ -158,9 +158,68 @@
             }
           ]
         }
+      ],
+      "levelUp": {
+        "condition": {
+          "type": "selfStrikesThisGame",
+          "op": ">=",
+          "value": 2
+        }
+      }
+    },
+    "updatedAt": "2026-10-27T14:07:01.850Z",
+    "verification": {
+      "version": 1,
+      "cardTextHash": "b8615bfd5164e7aec6a30c08a92233477fa65bc2601274cb057e680ec0970bdb",
+      "verifiedAt": "2026-10-27T00:00:00.000Z",
+      "verifiedBy": "agent",
+      "test": "test/vanguard-batch.test.mjs#vanguard-garen-levels-up",
+      "clauses": [
+        "When I'm summoned, give other allies +1|+1 this round.",
+        "I've struck twice."
+      ],
+      "notes": ""
+    }
+  },
+  "01DE012T1": {
+    "script": {
+      "triggers": [
+        {
+          "on": "summon",
+          "actions": [
+            {
+              "type": "buff",
+              "power": 1,
+              "health": 1,
+              "duration": "round",
+              "target": "allOtherAllyUnits"
+            }
+          ]
+        },
+        {
+          "on": "roundStart",
+          "actions": [
+            {
+              "type": "rally"
+            }
+          ]
+        }
       ]
     },
-    "updatedAt": "2026-10-27T06:28:29.178Z"
+    "status": "curated",
+    "updatedAt": "2026-10-27T14:07:01.851Z",
+    "verification": {
+      "version": 1,
+      "cardTextHash": "5be03eef1a13db4f7bbdab686dbb17b203daa0c6424763a4fe064f5265af7bc4",
+      "verifiedAt": "2026-10-27T00:00:00.000Z",
+      "verifiedBy": "agent",
+      "test": "test/vanguard-batch.test.mjs#vanguard-garen-level-two-rally",
+      "clauses": [
+        "When I'm summoned, give other allies +1|+1 this round.",
+        "Round Start: Rally."
+      ],
+      "notes": ""
+    }
   },
   "01DE014": {
     "status": "auto",
@@ -276,6 +335,39 @@
       "notes": ""
     }
   },
+  "01DE025": {
+    "script": {
+      "triggers": [
+        {
+          "on": "play",
+          "actions": [
+            {
+              "type": "capture",
+              "target": {
+                "type": "allyUnit"
+              },
+              "secondaryTarget": {
+                "type": "anyUnit"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    "status": "curated",
+    "updatedAt": "2026-10-27T14:07:01.852Z",
+    "verification": {
+      "version": 1,
+      "cardTextHash": "3efc3dda8cb851551b552cb553553b1a6cc0027eef9a3fd431079d01002491bd",
+      "verifiedAt": "2026-10-27T00:00:00.000Z",
+      "verifiedBy": "agent",
+      "test": "test/vanguard-batch.test.mjs#vanguard-detain-capture-release",
+      "clauses": [
+        "An ally Captures a unit."
+      ],
+      "notes": ""
+    }
+  },
   "01DE027": {
     "status": "auto",
     "script": {
@@ -358,8 +450,38 @@
     },
     "updatedAt": "2026-10-26T00:23:30.960Z"
   },
+  "01DE032": {
+    "script": {
+      "triggers": [
+        {
+          "on": "play",
+          "actions": [
+            {
+              "type": "barrier",
+              "target": {
+                "type": "allyUnit"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    "status": "curated",
+    "updatedAt": "2026-10-27T14:07:01.852Z",
+    "verification": {
+      "version": 1,
+      "cardTextHash": "21d362afe6435948688f6d9d0f227cdd956c9043a62e732f43fafd5c5a177e55",
+      "verifiedAt": "2026-10-27T00:00:00.000Z",
+      "verifiedBy": "agent",
+      "test": "test/vanguard-batch.test.mjs#vanguard-prismatic-barrier",
+      "clauses": [
+        "Give an ally Barrier this round."
+      ],
+      "notes": ""
+    }
+  },
   "01DE035": {
-    "status": "auto",
+    "status": "curated",
     "script": {
       "triggers": [
         {
@@ -370,17 +492,24 @@
               "power": 3,
               "health": 3,
               "duration": "round",
-              "target": {
-                "type": "allAllyUnits",
-                "filter": {}
-              },
-              "condition": null
+              "target": "allAllyUnits"
             }
           ]
         }
       ]
     },
-    "updatedAt": "2026-10-26T00:23:30.960Z"
+    "updatedAt": "2026-10-27T14:07:01.853Z",
+    "verification": {
+      "version": 1,
+      "cardTextHash": "99346fbd2e18a611514dbd1dcc3665d840685b9f6c543c3b5fed3190f483009c",
+      "verifiedAt": "2026-10-27T00:00:00.000Z",
+      "verifiedBy": "agent",
+      "test": "test/vanguard-batch.test.mjs#vanguard-for-demacia",
+      "clauses": [
+        "Give allies +3|+3 this round."
+      ],
+      "notes": "Previously auto-generated; verified against the printed text."
+    }
   },
   "01DE041": {
     "status": "auto",
@@ -927,6 +1056,40 @@
     },
     "updatedAt": "2026-10-26T00:23:30.963Z"
   },
+  "01IO001": {
+    "script": {
+      "triggers": [
+        {
+          "on": "play",
+          "actions": [
+            {
+              "type": "heal",
+              "amount": 4,
+              "target": "allyTarget"
+            },
+            {
+              "type": "draw",
+              "amount": 1
+            }
+          ]
+        }
+      ]
+    },
+    "status": "curated",
+    "updatedAt": "2026-10-27T14:07:01.852Z",
+    "verification": {
+      "version": 1,
+      "cardTextHash": "6fbcacb0ee88e5089c71553dce2196017d197761018143d2cb142654b955ead1",
+      "verifiedAt": "2026-10-27T00:00:00.000Z",
+      "verifiedBy": "agent",
+      "test": "test/vanguard-batch.test.mjs#vanguard-ritual-of-renewal",
+      "clauses": [
+        "Heal an ally or your Nexus 4.",
+        "Draw 1."
+      ],
+      "notes": ""
+    }
+  },
   "01IO002": {
     "status": "auto",
     "script": {
@@ -1026,6 +1189,45 @@
       ]
     },
     "updatedAt": "2026-10-26T00:23:30.963Z"
+  },
+  "01IO010": {
+    "script": {
+      "triggers": [
+        {
+          "on": "play",
+          "actions": [
+            {
+              "type": "swap",
+              "target": {
+                "type": "allyUnit",
+                "count": 2
+              }
+            },
+            {
+              "type": "barrier",
+              "target": {
+                "type": "lastTargets",
+                "count": 2
+              }
+            }
+          ]
+        }
+      ]
+    },
+    "status": "curated",
+    "updatedAt": "2026-10-27T14:07:01.852Z",
+    "verification": {
+      "version": 1,
+      "cardTextHash": "46200f31d6ac653df08a5284b0f73202e0595371a977e9f8f1d1705abe95376c",
+      "verifiedAt": "2026-10-27T00:00:00.000Z",
+      "verifiedBy": "agent",
+      "test": "test/vanguard-batch.test.mjs#vanguard-stand-united",
+      "clauses": [
+        "Swap 2 allies.",
+        "Give them Barrier this round."
+      ],
+      "notes": ""
+    }
   },
   "01IO011": {
     "status": "auto",
@@ -1233,11 +1435,106 @@
               "target": "supported"
             }
           ]
+        },
+        {
+          "on": "barrier",
+          "condition": {
+            "type": "and",
+            "conditions": [
+              {
+                "type": "eventTeam",
+                "who": "ally"
+              },
+              {
+                "type": "eventNotSource"
+              }
+            ]
+          },
+          "actions": [
+            {
+              "type": "addCounter",
+              "counter": "barrierSeen",
+              "amount": 1
+            }
+          ]
+        }
+      ],
+      "levelUp": {
+        "condition": {
+          "type": "counter",
+          "counter": "barrierSeen",
+          "op": ">=",
+          "value": 5
+        }
+      }
+    },
+    "status": "curated",
+    "updatedAt": "2026-10-27T14:07:01.851Z",
+    "verification": {
+      "version": 1,
+      "cardTextHash": "4d2a96213123c5cace1efd25cfc820df6f4f0bba169c1c1b661779e7dcbfe219",
+      "verifiedAt": "2026-10-27T00:00:00.000Z",
+      "verifiedBy": "agent",
+      "test": "test/vanguard-batch.test.mjs#vanguard-shen-levels-up",
+      "clauses": [
+        "Support: Give my supported ally Barrier this round.",
+        "I've seen allies gain Barrier 5 times."
+      ],
+      "notes": ""
+    }
+  },
+  "01IO032T1": {
+    "script": {
+      "triggers": [
+        {
+          "on": "support",
+          "actions": [
+            {
+              "type": "barrier",
+              "target": "supported"
+            }
+          ]
+        },
+        {
+          "on": "barrier",
+          "condition": {
+            "type": "and",
+            "conditions": [
+              {
+                "type": "eventTeam",
+                "who": "ally"
+              },
+              {
+                "type": "eventNotSource"
+              }
+            ]
+          },
+          "actions": [
+            {
+              "type": "buff",
+              "power": 3,
+              "health": 0,
+              "duration": "round",
+              "target": "eventUnit"
+            }
+          ]
         }
       ]
     },
-    "status": "partial",
-    "updatedAt": "2026-10-27T06:28:29.179Z"
+    "status": "curated",
+    "updatedAt": "2026-10-27T14:07:01.852Z",
+    "verification": {
+      "version": 1,
+      "cardTextHash": "79dc0bfe502a1e34fd64b24aa84bf97affd077a6e6c3a5ec68e218b2760abb72",
+      "verifiedAt": "2026-10-27T00:00:00.000Z",
+      "verifiedBy": "agent",
+      "test": "test/vanguard-batch.test.mjs#vanguard-shen-level-two-barrier-buff",
+      "clauses": [
+        "Support: Give my supported ally Barrier this round.",
+        "When an ally gets Barrier, give it +3|+0 this round."
+      ],
+      "notes": ""
+    }
   },
   "01IO038": {
     "status": "auto",
@@ -3816,6 +4113,36 @@
       "notes": ""
     }
   },
+  "04DE007T1": {
+    "script": {
+      "triggers": [
+        {
+          "on": "play",
+          "actions": [
+            {
+              "type": "nextSummon",
+              "keywords": [
+                "Challenger"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "status": "curated",
+    "updatedAt": "2026-10-27T14:07:01.853Z",
+    "verification": {
+      "version": 1,
+      "cardTextHash": "671952cef4b3cc2a1449e38467033c6cc2f1bea18346a280ccbf54d5f62080b7",
+      "verifiedAt": "2026-10-27T00:00:00.000Z",
+      "verifiedBy": "agent",
+      "test": "test/vanguard-batch.test.mjs#vanguard-tattered-banner",
+      "clauses": [
+        "The next time you summon an ally this round, grant it Challenger."
+      ],
+      "notes": ""
+    }
+  },
   "04DE014": {
     "script": {
       "triggers": [
@@ -5349,6 +5676,190 @@
     },
     "updatedAt": "2026-10-26T00:23:30.994Z"
   },
+  "06DE024": {
+    "script": {
+      "deferTargets": true,
+      "triggers": [
+        {
+          "on": "play",
+          "actions": [
+            {
+              "type": "choose",
+              "prompt": "Give +1|+1 or equip an equipment from hand?",
+              "options": [
+                {
+                  "id": "buff",
+                  "label": "Give an ally +1|+1 this round",
+                  "actions": [
+                    {
+                      "type": "buff",
+                      "power": 1,
+                      "health": 1,
+                      "duration": "round",
+                      "target": "allyUnit"
+                    }
+                  ]
+                },
+                {
+                  "id": "equip",
+                  "label": "Equip an ally from hand",
+                  "actions": [
+                    {
+                      "type": "equipFromHand",
+                      "target": "allyUnit",
+                      "handTarget": {
+                        "type": "handCard",
+                        "filter": {
+                          "type": "equipment",
+                          "maxCost": 2
+                        }
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "status": "curated",
+    "updatedAt": "2026-10-27T14:07:01.853Z",
+    "verification": {
+      "version": 1,
+      "cardTextHash": "389a8085b25f8d1193200c33069b820b744c9ae6c52ac1845832757520e2b8d6",
+      "verifiedAt": "2026-10-27T00:00:00.000Z",
+      "verifiedBy": "agent",
+      "test": "test/vanguard-batch.test.mjs#vanguard-catch-modal",
+      "clauses": [
+        "Give an ally +1|+1 this round or equip it with an equipment in hand that costs 2 or less."
+      ],
+      "notes": ""
+    }
+  },
+  "06DE029": {
+    "script": {
+      "triggers": [
+        {
+          "on": "equip",
+          "condition": {
+            "type": "and",
+            "conditions": [
+              {
+                "type": "eventTeam",
+                "who": "ally"
+              },
+              {
+                "type": "firstTimeThisGame",
+                "flag": "steadfast-elkin-equip",
+                "scope": "source"
+              }
+            ]
+          },
+          "actions": [
+            {
+              "type": "grantKeyword",
+              "keyword": "Tough",
+              "target": "self"
+            }
+          ]
+        }
+      ]
+    },
+    "status": "curated",
+    "updatedAt": "2026-10-27T14:07:01.853Z",
+    "verification": {
+      "version": 1,
+      "cardTextHash": "48ba0cf759968b2c1254dbca4d261ad6b539a81664186babf73197a43ee35dcd",
+      "verifiedAt": "2026-10-27T00:00:00.000Z",
+      "verifiedBy": "agent",
+      "test": "test/vanguard-batch.test.mjs#vanguard-steadfast-elkin",
+      "clauses": [
+        "The first time an ally is Equipped, grant me Tough."
+      ],
+      "notes": ""
+    }
+  },
+  "06DE033": {
+    "script": {
+      "triggers": [
+        {
+          "on": "play",
+          "actions": [
+            {
+              "type": "destroyEquipment",
+              "target": {
+                "type": "anyUnit",
+                "filter": {
+                  "equipped": true
+                }
+              }
+            },
+            {
+              "type": "if",
+              "condition": {
+                "type": "lastTargetFollower"
+              },
+              "actions": [
+                {
+                  "type": "silence",
+                  "target": "lastTargets"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "status": "curated",
+    "updatedAt": "2026-10-27T14:07:01.853Z",
+    "verification": {
+      "version": 1,
+      "cardTextHash": "e1cbe19cd763f4560f36666cc0481e1cf81346b2855561a519801f70518fd36d",
+      "verifiedAt": "2026-10-27T00:00:00.000Z",
+      "verifiedBy": "agent",
+      "test": "test/vanguard-batch.test.mjs#vanguard-silence-and-suppress",
+      "clauses": [
+        "Destroy a unit's equipment, and if it's a follower, Silence it."
+      ],
+      "notes": ""
+    }
+  },
+  "06DE040": {
+    "script": {
+      "triggers": [
+        {
+          "on": "play",
+          "actions": [
+            {
+              "type": "pickFromTop",
+              "count": 4,
+              "filter": {
+                "types": [
+                  "follower",
+                  "equipment"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    "status": "curated",
+    "updatedAt": "2026-10-27T14:07:01.854Z",
+    "verification": {
+      "version": 1,
+      "cardTextHash": "667c96de28c3674966fb5524aa69a1982bae876acbb3a19321266ac808b9f02d",
+      "verifiedAt": "2026-10-27T00:00:00.000Z",
+      "verifiedBy": "agent",
+      "test": "test/vanguard-batch.test.mjs#vanguard-tempting-prospect",
+      "clauses": [
+        "Pick a follower or equipment from the top 4 cards of your deck.",
+        "Draw it, then place the rest into your deck."
+      ],
+      "notes": ""
+    }
+  },
   "06DE042": {
     "script": {
       "triggers": [
@@ -5589,6 +6100,39 @@
     },
     "updatedAt": "2026-10-26T00:23:30.991Z"
   },
+  "06IO005": {
+    "script": {
+      "triggers": [
+        {
+          "on": "play",
+          "actions": [
+            {
+              "type": "recall",
+              "target": {
+                "type": "anyUnit",
+                "filter": {
+                  "maxHealth": 3
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    "status": "curated",
+    "updatedAt": "2026-10-27T14:07:01.852Z",
+    "verification": {
+      "version": 1,
+      "cardTextHash": "67f9c1e70833fd79e2875362bb1b514445e191b702e0e0311c3c98a8a34d7c59",
+      "verifiedAt": "2026-10-27T00:00:00.000Z",
+      "verifiedBy": "agent",
+      "test": "test/vanguard-batch.test.mjs#vanguard-gruesome-theater",
+      "clauses": [
+        "Recall a unit with 3 or less Health."
+      ],
+      "notes": ""
+    }
+  },
   "06IO013": {
     "status": "curated",
     "script": {
@@ -5623,6 +6167,103 @@
       "clauses": [
         "Give an ally +2|+0 this round.",
         "Create a Meditate in hand."
+      ],
+      "notes": ""
+    }
+  },
+  "06IO013T1": {
+    "script": {
+      "triggers": [
+        {
+          "on": "play",
+          "actions": [
+            {
+              "type": "buff",
+              "power": 0,
+              "health": 2,
+              "duration": "round",
+              "target": "allyUnit"
+            }
+          ]
+        }
+      ]
+    },
+    "status": "curated",
+    "updatedAt": "2026-10-27T14:07:01.853Z",
+    "verification": {
+      "version": 1,
+      "cardTextHash": "a02bc88bd807d85d485fa5dd2c931897cc4376e3c6b4c9b5942d6920eb45bc46",
+      "verifiedAt": "2026-10-27T00:00:00.000Z",
+      "verifiedBy": "agent",
+      "test": "test/vanguard-batch.test.mjs#vanguard-meditate",
+      "clauses": [
+        "Give an ally +0|+2 this round."
+      ],
+      "notes": ""
+    }
+  },
+  "06IO014": {
+    "script": {
+      "triggers": [
+        {
+          "on": "nexusStrike",
+          "continueOnSourceDeath": true,
+          "actions": [
+            {
+              "type": "recall",
+              "target": "self"
+            },
+            {
+              "type": "transform",
+              "cardId": "06IO014T1",
+              "target": "lastRecalled"
+            }
+          ]
+        }
+      ]
+    },
+    "status": "curated",
+    "updatedAt": "2026-10-27T14:07:01.854Z",
+    "verification": {
+      "version": 1,
+      "cardTextHash": "aa02dfe7ffac89f5044709132054031857ffaad41d4c8552666211c08aab63df",
+      "verifiedAt": "2026-10-27T00:00:00.000Z",
+      "verifiedBy": "agent",
+      "test": "test/vanguard-batch.test.mjs#vanguard-vastayan-disciple",
+      "clauses": [
+        "Nexus Strike: Recall me and transform me into Shimon Wind."
+      ],
+      "notes": ""
+    }
+  },
+  "06IO014T1": {
+    "script": {
+      "triggers": [
+        {
+          "on": "play",
+          "actions": [
+            {
+              "type": "summon",
+              "cardId": "06IO014"
+            },
+            {
+              "type": "draw",
+              "amount": 1
+            }
+          ]
+        }
+      ]
+    },
+    "status": "curated",
+    "updatedAt": "2026-10-27T14:07:01.854Z",
+    "verification": {
+      "version": 1,
+      "cardTextHash": "2c3fb610e6e7aef8a94f2a2b4477823124b12977e67cdce641f798ed3c41eefc",
+      "verifiedAt": "2026-10-27T00:00:00.000Z",
+      "verifiedBy": "agent",
+      "test": "test/vanguard-batch.test.mjs#vanguard-shimon-wind",
+      "clauses": [
+        "Summon a Vastayan Disciple and draw 1."
       ],
       "notes": ""
     }
@@ -6365,6 +7006,41 @@
       ]
     },
     "updatedAt": "2026-10-26T00:23:31.001Z"
+  },
+  "09DE031": {
+    "script": {
+      "triggers": [
+        {
+          "on": "play",
+          "actions": [
+            {
+              "type": "grantKeyword",
+              "keyword": "Spirit",
+              "prompt": "Choose an ally in hand",
+              "target": {
+                "type": "handCard",
+                "filter": {
+                  "type": "unit"
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    "status": "curated",
+    "updatedAt": "2026-10-27T14:07:01.854Z",
+    "verification": {
+      "version": 1,
+      "cardTextHash": "f802b92a90f3f380cc6a779f4b33219f44031f9b338a5c8212536dc692ef4ce1",
+      "verifiedAt": "2026-10-27T00:00:00.000Z",
+      "verifiedBy": "agent",
+      "test": "test/vanguard-batch.test.mjs#vanguard-jarro-lightfeather",
+      "clauses": [
+        "Play: Grant an ally in hand Spirit."
+      ],
+      "notes": ""
+    }
   },
   "09IO053": {
     "status": "auto",

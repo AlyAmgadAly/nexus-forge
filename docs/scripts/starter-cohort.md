@@ -10,12 +10,12 @@ Coverage is not correctness. **Script present** means an entry exists; **verifie
 | --- | ---: |
 | Unique starter cards | 206 |
 | Unique starter text cards | 179 |
-| Text cards with a script | 55 |
-| Text cards verified | 21 |
-| Text cards missing a script | 124 |
+| Text cards with a script | 61 |
+| Text cards verified | 29 |
+| Text cards missing a script | 118 |
 | Triage: ready | 66 |
-| Triage: engine gap | 58 |
-| Triage: verify existing script | 34 |
+| Triage: engine gap | 52 |
+| Triage: verify existing script | 32 |
 
 Triage labels: `ready` means the current DSL can express the printed text; `engine` means a gap is listed and an engine batch is needed; `verify` means an existing script needs clause-by-clause review before it can be marked curated.
 
@@ -23,7 +23,7 @@ Triage labels: `ready` means the current DSL can express the printed text; `engi
 
 ### Vanguard Disciplines
 
-Regions: Demacia, Ionia. Text cards: 29; scripted: 23; verified: 21; missing: 6.
+Regions: Demacia, Ionia. Text cards: 29; scripted: 29; verified: 29; missing: 0.
 
 #### Behold
 
@@ -60,10 +60,10 @@ Regions: Demacia, Ionia. Text cards: 29; scripted: 23; verified: 21; missing: 6.
 
 | ID | Card | Cost | Type | Status | Triage | Mechanic | Likely gap |
 | --- | --- | ---: | --- | --- | --- | --- | --- |
-| 06DE024 | Catch! | 1 | Spell | missing | engine | Equipment | modal or equip from hand |
-| 06DE033 | Silence and Suppress | 1 | Spell | missing | engine | Equipment | equipment target required |
-| 06DE029 | Steadfast Elkin | 1 | Unit | missing | engine | Equipment | ally equip watcher |
-| 06DE040 | Tempting Prospect | 1 | Spell | missing | engine | Equipment | player choice, top/bottom deck selection |
+| 06DE024 | Catch! | 1 | Spell | verified | verified | Equipment | modal or equip from hand |
+| 06DE033 | Silence and Suppress | 1 | Spell | verified | verified | Equipment | equipment target required |
+| 06DE029 | Steadfast Elkin | 1 | Unit | verified | verified | Equipment | ally equip watcher |
+| 06DE040 | Tempting Prospect | 1 | Spell | verified | verified | Equipment | player choice, top/bottom deck selection |
 
 #### Heal
 
@@ -82,14 +82,14 @@ Regions: Demacia, Ionia. Text cards: 29; scripted: 23; verified: 21; missing: 6.
 | ID | Card | Cost | Type | Status | Triage | Mechanic | Likely gap |
 | --- | --- | ---: | --- | --- | --- | --- | --- |
 | 05IO026 | The Mourned | 1 | Unit | verified | verified | Nexus Strike | — |
-| 06IO014 | Vastayan Disciple | 1 | Unit | missing | engine | Nexus Strike | transform and recall |
+| 06IO014 | Vastayan Disciple | 1 | Unit | verified | verified | Nexus Strike | transform and recall |
 
 #### Play
 
 | ID | Card | Cost | Type | Status | Triage | Mechanic | Likely gap |
 | --- | --- | ---: | --- | --- | --- | --- | --- |
 | 01IO026 | Inspiring Mentor | 1 | Unit | verified | verified | Play | hand buff |
-| 09DE031 | Jarro Lightfeather | 1 | Unit | missing | engine | Play | set mechanic, hand buff |
+| 09DE031 | Jarro Lightfeather | 1 | Unit | verified | verified | Play | set mechanic, hand buff |
 
 #### Recall
 
@@ -105,14 +105,14 @@ Regions: Demacia, Ionia. Text cards: 29; scripted: 23; verified: 21; missing: 6.
 | 01IO017 | Navori Bladescout | 1 | Unit | verified | verified | Summon | — |
 | 04IO014 | Shadow Apprentice | 1 | Unit | verified | verified | Summon | — |
 | 01IO042 | Sparring Student | 1 | Unit | verified | verified | Summon | — |
-| 01DE012 | Garen | 5 | Champion | script present | verify | Summon | — |
+| 01DE012 | Garen | 5 | Champion | verified | verified | Summon | — |
 
 #### Support
 
 | ID | Card | Cost | Type | Status | Triage | Mechanic | Likely gap |
 | --- | --- | ---: | --- | --- | --- | --- | --- |
 | 03IO017 | Pix! | 1 | Unit | verified | verified | Support | — |
-| 01IO032 | Shen | 4 | Champion | script present | verify | Support | — |
+| 01IO032 | Shen | 4 | Champion | verified | verified | Support | — |
 
 ### Reckless Revenants
 
@@ -211,7 +211,7 @@ Regions: Noxus, ShadowIsles. Text cards: 31; scripted: 7; verified: 0; missing: 
 
 ### Frost & Flame
 
-Regions: Freljord, PiltoverZaun. Text cards: 32; scripted: 3; verified: 0; missing: 29.
+Regions: Freljord, PiltoverZaun. Text cards: 32; scripted: 4; verified: 1; missing: 28.
 
 #### Buff/Grant
 
@@ -256,7 +256,7 @@ Regions: Freljord, PiltoverZaun. Text cards: 32; scripted: 3; verified: 0; missi
 
 | ID | Card | Cost | Type | Status | Triage | Mechanic | Likely gap |
 | --- | --- | ---: | --- | --- | --- | --- | --- |
-| 06DE024 | Catch! | 1 | Spell | missing | engine | Equipment | modal or equip from hand |
+| 06DE024 | Catch! | 1 | Spell | verified | verified | Equipment | modal or equip from hand |
 | 06FR004 | Weaponsmith's Apprentice | 1 | Unit | missing | engine | Equipment | set mechanic |
 
 #### Frostbite

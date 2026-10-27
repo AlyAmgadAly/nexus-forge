@@ -2,11 +2,11 @@
 
 A Runeterra-inspired card game with a scenic home screen, deck builder, Card Forge, private rooms, spectators, and an existing engine for 1v1 and 2v2.
 
-**Current version: 0.2.0 — portable Windows desktop build with room-code multiplayer over the internet.** The original browser/local Node development route still works. Desktop internet play uses Electron, PeerJS/WebRTC, and the host's authoritative game process. Real separate-network acceptance testing is still a human-run release gate; see [Limits and pending validation](#limits-and-pending-validation).
+**Current version: 0.3.0 — portable Windows desktop build with room-code multiplayer and complete Vanguard starter-deck effect coverage.** The original browser/local Node development route still works. Desktop internet play uses Electron, PeerJS/WebRTC, and the host's authoritative game process. Real separate-network acceptance testing is still a human-run release gate; see [Limits and pending validation](#limits-and-pending-validation).
 
 ## Play on Windows
 
-1. Download `NexusForge-0.2.0-portable.exe` from the [Nexus Forge 0.2.0 release](https://github.com/AlyAmgadAly/nexus-forge/releases/tag/v0.2.0), or build it locally with `npm run build:win` (see [Build the Windows release](#build-the-windows-release)). No Node.js installation is required.
+1. Download `NexusForge-0.3.0-portable.exe` from the [Nexus Forge 0.3.0 release](https://github.com/AlyAmgadAly/nexus-forge/releases/tag/v0.3.0), or build it locally with `npm run build:win` (see [Build the Windows release](#build-the-windows-release)). No Node.js installation is required.
 2. Launch the game. The executable is portable, but user data is stored per Windows account (see [Data and backups](#data-and-backups)). The build is unsigned, so Windows SmartScreen may warn on first launch; use **More info → Run anyway** only for a build you trust.
 3. Choose **Create a room**, then share the five-character room code.
 4. Friends launch their own copy, choose **Join a room** or **Spectate**, and enter the code.
@@ -62,13 +62,19 @@ npm run check:syntax
 npm test
 ```
 
-The suite currently contains 128 automated tests across engine, event ordering and dispatch, state/equipment/support mechanics, migration, protocol/content, deck validation, script vocabulary, verification metadata, seed upgrades, authoring tooling, and coverage reporting. `npm run check:syntax` checks 46 files. `npm run scripts:lint` validates the packaged seed scripts. `npm run build:win` runs all checks before packaging the portable Windows x64 artifact into `release/`.
+The suite currently contains 195 automated tests across engine, event ordering and dispatch, state/equipment/support mechanics, migration, protocol/content, deck validation, script vocabulary, verification metadata, seed upgrades, authoring tooling, and coverage reporting. `npm run check:syntax` checks 47 files. `npm run scripts:lint` validates 276 script entries. `npm run build:win` runs all checks before packaging the portable Windows x64 artifact into `release/`.
 
-Current card-effect status: **248 scripts present (16.0% of 1,552 text cards); 0 verified.** Coverage is not correctness. See [docs/effect-dsl.md](docs/effect-dsl.md) and run `npm run scripts:coverage` for the measured report.
+Current card-effect status: **270 scripts present (17.4% of 1,552 text cards); 38 verified (2.4%).** All 29 Vanguard Disciplines starter-deck text cards are verified; the other five starter decks remain in progress. Coverage is not correctness. See [docs/effect-dsl.md](docs/effect-dsl.md) and run `npm run scripts:coverage` for the measured report.
 
 For the complete test procedure, including local two-instance checks and the separate-network release gate, see [docs/testing.md](docs/testing.md).
 
-Local evidence recorded for 0.2.0:
+Local evidence recorded for 0.3.0:
+
+- `npm run build:win` passed syntax, lint, all 195 tests, seed generation, and produced `release/NexusForge-0.3.0-portable.exe`.
+- An earlier 0.3.0 packaged build launched with fresh seed data, served 1,647 cards at app version 0.3.0 with `desktop: true`, installed 275 seed scripts (43 curated entries, including 5 generated/level-2 cards), and closed without leaving processes or listening ports. After the final seed-script correction, the executable was rebuilt and its checksum updated; under the headless-only instruction it was not relaunched, so the smoke evidence covers the packaging path and seed installation rather than the exact final hash.
+- The 0.3.0 changes affect card scripts and engine effects, not the peer transport.
+
+Desktop multiplayer evidence recorded for 0.2.0 (transport unchanged in 0.3.0):
 
 - Two Electron instances with separate profiles completed host/guest lobby flow over PeerJS, including filtered guest state.
 - Ready, mulligan, game start, card play, and pass flow worked in both directions.
@@ -78,7 +84,7 @@ Local evidence recorded for 0.2.0:
 - Host departure closed the room and returned the guest Home.
 - Clipboard room-code copy worked in Electron after the narrow clipboard-write permission allowance.
 - A dev-profile restart preserved the admin token, a custom card, and a saved deck.
-- The packaged portable executable launched with fresh seed data, served 1,647 cards, registered a PeerJS host room, and exited without leaving processes or listening ports.
+- The 0.2.0 packaged portable executable launched with fresh seed data, served 1,647 cards, registered a PeerJS host room, and exited without leaving processes or listening ports.
 
 These are same-machine checks. They do not prove reachability across separate internet connections.
 
@@ -87,7 +93,8 @@ These are same-machine checks. They do not prove reachability across separate in
 - **External network gate pending:** home broadband versus mobile hotspot and friends on separate networks have not been run on this machine. Those results must be recorded before claiming internet play is release-verified.
 - **Relay/TURN gate pending:** public STUN is configured; no working free TURN relay has been proven. Restrictive NAT may prevent a connection.
 - 2v2 and spectator flows over the peer transport have automated server coverage but still need a recorded external session.
-- Card-effect automation remains partial: 248 scripts present (16.0% of text cards), 0 verified. A card being present does not mean every printed behavior is implemented.
+- Card-effect automation remains partial: 270 scripts present (17.4% of text cards), 38 verified (2.4%). Vanguard is fully verified; the other five starter decks contain 118 text cards without scripts and 32 unverified scripts. A card being present does not mean every printed behavior is implemented.
+- A user-reported mulligan stall remains under investigation. It was not reproduced by the automated suite, and this release does not claim to fix it.
 - Rewards, Battle Pass, and Store remain visibly unavailable.
 - macOS/Linux/mobile packaging, automatic updates, accounts, matchmaking, host migration, and cloud saves are out of scope for this release.
 
@@ -113,7 +120,7 @@ These are same-machine checks. They do not prove reachability across separate in
 | `docs/testing.md` | Automated, local desktop, packaged-app, and external-network test procedure |
 | `docs/effect-dsl.md` | Trigger, action, target, condition, and verification reference |
 | `docs/backups.md` | Backup locations and recovery steps for scripts and migrations |
-| `docs/release-0.2.0.md` | Release artifact, checksum, evidence, and open gates |
+| `docs/release-0.3.0.md` | Release artifact, checksum, evidence, and open gates |
 
 ## Build the Windows release
 
@@ -121,6 +128,6 @@ These are same-machine checks. They do not prove reachability across separate in
 npm run build:win
 ```
 
-Output: `release/NexusForge-0.2.0-portable.exe`. The build is unsigned; Windows SmartScreen may warn on first launch. Signing is not configured. Release notes record the checksum for the built artifact; rebuilds produce a different hash.
+Output: `release/NexusForge-0.3.0-portable.exe`. The build is unsigned; Windows SmartScreen may warn on first launch. Signing is not configured. Release notes record the checksum for the built artifact; rebuilds produce a different hash.
 
 Development work and milestone evidence are tracked in [ROADMAP.md](ROADMAP.md).

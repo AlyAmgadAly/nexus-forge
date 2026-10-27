@@ -1,44 +1,62 @@
 # Open gameplay dependencies
 
-Audited against the pinned `data/cards.json` on 2026-10-27. These local issue IDs
-track concrete follow-up work; they are not GitHub issues. Only the Vanguard
-batch and its generated-card dependencies have been reviewed here. Other starter
-decks still require review. Missing scripts must not be treated as working effects.
+Audited against the pinned `data/cards.json` on 2026-10-27 for the 0.3.0
+release. This file tracks concrete engine or authoring dependencies that are
+still open. It is not a list of missing scripts. Missing scripts must not be
+treated as working effects.
 
-## Vanguard Disciplines
+## Vanguard Disciplines — resolved in 0.3.0
 
-| Local issue | Card | Current state | Dependency and acceptance |
-| --- | --- | --- | --- |
-| NF-SCRIPT-001 | `06DE024` Catch! | Manual | Branch choice now exists, but selecting an equipment card costing at most 2 from hand and attaching that exact instance does not. Add a general equip-from-hand action with cost/ownership validation; test both printed branches, empty hand, and illegal equipment. |
-| NF-SCRIPT-002 | `06DE033` Silence and Suppress | Manual | Needs equipment targeting and a continuation tied to the same unit after destroying its equipment. Test follower silence, champion exclusion, and no equipment. Existing `destroyEquipment` alone is insufficient. |
-| NF-SCRIPT-003 | `06DE029` Steadfast Elkin | Manual | Needs an allied equip watcher with per-source first-time state. Source-scoped game flags now exist; equip watcher dispatch still needs an allied-team contract and tests for multiple Elkins, enemy equips, and repeated equips. |
-| NF-SCRIPT-004 | `06DE040` Tempting Prospect | Manual | Needs filtered selection from the top four deck cards and correct reinsertion of the remainder, preserving card accounting and hidden information. Generic branch choice does not implement deck choice. |
-| NF-SCRIPT-005 | `06IO014` Vastayan Disciple | Manual | Needs recall-to-hand transformation into `06IO014T1` Shimon Wind, rather than transforming the departed board object. Test the resulting hand card and the return summon/draw effect. Shimon Wind is also unscripted. |
-| NF-SCRIPT-006 | `09DE031` Jarro Lightfeather | Manual | Needs Spirit granted to a selected ally in hand and its stats/keyword carried into play. A generic hand power buff does not implement Spirit. |
-| NF-SCRIPT-007 | `01DE012` Garen | Partial | Summon buff works; printed level-up condition “I've struck twice.” is absent. Add the champion condition, exact level-two data/script behavior, and level-up regression before restoring curated status. |
-| NF-SCRIPT-008 | `01IO032` Shen | Partial | Support Barrier works; printed level-up condition “I've seen allies gain Barrier 5 times.” is absent. Add an in-play Barrier counter, level-two behavior, and positive/negative threshold tests before restoring curated status. |
+All 29 Vanguard Disciplines text cards are scripted, tested, and verified. The
+previous blockers are closed:
 
-Vanguard currently has 29 text cards: 21 verified, 2 partial, and 6 without scripts.
-It has not passed the starter-deck phase gate.
-
-## Generated-card follow-ups
-
-Creation is separate from playing the generated card. Tellstones now create the
-chosen Fleeting card correctly; that does not imply every resulting spell works.
-
-| Local issue | Cards | Remaining work |
+| Local issue | Card | Resolution |
 | --- | --- | --- |
-| NF-SCRIPT-009 | `01DE032` Prismatic Barrier; `06IO005` Gruesome Theater; `01IO001` Ritual of Renewal | No scripts. Implement Barrier, health-filtered recall, and heal-then-draw respectively with canonical-clause tests. |
-| NF-SCRIPT-010 | `01DE025` Detain; `01IO010` Stand United | No scripts. Capture lifecycle and swapping the selected two allies are missing capabilities; test leave-play/release and combat linkage semantics respectively. |
-| NF-SCRIPT-011 | `01DE035` For Demacia! | Auto script exists for the round buff, but has no verification metadata/test. Audit and verify separately. |
-| NF-SCRIPT-012 | `04DE007T1` Tattered Banner; `06IO013T1` Meditate | No scripts. Penitent Squire and Wuju Style create these cards, but their subsequent effects are not automated. Banner needs a next-ally-this-round watcher; Meditate needs the printed temporary health buff. |
+| NF-SCRIPT-001 | `06DE024` Catch! | `equipFromHand` selects an owned equipment costing at most 2 and attaches that exact instance. Tests cover the buff branch, the equip branch, empty hand, over-cost equipment, and non-equipment cards. |
+| NF-SCRIPT-002 | `06DE033` Silence and Suppress | `destroyEquipment` targets an equipped unit, then `lastTargetFollower` silences only a follower. Tests cover follower silence, champion exclusion, and no legal equipped target. |
+| NF-SCRIPT-003 | `06DE029` Steadfast Elkin | The `equip` watcher uses an allied-team check and `firstTimeThisGame` with `scope: "source"`. Tests cover multiple Elkins, enemy equips, and repeated equips. |
+| NF-SCRIPT-004 | `06DE040` Tempting Prospect | `pickFromTop` filters the top four cards, takes one, and returns the rest. Tests verify the pick, the remaining deck, and hidden information. |
+| NF-SCRIPT-005 | `06IO014` Vastayan Disciple | Recall-to-hand transform creates `06IO014T1` in hand; Shimon Wind summons the Disciple and draws 1. `continueOnSourceDeath` keeps the transform after the source leaves play. |
+| NF-SCRIPT-006 | `09DE031` Jarro Lightfeather | Hand-card keyword grants carry Spirit into play with the correct stats and keyword. |
+| NF-SCRIPT-007 | `01DE012` Garen | `selfStrikesThisGame` and the level-up model implement the printed strike-twice condition; the level-two rally clears the opposing attack token. |
+| NF-SCRIPT-008 | `01IO032` Shen | Barrier counters, the five-Barrier level-up condition, and the level-two buff are implemented. Tests cover the positive threshold, negative threshold, self-Barrier exclusion, and post-level support. |
+| NF-SCRIPT-009 | `01DE032` Prismatic Barrier; `06IO005` Gruesome Theater; `01IO001` Ritual of Renewal | Barrier, health-filtered recall, and heal-then-draw scripts are verified. |
+| NF-SCRIPT-010 | `01DE025` Detain; `01IO010` Stand United | Capture releases to the owner's board when the captor leaves play; Stand United swaps the selected allies and grants Barrier. |
+| NF-SCRIPT-011 | `01DE035` For Demacia! | The round buff is verified with permanent-stat rollback after the round. |
+| NF-SCRIPT-012 | `04DE007T1` Tattered Banner; `06IO013T1` Meditate | Next-summon keyword buffs expire unused at round end; Meditate's temporary health buff rolls back correctly. |
+
+Vanguard has 29 text cards: 29 verified, 0 partial, and 0 without scripts. It
+passes the starter-deck script gate for this release.
+
+## Remaining starter-deck dependencies
+
+Across the other five starter decks:
+
+- 150 text cards total.
+- 32 scripts present, all unverified.
+- 118 text cards without scripts.
+- 0 verified unique cards beyond those shared with Vanguard.
+
+No other starter deck has passed the clause-by-clause triage or the
+starter-deck phase gate. Per-card blockers for those decks have not yet been
+filed; review each deck and record the missing primitive before marking a card
+`blocked`.
+
+The generated per-deck table is
+[`docs/scripts/starter-cohort.md`](starter-cohort.md). Coverage is tracked in
+[`docs/scripts/coverage-0.3.0.md`](coverage-0.3.0.md).
 
 ## Wider phase gates
 
-- Across all six starters: 179 text cards, 55 scripts present, 21 verified, and
-  124 without scripts. The remaining existing scripts are unverified or partial.
-- No shipped champion script currently has a level-up block. Generic engine
-  support passing tests does not mean champion cards have been implemented.
-- Phase 1 still has target/action gaps listed in `AGENTS.md`. Phase 2 still needs
-  the other decks, generated-card follow-ups, deterministic multi-round starter
-  acceptance, and its release gate. No executable was rebuilt during this audit.
+- **Phase 1**: the primitives required by the Vanguard batch are implemented.
+  The remaining target/action gaps are listed in `AGENTS.md` section 1.4–1.5.
+- **Phase 2**: five starter decks remain, along with deterministic multi-round
+  starter acceptance and the phase release gate.
+- **Phase 3/4**: the remaining 1,282 text cards, 89 missing champion scripts,
+  and the long-tail mechanic families are not started.
+- **Champion level-ups**: Garen and Shen are verified. The cohort-wide
+  requirement for every champion with a `level2Id` remains open.
+- **Release evidence**: external-network, relay/TURN, clean-machine, full 1v1,
+  2v2, spectator, and reconnect verification remain pending. The user-reported
+  mulligan stall remains under investigation. None of these are claimed fixed or
+  verified by this batch.

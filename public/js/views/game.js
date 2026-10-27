@@ -53,6 +53,14 @@ function unitMatchesFilter(unit, filter = {}) {
   if (filter.type === 'follower' && unit.isChampion) return false;
   if (filter.type === 'landmark' && !unit.isLandmark) return false;
   if (filter.type === 'unit' && unit.isLandmark) return false;
+  if (filter.champion === true && !unit.isChampion) return false;
+  if (filter.champion === false && unit.isChampion) return false;
+  if (filter.equipped === true && !unit.equipped) return false;
+  if (filter.equipped === false && unit.equipped) return false;
+  if (Array.isArray(filter.types) && filter.types.length) {
+    const matches = filter.types.some((type) => unitMatchesFilter(unit, { ...filter, type, types: null }));
+    if (!matches) return false;
+  }
   if (filter.keyword && !unitHasKeyword(unit, filter.keyword)) return false;
   if (filter.notKeyword && unitHasKeyword(unit, filter.notKeyword)) return false;
   if (filter.subtype && !(unit.subtypes || []).includes(filter.subtype)) return false;
@@ -65,6 +73,29 @@ function unitMatchesFilter(unit, filter = {}) {
   if (filter.maxCost != null && (unit.cost ?? 0) > filter.maxCost) return false;
   if (filter.damaged === true && !(unit.damage > 0)) return false;
   if (filter.damaged === false && unit.damage > 0) return false;
+  return true;
+}
+
+function handMatchesFilter(card, filter = {}) {
+  if (!card) return false;
+  const types = Array.isArray(filter.types) && filter.types.length ? filter.types : (filter.type ? [filter.type] : []);
+  if (types.length) {
+    const matches = types.some((type) => {
+      if (type === 'any') return true;
+      if (type === 'champion') return card.supertype === 'Champion';
+      if (type === 'follower') return card.type === 'Unit' && card.supertype !== 'Champion';
+      if (type === 'unit') return card.type === 'Unit' || card.type === 'Champion';
+      return card.type === type;
+    });
+    if (!matches) return false;
+  }
+  if (filter.maxCost != null && (card.cost ?? 0) > filter.maxCost) return false;
+  if (filter.minCost != null && (card.cost ?? 0) < filter.minCost) return false;
+  if (filter.keyword && !unitHasKeyword(card, filter.keyword)) return false;
+  if (filter.notKeyword && unitHasKeyword(card, filter.notKeyword)) return false;
+  if (filter.region && !(card.regions || []).includes(filter.region)) return false;
+  if (filter.subtype && !(card.subtypes || []).includes(filter.subtype)) return false;
+  if (filter.supertype && card.supertype !== filter.supertype) return false;
   return true;
 }
 
@@ -83,9 +114,12 @@ function targetOptionsForSpec(spec, view, team) {
   if (['allyUnit', 'otherAllyUnit', 'allyChampion', 'allyFollower', 'allyLandmark', 'strongestAlly', 'weakestAlly', 'randomAllyUnit', 'selfUnit'].includes(type)) list = choose(mine.board, 'ally');
   else if (['enemyUnit', 'enemyChampion', 'enemyFollower', 'enemyLandmark', 'strongestEnemy', 'weakestEnemy', 'randomEnemyUnit'].includes(type)) list = choose(theirs.board, 'enemy');
   else if (type === 'anyTarget') list = [...choose([...allUnits(view)], 'any'), nexus(team, mine.name), nexus(enemy, theirs.name)];
+  else if (type === 'allyTarget') list = [...choose(mine.board, 'ally'), nexus(team, mine.name)];
   else if (['anyUnit', 'strongestUnit', 'weakestUnit', 'randomUnit'].includes(type)) list = choose([...allUnits(view)], 'any');
   else if (type === 'handCard') {
-    list = (view.you?.hand || []).map((h) => ({ id: `h:${h.iid}`, label: `Hand: ${h.name}`, kind: 'hand' }));
+    list = (view.you?.hand || [])
+      .filter((h) => !h.hidden && handMatchesFilter(h, filter))
+      .map((h) => ({ id: `h:${h.iid}`, label: `Hand: ${h.name} (${h.cost})`, kind: 'hand' }));
   } else if (type === 'enemyNexus') list = [nexus(enemy, theirs.name)];
   else if (type === 'allyNexus') list = [nexus(team, mine.name)];
   else if (type === 'anyNexus') list = [nexus(team, mine.name), nexus(enemy, theirs.name)];
@@ -513,7 +547,7 @@ function handPanel(view, ctx, root) {
   return `<div class="lor-hand" style="--overlap:${overlap}px">
     ${hand.map((h, i) => {
       if (h.hidden) return `<div class="lor-hand-slot hidden-card">${cardHtml({ hidden: true }, { attrs: 'data-hand-card=""' })}</div>`;
-      const card = cardById(h.id) || h;
+      const card = { ...(cardById(h.id) || {}), ...h };
       const isPlayable = playable.has(h.iid);
       const rot = (i - (n - 1) / 2) * spread;
       const lift = Math.abs(i - (n - 1) / 2) * 3.4;

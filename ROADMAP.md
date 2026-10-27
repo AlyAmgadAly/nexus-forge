@@ -16,10 +16,11 @@ Already present:
 - A reference-based scenic home screen, with browser QA and screenshots in `docs/qa/lobby/`.
 - Deck building and deck-code import/export; Card Forge and configurable local rules.
 - Room creation, joining, spectating, chat, readiness, host controls, and 1v1/2v2 engine paths.
-- Player-specific game views and 12 existing engine tests. Card-effect automation remains partial.
-- Electron 0.2.0 desktop shell, per-user writable data with backup migration, loopback service lifecycle, and portable Windows packaging.
+- Player-specific game views and 195 automated tests. Card-effect automation remains partial: 270 scripts present (17.4% of 1,552 text cards), 38 verified (2.4%).
+- Electron 0.3.0 desktop shell, per-user writable data with backup migration, loopback service lifecycle, and portable Windows packaging.
 - PeerJS/WebRTC host and guest transports, room content manifests, filtered peer views, validated deck submissions, host-approved custom content, reconnect tokens, host-close behavior, and desktop connection UI.
-- 23 automated tests covering the engine, data migration, peer rooms/service lifecycle, manifests, content sanitization, deck payloads, and deck-code fallback for Card Forge cards.
+- 195 automated tests covering the engine, data migration, peer rooms/service lifecycle, manifests, content sanitization, deck payloads, deck-code fallback for Card Forge cards, effect DSL, script coverage, and the Vanguard starter batch.
+- All 29 Vanguard Disciplines starter-deck text cards are scripted and verified; the other five starter decks contain 118 text cards without scripts and 32 unverified scripts. See `docs/scripts/coverage-0.3.0.md`.
 
 The desktop path for M1-M5 and M7 packaging is implemented and was exercised locally with two Electron instances on one Windows machine: host/join over PeerJS, ready/mulligan/start, bidirectional game actions, guest reconnect and cancel, host close, custom deck/content approval, clipboard copy, data persistence, portable launch, and clean shutdown. The real separate-network matrix in M6 has not been run. Local two-instance evidence is adapter/UI smoke evidence only and does not prove internet reachability.
 
@@ -53,7 +54,7 @@ Avoid a second game engine in the renderer. Separate message dispatch from WebSo
 | [M4](https://github.com/AlyAmgadAly/nexus-forge/milestone/4) | Player decks, room content synchronization, and version checks | M3 | Implemented; local deck/content approval verified | [#4](https://github.com/AlyAmgadAly/nexus-forge/issues/4) |
 | [M5](https://github.com/AlyAmgadAly/nexus-forge/milestone/5) | Reconnects, host departure, and clear connection states | M3, M4 | Implemented; local reconnect/host-close verified | [#5](https://github.com/AlyAmgadAly/nexus-forge/issues/5) |
 | [M6](https://github.com/AlyAmgadAly/nexus-forge/milestone/6) | Automated regression coverage and real-network release testing | M1-M5 | Automated checks pass; external matrix pending | [#6](https://github.com/AlyAmgadAly/nexus-forge/issues/6) |
-| [M7](https://github.com/AlyAmgadAly/nexus-forge/milestone/7) | Portable Windows release and player instructions | M6 | Release v0.2.0 published; clean-machine/external gates pending | [#7](https://github.com/AlyAmgadAly/nexus-forge/issues/7) |
+| [M7](https://github.com/AlyAmgadAly/nexus-forge/milestone/7) | Portable Windows release and player instructions | M6 | v0.2.0 published; v0.3.0 build ready; clean-machine/external gates pending | [#7](https://github.com/AlyAmgadAly/nexus-forge/issues/7) |
 
 GitHub issues and milestones mirror M1-M7. Completing an issue requires its acceptance criteria and recorded evidence, not just code being merged.
 
@@ -217,7 +218,7 @@ Acceptance criteria:
 - [x] Any network limitations are explicit; unresolved blocking failures prevent release sign-off.
 - [ ] **External gate:** no paid server, VPN, shared LAN, or manual port forwarding was needed for the supported acceptance paths. *(The same-machine path used none of these, but the external paths have not been exercised.)*
 
-Local evidence: `npm run check:syntax` passes 34 files and `npm test` passes 23/23 (12 engine, 3 migration, 2 service/peer, 6 protocol/content). The two-instance UI checks listed under M1-M5 provide local runtime evidence. A Windows CI workflow for `npm ci`, syntax checks, and tests exists but has not run on GitHub. Every row that requires a separate device, separate network, or relay observation remains open.
+Local evidence: `npm run check:syntax` passes 47 files and `npm test` passes 195/195, including engine, event ordering, Vanguard card effects, data migration, peer rooms, manifests, content sanitization, deck payloads, and coverage tooling. The two-instance UI checks listed under M1-M5 provide local runtime evidence for the unchanged 0.2.0 transport. A Windows CI workflow for `npm ci`, syntax checks, and tests exists but has not run on GitHub. Every row that requires a separate device, separate network, or relay observation remains open.
 
 ### M7 - Portable Windows release
 
@@ -239,7 +240,17 @@ Acceptance criteria:
 - [ ] **External gate:** two friends on separate internet connections host/join and play with the release artifact.
 - [x] The release links to a matching commit/checksum and documents supported paths and remaining limitations.
 
-Release evidence: [Nexus Forge v0.2.0](https://github.com/AlyAmgadAly/nexus-forge/releases/tag/v0.2.0) was published on 26 October 2026 with `NexusForge-0.2.0-portable.exe` (121,332,668 bytes; SHA-256 `AC45ED31054568C0706EAACD681F8BC38A709E13F5584587C63DB218A60D4AAA`). The release page links to the tagged commit and documents supported paths, checksum, and limitations. The build has not run on a clean Windows machine/account and has not been used between separate networks. The clean-machine and external-network acceptance boxes remain open.
+Current release evidence: [Nexus Forge v0.3.0](https://github.com/AlyAmgadAly/nexus-forge/releases/tag/v0.3.0) was published on 27 October 2026 with `NexusForge-0.3.0-portable.exe` (121,460,358 bytes; SHA-256 `3E9EAD7832C7ABE9CB61E2B9CA914447966290030609C8169E4904AD79798C9A`). The release page links to the tagged commit and documents supported paths, checksum, and limitations. The build has not run on a clean Windows machine/account and has not been used between separate networks. The clean-machine and external-network acceptance boxes remain open. The previous [v0.2.0 release](https://github.com/AlyAmgadAly/nexus-forge/releases/tag/v0.2.0) remains published with `NexusForge-0.2.0-portable.exe` (121,332,668 bytes; SHA-256 `AC45ED31054568C0706EAACD681F8BC38A709E13F5584587C63DB218A60D4AAA`).
+
+### Content milestone — Vanguard Disciplines (0.3.0)
+
+- Applied 19 curated entries from `scripts/batches/2026-10-27-vanguard-batch-01.json`: 14 collectible Vanguard text cards plus 5 generated/level-2 cards.
+- Vanguard Disciplines is complete: **29/29 text cards verified, 0 missing, 0 partial**. Garen and Shen now include their printed level-up conditions and level-two behavior.
+- Added the engine primitives the batch proved: equip-from-hand with cost filtering, filtered top-deck picks, capture/release, allied swap, next-summon buffs, counters, unit/hand transforms, hand-card keywords, and the associated event/condition helpers.
+- Coverage: **270 scripts present (17.4%)**, **38 verified (2.4%)**, 1,282 missing. Starter cohort: 61 scripted, 29 verified, 118 missing.
+- Regression: 47 syntax files, 195 tests, 276 lint entries with 0 errors and 0 warnings.
+- An earlier 0.3.0 packaged build passed fresh-seed smoke: 275 scripts installed (43 curated including 5 generated/level-2 scripts), 1,647 cards served at app version 0.3.0 with `desktop: true`, and clean shutdown with no leftover processes or listening ports. After the final seed-script correction, the executable was rebuilt; under the headless-only instruction it was not relaunched, so this evidence covers the packaging path and seed installation rather than the exact final hash.
+- Open gates: external-network, relay/TURN, clean-machine, 2v2, spectator, and reconnect verification; the user-reported mulligan stall remains under investigation and is not claimed fixed.
 
 ## Definition of the first desktop internet release
 

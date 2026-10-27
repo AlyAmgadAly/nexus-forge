@@ -92,6 +92,9 @@ function checkCondition(condition, path, errors, warnings) {
   if (type === 'event' && condition.value == null) {
     errors.push(`${path}.value is required.`);
   }
+  if (type === 'counter' && (!condition.counter || typeof condition.counter !== 'string')) {
+    errors.push(`${path}.counter is required.`);
+  }
   if (type === 'firstTimeThisGame' && condition.scope != null && !['controller', 'source'].includes(condition.scope)) {
     errors.push(`${path}.scope must be controller or source.`);
   }
@@ -127,6 +130,8 @@ function checkAction(action, path, errors, warnings) {
     return;
   }
   checkTarget(action.target, `${path}.target`, errors, warnings);
+  checkTarget(action.secondaryTarget, `${path}.secondaryTarget`, errors, warnings);
+  checkTarget(action.handTarget, `${path}.handTarget`, errors, warnings);
   if (action.duration != null && !DURATIONS.has(action.duration)) {
     errors.push(`${path}.duration must be one of ${[...DURATIONS].join(', ')}.`);
   }
@@ -160,6 +165,42 @@ function checkAction(action, path, errors, warnings) {
   }
   if ((type === 'strike' || type === 'fight' || type === 'copy') && !action.target) {
     errors.push(`${path}.target is required.`);
+  }
+  if (type === 'addCounter' && (!action.counter || typeof action.counter !== 'string')) {
+    errors.push(`${path}.counter is required.`);
+  }
+  if (type === 'addCounter' && action.amount != null && !Number.isFinite(Number(action.amount))) {
+    errors.push(`${path}.amount must be numeric.`);
+  }
+  if (type === 'nextSummon') {
+    const hasKeywords = Array.isArray(action.keywords) && action.keywords.length;
+    const hasStats = Number(action.power) || Number(action.health);
+    if (!hasKeywords && !hasStats) errors.push(`${path} requires keywords or power/health.`);
+    if (action.keywords != null && !Array.isArray(action.keywords)) errors.push(`${path}.keywords must be an array.`);
+  }
+  if (type === 'pickFromTop') {
+    if (action.count != null && (!Number.isInteger(action.count) || action.count < 1 || action.count > 20)) {
+      errors.push(`${path}.count must be an integer from 1 to 20.`);
+    }
+    if (action.filter != null) {
+      if (typeof action.filter !== 'object' || Array.isArray(action.filter)) {
+        errors.push(`${path}.filter must be an object.`);
+      } else {
+        for (const key of Object.keys(action.filter)) {
+          if (!HAND_FILTER_FIELDS.has(key)) warnings.push(`${path}.filter.${key} is not implemented by pickFromTop and will be ignored.`);
+        }
+      }
+    }
+  }
+  if (type === 'equipFromHand' && (!action.target || !action.handTarget)) {
+    errors.push(`${path} requires target and handTarget.`);
+  }
+  if (type === 'capture' && (!action.target || !action.secondaryTarget)) {
+    errors.push(`${path} requires target (the captor) and secondaryTarget (the captured unit).`);
+  }
+  if (type === 'swap') {
+    const count = typeof action.target === 'object' ? action.target?.count || 1 : 1;
+    if (!action.target || count < 2) errors.push(`${path}.target must select at least 2 units.`);
   }
   if (type === 'strike' && action.striker != null && action.striker !== 'eventCard') {
     errors.push(`${path}.striker must be "eventCard" when set.`);

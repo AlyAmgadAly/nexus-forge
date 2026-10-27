@@ -1,0 +1,704 @@
+{
+  "batch": "2026-10-27-vanguard-batch-01",
+  "cards": {
+    "01DE012": {
+      "status": "curated",
+      "script": {
+        "triggers": [
+          {
+            "on": "summon",
+            "actions": [
+              {
+                "type": "buff",
+                "power": 1,
+                "health": 1,
+                "duration": "round",
+                "target": "allOtherAllyUnits"
+              }
+            ]
+          }
+        ],
+        "levelUp": {
+          "condition": {
+            "type": "selfStrikesThisGame",
+            "op": ">=",
+            "value": 2
+          }
+        }
+      },
+      "verification": {
+        "version": 1,
+        "verifiedAt": "2026-10-27T00:00:00.000Z",
+        "verifiedBy": "agent",
+        "test": "test/vanguard-batch.test.mjs#vanguard-garen-levels-up",
+        "clauses": [
+          "When I'm summoned, give other allies +1|+1 this round.",
+          "I've struck twice."
+        ],
+        "notes": ""
+      }
+    },
+    "01DE012T1": {
+      "status": "curated",
+      "script": {
+        "triggers": [
+          {
+            "on": "summon",
+            "actions": [
+              {
+                "type": "buff",
+                "power": 1,
+                "health": 1,
+                "duration": "round",
+                "target": "allOtherAllyUnits"
+              }
+            ]
+          },
+          {
+            "on": "roundStart",
+            "actions": [
+              {
+                "type": "rally"
+              }
+            ]
+          }
+        ]
+      },
+      "verification": {
+        "version": 1,
+        "verifiedAt": "2026-10-27T00:00:00.000Z",
+        "verifiedBy": "agent",
+        "test": "test/vanguard-batch.test.mjs#vanguard-garen-level-two-rally",
+        "clauses": [
+          "When I'm summoned, give other allies +1|+1 this round.",
+          "Round Start: Rally."
+        ],
+        "notes": ""
+      }
+    },
+    "01IO032": {
+      "status": "curated",
+      "script": {
+        "triggers": [
+          {
+            "on": "support",
+            "actions": [
+              {
+                "type": "barrier",
+                "target": "supported"
+              }
+            ]
+          },
+          {
+            "on": "barrier",
+            "condition": {
+              "type": "and",
+              "conditions": [
+                {
+                  "type": "eventTeam",
+                  "who": "ally"
+                },
+                {
+                  "type": "eventNotSource"
+                }
+              ]
+            },
+            "actions": [
+              {
+                "type": "addCounter",
+                "counter": "barrierSeen",
+                "amount": 1
+              }
+            ]
+          }
+        ],
+        "levelUp": {
+          "condition": {
+            "type": "counter",
+            "counter": "barrierSeen",
+            "op": ">=",
+            "value": 5
+          }
+        }
+      },
+      "verification": {
+        "version": 1,
+        "verifiedAt": "2026-10-27T00:00:00.000Z",
+        "verifiedBy": "agent",
+        "test": "test/vanguard-batch.test.mjs#vanguard-shen-levels-up",
+        "clauses": [
+          "Support: Give my supported ally Barrier this round.",
+          "I've seen allies gain Barrier 5 times."
+        ],
+        "notes": ""
+      }
+    },
+    "01IO032T1": {
+      "status": "curated",
+      "script": {
+        "triggers": [
+          {
+            "on": "support",
+            "actions": [
+              {
+                "type": "barrier",
+                "target": "supported"
+              }
+            ]
+          },
+          {
+            "on": "barrier",
+            "condition": {
+              "type": "and",
+              "conditions": [
+                {
+                  "type": "eventTeam",
+                  "who": "ally"
+                },
+                {
+                  "type": "eventNotSource"
+                }
+              ]
+            },
+            "actions": [
+              {
+                "type": "buff",
+                "power": 3,
+                "health": 0,
+                "duration": "round",
+                "target": "eventUnit"
+              }
+            ]
+          }
+        ]
+      },
+      "verification": {
+        "version": 1,
+        "verifiedAt": "2026-10-27T00:00:00.000Z",
+        "verifiedBy": "agent",
+        "test": "test/vanguard-batch.test.mjs#vanguard-shen-level-two-barrier-buff",
+        "clauses": [
+          "Support: Give my supported ally Barrier this round.",
+          "When an ally gets Barrier, give it +3|+0 this round."
+        ],
+        "notes": ""
+      }
+    },
+    "01DE032": {
+      "status": "curated",
+      "script": {
+        "triggers": [
+          {
+            "on": "play",
+            "actions": [
+              {
+                "type": "barrier",
+                "target": {
+                  "type": "allyUnit"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "verification": {
+        "version": 1,
+        "verifiedAt": "2026-10-27T00:00:00.000Z",
+        "verifiedBy": "agent",
+        "test": "test/vanguard-batch.test.mjs#vanguard-prismatic-barrier",
+        "clauses": [
+          "Give an ally Barrier this round."
+        ],
+        "notes": ""
+      }
+    },
+    "06IO005": {
+      "status": "curated",
+      "script": {
+        "triggers": [
+          {
+            "on": "play",
+            "actions": [
+              {
+                "type": "recall",
+                "target": {
+                  "type": "anyUnit",
+                  "filter": {
+                    "maxHealth": 3
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "verification": {
+        "version": 1,
+        "verifiedAt": "2026-10-27T00:00:00.000Z",
+        "verifiedBy": "agent",
+        "test": "test/vanguard-batch.test.mjs#vanguard-gruesome-theater",
+        "clauses": [
+          "Recall a unit with 3 or less Health."
+        ],
+        "notes": ""
+      }
+    },
+    "01IO001": {
+      "status": "curated",
+      "script": {
+        "triggers": [
+          {
+            "on": "play",
+            "actions": [
+              {
+                "type": "heal",
+                "amount": 4,
+                "target": "allyTarget"
+              },
+              {
+                "type": "draw",
+                "amount": 1
+              }
+            ]
+          }
+        ]
+      },
+      "verification": {
+        "version": 1,
+        "verifiedAt": "2026-10-27T00:00:00.000Z",
+        "verifiedBy": "agent",
+        "test": "test/vanguard-batch.test.mjs#vanguard-ritual-of-renewal",
+        "clauses": [
+          "Heal an ally or your Nexus 4.",
+          "Draw 1."
+        ],
+        "notes": ""
+      }
+    },
+    "01DE025": {
+      "status": "curated",
+      "script": {
+        "triggers": [
+          {
+            "on": "play",
+            "actions": [
+              {
+                "type": "capture",
+                "target": {
+                  "type": "allyUnit"
+                },
+                "secondaryTarget": {
+                  "type": "anyUnit"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "verification": {
+        "version": 1,
+        "verifiedAt": "2026-10-27T00:00:00.000Z",
+        "verifiedBy": "agent",
+        "test": "test/vanguard-batch.test.mjs#vanguard-detain-capture-release",
+        "clauses": [
+          "An ally Captures a unit."
+        ],
+        "notes": ""
+      }
+    },
+    "01IO010": {
+      "status": "curated",
+      "script": {
+        "triggers": [
+          {
+            "on": "play",
+            "actions": [
+              {
+                "type": "swap",
+                "target": {
+                  "type": "allyUnit",
+                  "count": 2
+                }
+              },
+              {
+                "type": "barrier",
+                "target": {
+                  "type": "lastTargets",
+                  "count": 2
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "verification": {
+        "version": 1,
+        "verifiedAt": "2026-10-27T00:00:00.000Z",
+        "verifiedBy": "agent",
+        "test": "test/vanguard-batch.test.mjs#vanguard-stand-united",
+        "clauses": [
+          "Swap 2 allies.",
+          "Give them Barrier this round."
+        ],
+        "notes": ""
+      }
+    },
+    "01DE035": {
+      "status": "curated",
+      "script": {
+        "triggers": [
+          {
+            "on": "play",
+            "actions": [
+              {
+                "type": "buff",
+                "power": 3,
+                "health": 3,
+                "duration": "round",
+                "target": "allAllyUnits"
+              }
+            ]
+          }
+        ]
+      },
+      "verification": {
+        "version": 1,
+        "verifiedAt": "2026-10-27T00:00:00.000Z",
+        "verifiedBy": "agent",
+        "test": "test/vanguard-batch.test.mjs#vanguard-for-demacia",
+        "clauses": [
+          "Give allies +3|+3 this round."
+        ],
+        "notes": "Previously auto-generated; verified against the printed text."
+      }
+    },
+    "04DE007T1": {
+      "status": "curated",
+      "script": {
+        "triggers": [
+          {
+            "on": "play",
+            "actions": [
+              {
+                "type": "nextSummon",
+                "keywords": [
+                  "Challenger"
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "verification": {
+        "version": 1,
+        "verifiedAt": "2026-10-27T00:00:00.000Z",
+        "verifiedBy": "agent",
+        "test": "test/vanguard-batch.test.mjs#vanguard-tattered-banner",
+        "clauses": [
+          "The next time you summon an ally this round, grant it Challenger."
+        ],
+        "notes": ""
+      }
+    },
+    "06IO013T1": {
+      "status": "curated",
+      "script": {
+        "triggers": [
+          {
+            "on": "play",
+            "actions": [
+              {
+                "type": "buff",
+                "power": 0,
+                "health": 2,
+                "duration": "round",
+                "target": "allyUnit"
+              }
+            ]
+          }
+        ]
+      },
+      "verification": {
+        "version": 1,
+        "verifiedAt": "2026-10-27T00:00:00.000Z",
+        "verifiedBy": "agent",
+        "test": "test/vanguard-batch.test.mjs#vanguard-meditate",
+        "clauses": [
+          "Give an ally +0|+2 this round."
+        ],
+        "notes": ""
+      }
+    },
+    "06DE024": {
+      "status": "curated",
+      "script": {
+        "deferTargets": true,
+        "triggers": [
+          {
+            "on": "play",
+            "actions": [
+              {
+                "type": "choose",
+                "prompt": "Give +1|+1 or equip an equipment from hand?",
+                "options": [
+                  {
+                    "id": "buff",
+                    "label": "Give an ally +1|+1 this round",
+                    "actions": [
+                      {
+                        "type": "buff",
+                        "power": 1,
+                        "health": 1,
+                        "duration": "round",
+                        "target": "allyUnit"
+                      }
+                    ]
+                  },
+                  {
+                    "id": "equip",
+                    "label": "Equip an ally from hand",
+                    "actions": [
+                      {
+                        "type": "equipFromHand",
+                        "target": "allyUnit",
+                        "handTarget": {
+                          "type": "handCard",
+                          "filter": {
+                            "type": "equipment",
+                            "maxCost": 2
+                          }
+                        }
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "verification": {
+        "version": 1,
+        "verifiedAt": "2026-10-27T00:00:00.000Z",
+        "verifiedBy": "agent",
+        "test": "test/vanguard-batch.test.mjs#vanguard-catch-modal",
+        "clauses": [
+          "Give an ally +1|+1 this round or equip it with an equipment in hand that costs 2 or less."
+        ],
+        "notes": ""
+      }
+    },
+    "06DE033": {
+      "status": "curated",
+      "script": {
+        "triggers": [
+          {
+            "on": "play",
+            "actions": [
+              {
+                "type": "destroyEquipment",
+                "target": {
+                  "type": "anyUnit",
+                  "filter": {
+                    "equipped": true
+                  }
+                }
+              },
+              {
+                "type": "if",
+                "condition": {
+                  "type": "lastTargetFollower"
+                },
+                "actions": [
+                  {
+                    "type": "silence",
+                    "target": "lastTargets"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "verification": {
+        "version": 1,
+        "verifiedAt": "2026-10-27T00:00:00.000Z",
+        "verifiedBy": "agent",
+        "test": "test/vanguard-batch.test.mjs#vanguard-silence-and-suppress",
+        "clauses": [
+          "Destroy a unit's equipment, and if it's a follower, Silence it."
+        ],
+        "notes": ""
+      }
+    },
+    "06DE029": {
+      "status": "curated",
+      "script": {
+        "triggers": [
+          {
+            "on": "equip",
+            "condition": {
+              "type": "and",
+              "conditions": [
+                {
+                  "type": "eventTeam",
+                  "who": "ally"
+                },
+                {
+                  "type": "firstTimeThisGame",
+                  "flag": "steadfast-elkin-equip",
+                  "scope": "source"
+                }
+              ]
+            },
+            "actions": [
+              {
+                "type": "grantKeyword",
+                "keyword": "Tough",
+                "target": "self"
+              }
+            ]
+          }
+        ]
+      },
+      "verification": {
+        "version": 1,
+        "verifiedAt": "2026-10-27T00:00:00.000Z",
+        "verifiedBy": "agent",
+        "test": "test/vanguard-batch.test.mjs#vanguard-steadfast-elkin",
+        "clauses": [
+          "The first time an ally is Equipped, grant me Tough."
+        ],
+        "notes": ""
+      }
+    },
+    "06DE040": {
+      "status": "curated",
+      "script": {
+        "triggers": [
+          {
+            "on": "play",
+            "actions": [
+              {
+                "type": "pickFromTop",
+                "count": 4,
+                "filter": {
+                  "types": [
+                    "follower",
+                    "equipment"
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "verification": {
+        "version": 1,
+        "verifiedAt": "2026-10-27T00:00:00.000Z",
+        "verifiedBy": "agent",
+        "test": "test/vanguard-batch.test.mjs#vanguard-tempting-prospect",
+        "clauses": [
+          "Pick a follower or equipment from the top 4 cards of your deck.",
+          "Draw it, then place the rest into your deck."
+        ],
+        "notes": ""
+      }
+    },
+    "06IO014": {
+      "status": "curated",
+      "script": {
+        "triggers": [
+          {
+            "on": "nexusStrike",
+            "continueOnSourceDeath": true,
+            "actions": [
+              {
+                "type": "recall",
+                "target": "self"
+              },
+              {
+                "type": "transform",
+                "cardId": "06IO014T1",
+                "target": "lastRecalled"
+              }
+            ]
+          }
+        ]
+      },
+      "verification": {
+        "version": 1,
+        "verifiedAt": "2026-10-27T00:00:00.000Z",
+        "verifiedBy": "agent",
+        "test": "test/vanguard-batch.test.mjs#vanguard-vastayan-disciple",
+        "clauses": [
+          "Nexus Strike: Recall me and transform me into Shimon Wind."
+        ],
+        "notes": ""
+      }
+    },
+    "06IO014T1": {
+      "status": "curated",
+      "script": {
+        "triggers": [
+          {
+            "on": "play",
+            "actions": [
+              {
+                "type": "summon",
+                "cardId": "06IO014"
+              },
+              {
+                "type": "draw",
+                "amount": 1
+              }
+            ]
+          }
+        ]
+      },
+      "verification": {
+        "version": 1,
+        "verifiedAt": "2026-10-27T00:00:00.000Z",
+        "verifiedBy": "agent",
+        "test": "test/vanguard-batch.test.mjs#vanguard-shimon-wind",
+        "clauses": [
+          "Summon a Vastayan Disciple and draw 1."
+        ],
+        "notes": ""
+      }
+    },
+    "09DE031": {
+      "status": "curated",
+      "script": {
+        "triggers": [
+          {
+            "on": "play",
+            "actions": [
+              {
+                "type": "grantKeyword",
+                "keyword": "Spirit",
+                "prompt": "Choose an ally in hand",
+                "target": {
+                  "type": "handCard",
+                  "filter": {
+                    "type": "unit"
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "verification": {
+        "version": 1,
+        "verifiedAt": "2026-10-27T00:00:00.000Z",
+        "verifiedBy": "agent",
+        "test": "test/vanguard-batch.test.mjs#vanguard-jarro-lightfeather",
+        "clauses": [
+          "Play: Grant an ally in hand Spirit."
+        ],
+        "notes": ""
+      }
+    }
+  }
+}

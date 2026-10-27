@@ -39,6 +39,12 @@ function matchesFilter(game, unit, filter = {}) {
   if (filter.excludeUid && unit.uid === filter.excludeUid) return false;
   if (filter.champion === true && unit.card?.supertype !== 'Champion') return false;
   if (filter.champion === false && unit.card?.supertype === 'Champion') return false;
+  if (filter.equipped === true && !(unit.equipment || []).length) return false;
+  if (filter.equipped === false && (unit.equipment || []).length) return false;
+  if (Array.isArray(filter.types) && filter.types.length) {
+    const matches = filter.types.some((type) => matchesFilter(game, unit, { ...filter, type, types: null }));
+    if (!matches) return false;
+  }
   return true;
 }
 
@@ -51,10 +57,28 @@ export function targetOptions(game, rawSpec, ctx = {}) {
   const opts = [];
   const addUnit = (u) => {
     if (!u || u.dead) return;
+    if (filter.excludeChosen && (ctx.chosenTargets || []).some((chosen) => chosen?.uid === u.uid)) return;
     if (!matchesFilter(game, u, { ...filter, excludeSource: filter.excludeSource === 'self' ? ctx.source : filter.excludeSource })) return;
     opts.push({ id: `u:${u.uid}`, kind: 'unit', label: `${u.name} (${game.power(u)}|${game.health(u)})`, cardId: u.cardId, uid: u.uid });
   };
   const addNexus = (t, label) => opts.push({ id: `n:${t}`, kind: 'nexus', team: t, label: `${label} (${game.teams[t].nexus})` });
+  const addHandCard = (handCard) => {
+    if (!handCard) return;
+    const card = game.cardDB.get(handCard.cardId);
+    if (!card) return;
+    opts.push({ id: `h:${handCard.iid}`, kind: 'hand', label: `${card.name} (${card.cost})`, cardId: card.id });
+  };
+  const addEntity = (entity) => {
+    if (!entity) return;
+    if (entity.nexus) {
+      const label = entity.nexus === team ? 'Your Nexus' : 'Enemy Nexus';
+      addNexus(entity.nexus, label);
+    } else if (entity.uid) {
+      addUnit(entity);
+    } else if (entity.handCard) {
+      addHandCard(entity.handCard);
+    }
+  };
   const allyUnits = () => game.unitsOnTeam(team).filter((u) => !u.isLandmark || spec.type.includes('Landmark'));
   const enemyUnits = () => game.unitsOnTeam(enemyTeam).filter((u) => !u.isLandmark || spec.type.includes('Landmark'));
   switch (spec.type) {
@@ -98,12 +122,21 @@ export function targetOptions(game, rawSpec, ctx = {}) {
       for (const h of controller.hand) {
         const c = game.cardDB.get(h.cardId);
         if (!c) continue;
-        if (filter.maxCost != null && c.cost > filter.maxCost) continue;
-        if (filter.minCost != null && c.cost < filter.minCost) continue;
-        if (filter.type && filter.type !== 'any' && c.type !== filter.type) continue;
-        opts.push({ id: `h:${h.iid}`, kind: 'hand', label: `${c.name} (${c.cost})`, cardId: c.id });
+        if (!matchesCardFilter(game, c, filter)) continue;
+        addHandCard(h);
       }
       break;
+    case 'lastTargets':
+      for (const entity of ctx.lastTargets || []) addEntity(entity);
+      break;
+    case 'lastRecalled':
+      if (ctx.lastRecalled?.handCard) addHandCard(ctx.lastRecalled.handCard);
+      break;
+    case 'eventUnit': {
+      const entity = ctx.unit || ctx.target || ctx.summoned || ctx.healed || ctx.recalled || null;
+      if (entity?.uid) addUnit(entity);
+      break;
+    }
     case 'allAllyUnits': return allyUnits().filter((u) => matchesFilter(game, u, filter)).map((u) => ({ id: `u:${u.uid}`, kind: 'unit', label: u.name, uid: u.uid }));
     case 'allOtherAllyUnits': return allyUnits().filter((u) => u !== ctx.source && matchesFilter(game, u, filter)).map((u) => ({ id: `u:${u.uid}`, kind: 'unit', label: u.name, uid: u.uid }));
     case 'allEnemyUnits': return enemyUnits().filter((u) => matchesFilter(game, u, filter)).map((u) => ({ id: `u:${u.uid}`, kind: 'unit', label: u.name, uid: u.uid }));
@@ -201,6 +234,9 @@ export function resolveEntity(game, id) {
 
 function matchesCardFilter(game, card, filter = {}) {
   if (!card) return false;
+  if (Array.isArray(filter.types) && filter.types.length) {
+    return filter.types.some((type) => matchesCardFilter(game, card, { ...filter, type, types: null }));
+  }
   const type = filter.type;
   if (type && type !== 'any') {
     if (type === 'champion') {
@@ -309,6 +345,21 @@ export function evalCondition(game, condition, ctx = {}) {
     case 'sourceAttacking': return !!game.combat?.attackers?.includes(source);
     case 'sourceBlocking': return !!game.combat?.blockers?.includes(source);
     case 'sourceLeveled': return !!source?.leveled;
+    case 'selfStrikesThisGame': return cmp(source?.strikesThisGame || 0, c.op || '>=', c.value ?? 1);
+    case 'counter': return cmp(source?.counters?.[c.counter] || 0, c.op || '>=', c.value ?? 1);
+    case 'eventTeam': {
+      const entity = ctx.unit || ctx.equipped || ctx.target || ctx.summoned || ctx.healed || ctx.recalled || ctx.eventSource || null;
+      if (!entity?.team) return false;
+      return c.who === 'enemy' ? entity.team === enemyTeam : entity.team === team;
+    }
+    case 'eventNotSource': {
+      const entity = ctx.unit || ctx.equipped || ctx.target || ctx.summoned || ctx.healed || ctx.recalled || ctx.eventSource || null;
+      return !!entity && entity !== source;
+    }
+    case 'lastTargetFollower': {
+      const unit = ctx.lastTargets?.[0];
+      return !!unit && !unit.isLandmark && !unit.isEquipment && unit.card?.supertype !== 'Champion';
+    }
     case 'targetChampion': return ctx.target?.card?.supertype === 'Champion';
     case 'event': return c.value == null || ctx.event === c.value;
     case 'eventCard': {
@@ -539,44 +590,18 @@ export class EffectRunner {
           continue;
         }
 
-        // Resolve target (if any). Preset targets are consumed in action order.
-        let targetSpec = action.target;
-        if (targetSpec) {
-          if (res.presetTargets.length && targetNeedsChoice(normalizeTarget(targetSpec).type) && !res.chosen.has(path)) {
-            const count = normalizeTarget(targetSpec).count || 1;
-            const ids = res.presetTargets.splice(0, count);
-            res.chosen.set(path, ids);
-          }
-          const spec = normalizeTarget(targetSpec);
-          if (!res.chosen.has(path)) {
-            const options = targetOptions(game, spec, res.ctx);
-            if (!options.length) {
-              // No legal target: skip the action instead of stalling the game.
-              res.index++;
-              game.log(`${res.ctx.source?.name || 'Effect'}: no legal target, effect skipped.`, 'effect');
-              continue;
-            }
-            if (res.auto || game.isAutoChoice(spec.type)) {
-              res.chosen.set(path, autoTargetIds(game, spec, res.ctx));
-            } else {
-              const player = res.controller;
-              game.pending = {
-                playerId: player.id,
-                playerName: player.name,
-                prompt: action.prompt || spec.prompt || promptForTarget(spec.type),
-                options,
-                min: spec.count || 1,
-                max: spec.count || 1,
-                path,
-                resolution: res,
-                filter: spec.filter || {},
-              };
-              game.log(`${player.name} is choosing a target…`, 'choice');
-              this.pumpPending();
-              return;
-            }
-          }
+        // Top-of-deck choices are resolved before the action executes so the
+        // same pending-choice path works for manual and automatic scripts.
+        if (action.type === 'pickFromTop') {
+          const picked = this.prepareTopPick(res, action, path);
+          if (picked === false) { res.index++; continue; }
+          if (picked === null) return;
         }
+
+        // Resolve targets (if any). Preset targets are consumed in action order.
+        const resolvedTargets = this.resolveActionTargets(res, action, path);
+        if (resolvedTargets === false) { res.index++; continue; }
+        if (resolvedTargets === null) return;
         res.index++;
         try {
           this.execute(action, res, path);
@@ -596,24 +621,131 @@ export class EffectRunner {
     if (this.game.onPending) this.game.onPending();
   }
 
+  resolveActionTargets(res, action, path) {
+    const game = this.game;
+    const fields = [];
+    // The hand target is selected first so an equip effect with no legal
+    // equipment can skip before asking the player to choose a bearer.
+    if (action.handTarget) fields.push(['handTarget', action.handTarget, `${path}:hand`]);
+    if (action.target) fields.push(['target', action.target, path]);
+    if (action.secondaryTarget) fields.push(['secondaryTarget', action.secondaryTarget, `${path}:2`]);
+    if (!fields.length) return true;
+    if (res.targetPath !== path) {
+      res.targetPath = path;
+      res.ctx.chosenTargets = [];
+    }
+    for (const [field, rawSpec, key] of fields) {
+      if (res.chosen.has(key)) continue;
+      const spec = normalizeTarget(rawSpec);
+      const count = spec.count || 1;
+      if (res.presetTargets.length && targetNeedsChoice(spec.type)) {
+        const ids = res.presetTargets.splice(0, count);
+        res.chosen.set(key, ids);
+        for (const id of ids) {
+          const entity = resolveEntity(game, id);
+          if (entity) res.ctx.chosenTargets.push(entity);
+        }
+        continue;
+      }
+      const options = targetOptions(game, spec, res.ctx);
+      if (options.length < count) {
+        game.log(`${res.ctx.source?.name || 'Effect'}: not enough legal targets for ${field}, effect skipped.`, 'effect');
+        return false;
+      }
+      if (res.auto || game.isAutoChoice(spec.type)) {
+        const ids = autoTargetIds(game, spec, res.ctx);
+        if (ids.length < count) {
+          game.log(`${res.ctx.source?.name || 'Effect'}: not enough legal targets for ${field}, effect skipped.`, 'effect');
+          return false;
+        }
+        res.chosen.set(key, ids);
+        for (const id of ids) {
+          const entity = resolveEntity(game, id);
+          if (entity) res.ctx.chosenTargets.push(entity);
+        }
+      } else {
+        const player = res.controller;
+        game.pending = {
+          playerId: player.id,
+          playerName: player.name,
+          prompt: action.prompt || spec.prompt || promptForTarget(spec.type),
+          options,
+          min: count,
+          max: count,
+          path: key,
+          resolution: res,
+          filter: spec.filter || {},
+        };
+        game.log(`${player.name} is choosing a target…`, 'choice');
+        this.pumpPending();
+        return null;
+      }
+    }
+    return true;
+  }
+
+  prepareTopPick(res, action, path) {
+    if (res.chosen.has(path)) return true;
+    const game = this.game;
+    const controller = res.controller;
+    const count = Math.max(1, Math.min(20, Number(action.count) || 4));
+    const top = controller.deck.slice(0, count);
+    const options = [];
+    top.forEach((cardId, index) => {
+      const card = game.cardDB.get(cardId);
+      if (!matchesCardFilter(game, card, action.filter || {})) return;
+      options.push({ id: `d:${index}:${cardId}`, label: `${card.name} (${card.cost})`, kind: 'deck', cardId });
+    });
+    res.pickData = { path, top };
+    if (!options.length) {
+      const text = `${controller.name} finds no matching card in the top ${count} of their deck.`;
+      game.log(text, 'effect', controller.id, { privateTo: controller.id, publicText: `${controller.name} reveals no card.` });
+      return false;
+    }
+    if (res.auto || options.length === 1) {
+      res.chosen.set(path, [options[0].id]);
+      return true;
+    }
+    game.pending = {
+      playerId: controller.id,
+      playerName: controller.name,
+      prompt: action.prompt || `Choose a card from the top ${count} of your deck`,
+      options,
+      min: 1,
+      max: 1,
+      path,
+      resolution: res,
+    };
+    game.log(`${controller.name} is choosing a card from the top of their deck…`, 'choice');
+    this.pumpPending();
+    return null;
+  }
+
   execute(action, res, path) {
     const game = this.game;
     const controller = res.controller;
     const team = controller.team;
     const enemyTeam = game.otherTeam(team);
     const source = res.ctx.source;
-    let targets = [];
-    if (res.chosen.has(path)) {
-      targets = res.chosen.get(path).map((id) => resolveEntity(game, id)).filter(Boolean);
-    }
-    if (action.target && !targets.length) {
-      targets = autoTargetIds(game, action.target, res.ctx).map((id) => resolveEntity(game, id)).filter(Boolean);
-    }
+    const pickTargets = (rawSpec, key) => {
+      if (!rawSpec) return [];
+      const ids = res.chosen.has(key) ? res.chosen.get(key) : autoTargetIds(game, rawSpec, res.ctx);
+      return ids.map((id) => resolveEntity(game, id)).filter(Boolean);
+    };
+    const targets = pickTargets(action.target, path);
+    const secondaryTargets = pickTargets(action.secondaryTarget, `${path}:2`);
+    const handTargets = pickTargets(action.handTarget, `${path}:hand`);
     const target = targets[0] || null;
+    const secondaryTarget = secondaryTargets[0] || null;
+    const handTarget = handTargets[0] || null;
+    if (targets.length) {
+      res.ctx.lastTargets = targets;
+      res.ctx.lastTarget = target;
+    }
     const amount = amountValue(game, action, res.ctx, target);
 
-    if (targets.length && action.target && source?.isSpell) {
-      for (const t of targets) {
+    if (action.target && source?.isSpell) {
+      for (const t of [...targets, ...secondaryTargets]) {
         if (t.uid) game.recordTargeting(t, { source, action: action.type, spell: true });
       }
     }
@@ -678,6 +810,7 @@ export class EffectRunner {
       case 'grantKeyword': {
         for (const t of targets) {
           if (t.uid) game.grantKeyword(t, canonicalKeyword(action.keyword), action.duration || 'permanent');
+          else if (t.handCard) game.grantKeywordToHandCard(t.handCard, canonicalKeyword(action.keyword));
         }
         break;
       }
@@ -689,7 +822,10 @@ export class EffectRunner {
       case 'spellShield': for (const t of targets) if (t.uid) game.grantStatus(t, 'spellShield'); break;
       case 'stun': for (const t of targets) if (t.uid) game.stunUnit(t); break;
       case 'frostbite': for (const t of targets) if (t.uid) game.frostbiteUnit(t); break;
-      case 'recall': for (const t of targets) if (t.uid) game.recallUnit(t, source); break;
+      case 'recall': for (const t of targets) if (t.uid) {
+        const moved = game.recallUnit(t, source);
+        if (moved) res.ctx.lastRecalled = moved;
+      } break;
       case 'silence': for (const t of targets) if (t.uid) game.silenceUnit(t); break;
       case 'destroyEquipment':
       case 'detach': {
@@ -701,6 +837,69 @@ export class EffectRunner {
       case 'moveToDeck': {
         for (const t of targets) {
           if (t.uid) game.moveUnitToDeck(t, { source, position: action.position || action.to || 'shuffle' });
+        }
+        break;
+      }
+      case 'equipFromHand': {
+        const unit = target?.uid ? game.unitById(target.uid) : null;
+        const handCard = handTarget?.handCard || null;
+        const card = handCard ? game.cardDB.get(handCard.cardId) : null;
+        if (!unit || unit.team !== team || !handCard || !card || card.type !== 'Equipment') {
+          game.log(`${source?.name || 'Effect'}: no legal equipment target, effect skipped.`, 'effect');
+          break;
+        }
+        const handIndex = controller.hand.findIndex((h) => h.iid === handCard.iid);
+        if (handIndex < 0) break;
+        controller.hand.splice(handIndex, 1);
+        const equipped = game.equipCard(unit, card, controller, { source, fromHand: true });
+        if (!equipped) controller.hand.splice(handIndex, 0, handCard);
+        break;
+      }
+      case 'pickFromTop': {
+        const chosenId = res.chosen.get(path)?.[0];
+        if (!chosenId || !res.pickData || res.pickData.path !== path) break;
+        const parts = String(chosenId).split(':');
+        const cardId = parts[2];
+        let index = Number(parts[1]);
+        const deck = controller.deck;
+        if (!Number.isInteger(index) || deck[index] !== cardId) index = deck.indexOf(cardId);
+        if (index < 0 || !cardId) break;
+        deck.splice(index, 1);
+        if (action.rest !== 'keep') game.shuffleDeck(controller);
+        game.addCardToHand(controller, cardId, { fromDeck: true });
+        break;
+      }
+      case 'capture': {
+        const captor = target?.uid ? game.unitById(target.uid) : null;
+        const captured = secondaryTarget?.uid ? game.unitById(secondaryTarget.uid) : null;
+        if (!captor || !captured || captor === captured || captor.team !== team) {
+          game.log(`${source?.name || 'Effect'}: no legal capture pair, effect skipped.`, 'effect');
+          break;
+        }
+        game.captureUnit(captor, captured, source);
+        break;
+      }
+      case 'swap': {
+        if (targets.length < 2) break;
+        game.swapUnits(targets[0], targets[1]);
+        break;
+      }
+      case 'nextSummon': {
+        game.setNextSummon(controller, {
+          keywords: Array.isArray(action.keywords) ? action.keywords : [],
+          power: action.power ?? 0,
+          health: action.health ?? 0,
+          source,
+          name: source?.name || 'Next summon',
+        });
+        break;
+      }
+      case 'addCounter': {
+        const list = targets.length ? targets : (source ? [{ uid: source.uid }] : []);
+        for (const t of list) {
+          if (!t.uid) continue;
+          const unit = game.unitById(t.uid);
+          if (unit) game.addCounter(unit, action.counter, amount || 1);
         }
         break;
       }
@@ -761,7 +960,12 @@ export class EffectRunner {
         break;
       }
       case 'levelUp': if (source) game.levelUp(source); break;
-      case 'transform': if (source && action.cardId) game.transformUnit(source, action.cardId); break;
+      case 'transform': {
+        if (!action.cardId) break;
+        if (target?.handCard) game.transformHandCard(target.handCard, action.cardId);
+        else if (source) game.transformUnit(source, action.cardId);
+        break;
+      }
       case 'copy': {
         if (source && target?.uid) game.copyUnit(target, controller);
         break;
@@ -805,19 +1009,26 @@ export function promptForTarget(type) {
     allyLandmark: 'Choose an allied landmark',
     enemyLandmark: 'Choose an enemy landmark',
     anyNexus: 'Choose a Nexus',
+    allyTarget: 'Choose an ally or your Nexus',
     handCard: 'Choose a card in hand',
+    lastTargets: 'Choose the previous target',
+    lastRecalled: 'Choose the recalled card',
+    eventUnit: 'Choose the triggering unit',
   };
   return map[type] || 'Choose a target';
 }
 
 export function targetSpecsForScript(script) {
-  if (!script?.triggers) return [];
+  if (!script?.triggers || script.deferTargets) return [];
   const specs = [];
   const visit = (actions) => {
     for (const action of actions || []) {
-      if (action.target && targetNeedsChoice(normalizeTarget(action.target).type)) {
-        const spec = normalizeTarget(action.target);
-        specs.push({ ...spec, prompt: action.prompt || spec.prompt || promptForTarget(spec.type), actionType: action.type });
+      for (const key of ['handTarget', 'target', 'secondaryTarget']) {
+        const raw = action[key];
+        if (raw && targetNeedsChoice(normalizeTarget(raw).type)) {
+          const spec = normalizeTarget(raw);
+          specs.push({ ...spec, prompt: action.prompt || spec.prompt || promptForTarget(spec.type), actionType: action.type });
+        }
       }
       visit(action.actions);
       visit(action.elseActions);

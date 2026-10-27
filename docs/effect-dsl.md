@@ -110,6 +110,10 @@ and update the hash.
 - `continueOnSourceDeath` is an optional boolean. Set it only when the
   remaining actions do not depend on the source staying in play, such as a
   watcher that must finish a separate effect after its source is struck.
+- `deferTargets` is an optional boolean. When true, no targets are collected
+  before the card is played; each action prompts during resolution instead.
+  Use it for modal cards where the chosen branch determines the target, such
+  as Catch!. Without it, the play UI asks for every branch's targets up front.
 - `levelUp.condition` is read by `checkLevelUps()` for champions with a
   `level2Id`. It is not a trigger. The `levelUp` trigger fires after the swap.
 - Trigger-level `"auto": true|false` is legacy metadata. `Game.runScript()`
@@ -281,6 +285,8 @@ Every action is an object with a `type`. Common fields:
 | Field | Meaning |
 | --- | --- |
 | `target` | Target name or `{ "type": ..., "count": ..., "filter": ..., "prompt": ... }`. |
+| `secondaryTarget` | Second chosen entity, resolved after `target`. Used by `capture` for the captured unit. |
+| `handTarget` | Chosen card in the controller's hand. Used by `equipFromHand`. |
 | `amount` / `value` | Numeric or symbolic amount. See [Amounts](#amounts). |
 | `duration` | `permanent` (default) or `round`. |
 | `condition` | Condition object for `if`; for other actions, prefer a trigger condition. |
@@ -335,6 +341,12 @@ Every action is an object with a `type`. Common fields:
 | `transform` | `cardId` | Transforms the source into the named card and fires `transform`. |
 | `copy` | `target` | Summons a copy of a unit. Cannot copy spells, landmarks, or equipment. |
 | `moveToDeck` | `target`, `position` (`top`, `bottom`, or `shuffle` default) | Removes a unit from play and puts its card into its owner's deck. Attached equipment returns to hand. |
+| `equipFromHand` | `target` (bearer), `handTarget` (equipment) | Attaches an equipment card from hand to an allied unit without paying its cost. Skips if no legal pair exists. |
+| `pickFromTop` | `count` (default 4), `filter`, `rest` (`shuffle` default) | Reveals the top `count` cards, lets the controller pick one matching `filter`, draws it, then shuffles the rest back (or keeps them on top when `rest: "keep"`). |
+| `capture` | `target` (captor), `secondaryTarget` (captured unit) | Removes the captured unit from play under the captor. It is released to its owner's board when the captor leaves play. |
+| `swap` | `target` with `count: 2` | Swaps the board positions of two allied units. |
+| `nextSummon` | `keywords`, `power`, `health` | Buffs the controller's next summoned ally this round. Unused buffs expire at round end. |
+| `addCounter` | `counter`, `amount` (default 1), optional `target` | Increments a named counter on the source or targets. |
 | `toss` | `amount` | Tosses cards from the bottom of the deck. |
 | `predict` | `count` (default 3) | Automatically takes the highest-cost card from the top N. Not a player choice. |
 | `counter` | none | Counters the top stack item. |
@@ -414,7 +426,8 @@ multiple targets and the board can supply them.
 `randomEnemyUnit`, `randomUnit`, `allAllyUnits`, `allOtherAllyUnits`,
 `allEnemyUnits`, `allOtherEnemyUnits`, `allUnits`, `allBattlingUnits`,
 `allAttackingUnits`, `allDefendingUnits`, `allDamagedAllyUnits`,
-`allDamagedEnemyUnits`, `allChampionAllies`, `allChampionEnemies`.
+`allDamagedEnemyUnits`, `allChampionAllies`, `allChampionEnemies`,
+`lastTargets`, `lastRecalled`, `eventUnit`.
 
 `all*` targets return every matching entity. `count` is ignored for `all*`
 targets. Use a choice target for "one" and an all-target for "all".
@@ -444,8 +457,12 @@ Unit target filters:
 | `excludeSource` | `true` or `"self"` excludes the source unit. |
 | `excludeUid` | Excludes a specific unit UID. |
 | `champion` | `true`/`false` champion shorthand. |
+| `equipped` | `true`/`false` attached-equipment shorthand. |
+| `types` | Array of type checks; matches any entry. |
+| `excludeChosen` | Excludes entities already chosen by the current action (multi-target prompts). |
 
-`handCard` supports only `maxCost`, `minCost`, and `type`. Action filters for
+`handCard` supports `maxCost`, `minCost`, `type`, `types`, `keyword`,
+`notKeyword`, `region`, `subtype`, and `supertype`. Action filters for
 `create` and `createRandom` use the card-pool filter path in
 `Game.randomCard()`; supported fields include `region`, `regions`, `type`,
 `supertype`, `keyword`, `maxCost`, `minCost`, `excludeRegion` (a single region
@@ -487,6 +504,11 @@ A condition is evaluated before a trigger's actions. `op` accepts `>`, `>=`,
 | `round` | `op`, `value` | Current round number. |
 | `sourceAttacking` / `sourceBlocking` | none | Source is in the current combat role. |
 | `sourceLeveled` | none | Source champion is leveled. |
+| `selfStrikesThisGame` | `op`, `value` | Source's lifetime strike count. |
+| `counter` | `counter`, `op`, `value` | Named counter on the source. |
+| `eventTeam` | `who` (`ally` default or `enemy`) | The event entity belongs to the controller's team or the enemy team. |
+| `eventNotSource` | none | The event entity is not the trigger's source unit. |
+| `lastTargetFollower` | none | The previous target was a non-champion, non-landmark unit. |
 | `targetChampion` | none | Event target is a champion. |
 | `event` | `value` | Current event equals the value. |
 | `eventCard` | `filter` | The event's card or unit matches the filter. Reads `summoned`, `played`, `card`, `spell`, `equipment`, or `target` from the event context. |
@@ -822,12 +844,13 @@ names for them.
 Not yet implemented as targets: `owner`, `topDeck`, `bottomDeck`, `deckChoice`,
 `chosenUnit`, `chosenAlly`, `chosenEnemy`, `allyEquipment`, `enemyEquipment`.
 
-Not yet implemented as actions: `attach`/`detach`, `advanceCountdown`/
-`destroyLandmark`, non-random discard from hand, choose-from-deck with a
-predicate, `setStats`, `swapStats`, `reveal`, `predictChoose`, `grantAura`,
-`strikeNexus`, `moveToDeck`, `moveToHand`, `increaseMaxMana`, `refillMana`,
-`copyCard`, `transformCardInHand`, `createInDeck`, `obliterateDeck`,
-`silenceAll`, and `stunAll`.
+Not yet implemented as actions: generic `attach` from outside hand (equipment
+from hand uses `equipFromHand`), `advanceCountdown`/`destroyLandmark`,
+non-random discard from hand, choose-from-deck with a predicate beyond the top
+N (`pickFromTop`), `setStats`, `swapStats`, `reveal`, `predictChoose`,
+`grantAura`, `strikeNexus`, `moveToHand` (use `recall`), `increaseMaxMana`,
+`refillMana`, `copyCard`, `createInDeck`, `obliterateDeck`, `silenceAll`, and
+`stunAll`.
 
 ## Authoring workflow
 
