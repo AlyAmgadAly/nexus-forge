@@ -13,6 +13,7 @@
 > Ordered execution plans:
 > - [Implementation order](docs/agents/implementation-order.md)
 > - [Testing order](docs/agents/testing-order.md)
+> - [Manual in-game test plan](docs/agents/manual-game-testing.md)
 
 ---
 
@@ -966,8 +967,11 @@ level-ups, then complex multi-clause cards.
 The dependency-ordered batch plan is
 [`docs/agents/implementation-order.md`](docs/agents/implementation-order.md); the
 exhaustive test order is
-[`docs/agents/testing-order.md`](docs/agents/testing-order.md). Follow them unless a
-measured dependency changes the order; update the plan when it does.
+[`docs/agents/testing-order.md`](docs/agents/testing-order.md); the human-visible
+two-client plan is
+[`docs/agents/manual-game-testing.md`](docs/agents/manual-game-testing.md). Follow
+them unless a measured dependency changes the order; update the plan when it
+does.
 
 #### 2.4 Starter-deck acceptance
 
@@ -1753,4 +1757,4 @@ And after Phase 2:
 | 2026-10-27 | Vanguard batch 01: applied 19 curated entries (14 collectible Vanguard cards + 5 generated/level-2 cards), added the engine primitives they proved, completed Garen/Shen level-ups, and verified all 29 Vanguard Disciplines text cards. Suite is 195 passing. Coverage is 270 present (17.4%), 38 verified (2.4%), 1,282 missing. |
 | 2026-10-27 | 0.3.0 release prep: bumped app/protocol metadata to 0.3.0, rebuilt the portable Windows artifact, recorded packaged fresh-seed smoke evidence, regenerated the starter cohort and coverage reports, and updated README/testing/DSL/release documentation. External-network, relay, clean-machine, 2v2, spectator, reconnect, and mulligan-stall gates remain open. |
 | 2026-10-27 | Reckless Revenants batch 01: applied 18 curated entries, added `drain`, `reduceCost`, `moveCardToTop`, the `spellKill` event, `sourceWasBlocked`, enemy-deck `create`, and card-pool filters, and verified 18/31 deck text cards. Suite is 215 passing; coverage is 282 present (18.2%), 56 verified (3.6%), 1,270 missing. The 0.3.0 release artifact is unchanged. |
-| 2026-10-27 | Added the ordered execution plans: `docs/agents/implementation-order.md` for the remaining Reckless batches, the 25-card auto audit, the four remaining starter decks, cohort acceptance, and release gates; `docs/agents/testing-order.md` for the per-batch and per-card test matrix. No card data or engine behavior changed. |
+| 2026-10-27 | Added the ordered execution plans: `docs/agents/implementation-order.md` for the remaining Reckless batches, the 25-card auto audit, the four remaining starter decks, cohort acceptance, and release gates; `docs/agents/testing-order.md` for the per-batch and per-card test matrix; and `docs/agents/manual-game-testing.md` for the reviewable two-client in-game plan covering lobby, mulligan, passing, combat, blocking, spells, round cleanup, lethal, keywords, reconnect, and 2v2. No card data or engine behavior changed. |

@@ -260,7 +260,7 @@ Current release evidence: [Nexus Forge v0.3.0](https://github.com/AlyAmgadAly/ne
 - Coverage: **282 scripts present (18.2%)**, **56 verified (3.6%)**, 1,270 missing. Starter cohort: 73 scripted, 47 verified, 106 missing.
 - Regression: 47 syntax files, 215 tests, 288 lint entries with 0 errors and 0 warnings.
 - The 0.3.0 release artifact and tags are unchanged. No build was produced for this post-release batch.
-- Execution order and test order for the remaining batches: [`docs/agents/implementation-order.md`](docs/agents/implementation-order.md) and [`docs/agents/testing-order.md`](docs/agents/testing-order.md).
+- Execution order and test order for the remaining batches: [`docs/agents/implementation-order.md`](docs/agents/implementation-order.md) and [`docs/agents/testing-order.md`](docs/agents/testing-order.md). The reviewable two-client manual plan is [`docs/agents/manual-game-testing.md`](docs/agents/manual-game-testing.md); it has not been executed under the headless-only instruction.
 - Open gates: external-network, relay/TURN, clean-machine, full 1v1, 2v2, spectator, reconnect, and the mulligan-stall investigation.
 
 ## Definition of the first desktop internet release
