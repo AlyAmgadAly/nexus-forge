@@ -344,6 +344,7 @@ export function evalCondition(game, condition, ctx = {}) {
     case 'round': return cmp(game.round, c.op || '>=', c.value ?? 1);
     case 'sourceAttacking': return !!game.combat?.attackers?.includes(source);
     case 'sourceBlocking': return !!game.combat?.blockers?.includes(source);
+    case 'sourceWasBlocked': return !!source && ctx.attacker === source && !!ctx.blocker;
     case 'sourceLeveled': return !!source?.leveled;
     case 'selfStrikesThisGame': return cmp(source?.strikesThisGame || 0, c.op || '>=', c.value ?? 1);
     case 'counter': return cmp(source?.counters?.[c.counter] || 0, c.op || '>=', c.value ?? 1);
@@ -764,6 +765,20 @@ export class EffectRunner {
         if (dead.length) game.emitDeaths(dead, { source });
         break;
       }
+      case 'drain': {
+        const dead = [];
+        for (const t of targets) {
+          if (!t.uid) continue;
+          const dealt = game.damageUnit(t, amount, source, {
+            spell: !!source?.isSpell,
+            skill: !source?.isSpell,
+            deathBatch: dead,
+          });
+          if (dealt > 0) game.healNexus(team, dealt, source);
+        }
+        if (dead.length) game.emitDeaths(dead, { source });
+        break;
+      }
       case 'damageAll': {
         const list = game.unitsOnTeam(action.team === 'enemy' ? enemyTeam : team).filter((u) => matchesFilter(game, u, action.filter || {}));
         const dead = [];
@@ -926,12 +941,25 @@ export class EffectRunner {
       }
       case 'create': {
         const count = action.count || 1;
+        const recipients = action.who === 'enemy' ? game.playersOnTeam(enemyTeam) : [controller];
         for (let i = 0; i < count; i++) {
           let card = action.cardId ? game.cardDB.get(action.cardId) : game.cardDB.findToken(action.name || action.cardName || '');
           if (!card && action.filter) card = game.randomCard(action.filter, controller);
           if (!card) { game.log(`Unknown card to create: ${action.name || action.cardId}`, 'error'); break; }
-          game.createCard(controller, card, { destination: action.destination || 'hand', fleeting: !!action.fleeting, source });
+          for (const recipient of recipients) {
+            game.createCard(recipient, card, { destination: action.destination || 'hand', fleeting: !!action.fleeting, source });
+          }
         }
+        break;
+      }
+      case 'reduceCost': {
+        for (const t of [...targets, ...handTargets]) {
+          if (t.handCard) game.reduceHandCost(t.handCard, amount || 1, { minimum: action.minimum ?? 0 });
+        }
+        break;
+      }
+      case 'moveCardToTop': {
+        game.moveCardToTop(controller, { cardId: action.cardId, name: action.name });
         break;
       }
       case 'createRandom': {

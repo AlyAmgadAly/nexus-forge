@@ -1,6 +1,6 @@
 # Nexus Forge roadmap
 
-Planning baseline: **26 October 2026**. This roadmap records agreed direction and current verification state. Milestones are ordered by dependency; no delivery dates are committed.
+Planning baseline: **26 October 2026**. Content baseline updated **27 October 2026** after the Reckless Revenants batch. This roadmap records agreed direction and current verification state. Milestones are ordered by dependency; no delivery dates are committed.
 
 ## Intended outcome
 
@@ -16,11 +16,11 @@ Already present:
 - A reference-based scenic home screen, with browser QA and screenshots in `docs/qa/lobby/`.
 - Deck building and deck-code import/export; Card Forge and configurable local rules.
 - Room creation, joining, spectating, chat, readiness, host controls, and 1v1/2v2 engine paths.
-- Player-specific game views and 195 automated tests. Card-effect automation remains partial: 270 scripts present (17.4% of 1,552 text cards), 38 verified (2.4%).
+- Player-specific game views and 215 automated tests. Card-effect automation remains partial: 282 scripts present (18.2% of 1,552 text cards), 56 verified (3.6%).
 - Electron 0.3.0 desktop shell, per-user writable data with backup migration, loopback service lifecycle, and portable Windows packaging.
 - PeerJS/WebRTC host and guest transports, room content manifests, filtered peer views, validated deck submissions, host-approved custom content, reconnect tokens, host-close behavior, and desktop connection UI.
-- 195 automated tests covering the engine, data migration, peer rooms/service lifecycle, manifests, content sanitization, deck payloads, deck-code fallback for Card Forge cards, effect DSL, script coverage, and the Vanguard starter batch.
-- All 29 Vanguard Disciplines starter-deck text cards are scripted and verified; the other five starter decks contain 118 text cards without scripts and 32 unverified scripts. See `docs/scripts/coverage-0.3.0.md`.
+- 215 automated tests covering the engine, data migration, peer rooms/service lifecycle, manifests, content sanitization, deck payloads, deck-code fallback for Card Forge cards, effect DSL, script coverage, and the Vanguard and Reckless Revenants starter batches.
+- All 29 Vanguard Disciplines starter-deck text cards are scripted and verified. Reckless Revenants is 18/31 verified with 12 missing and one generated script; the other four starter decks contain 95 unique text cards without scripts. See `docs/scripts/coverage-0.3.0.md` (current working tree, not the published 0.3.0 artifact).
 
 The desktop path for M1-M5 and M7 packaging is implemented and was exercised locally with two Electron instances on one Windows machine: host/join over PeerJS, ready/mulligan/start, bidirectional game actions, guest reconnect and cancel, host close, custom deck/content approval, clipboard copy, data persistence, portable launch, and clean shutdown. The real separate-network matrix in M6 has not been run. Local two-instance evidence is adapter/UI smoke evidence only and does not prove internet reachability.
 
@@ -218,7 +218,7 @@ Acceptance criteria:
 - [x] Any network limitations are explicit; unresolved blocking failures prevent release sign-off.
 - [ ] **External gate:** no paid server, VPN, shared LAN, or manual port forwarding was needed for the supported acceptance paths. *(The same-machine path used none of these, but the external paths have not been exercised.)*
 
-Local evidence: `npm run check:syntax` passes 47 files and `npm test` passes 195/195, including engine, event ordering, Vanguard card effects, data migration, peer rooms, manifests, content sanitization, deck payloads, and coverage tooling. The two-instance UI checks listed under M1-M5 provide local runtime evidence for the unchanged 0.2.0 transport. A Windows CI workflow for `npm ci`, syntax checks, and tests exists but has not run on GitHub. Every row that requires a separate device, separate network, or relay observation remains open.
+Local evidence: `npm run check:syntax` passes 47 files and `npm test` passes 215/215, including engine, event ordering, Vanguard and Reckless Revenants card effects, data migration, peer rooms, manifests, content sanitization, deck payloads, and coverage tooling. The two-instance UI checks listed under M1-M5 provide local runtime evidence for the unchanged 0.2.0 transport. A Windows CI workflow for `npm ci`, syntax checks, and tests exists but has not run on GitHub. Every row that requires a separate device, separate network, or relay observation remains open.
 
 ### M7 - Portable Windows release
 
@@ -251,6 +251,16 @@ Current release evidence: [Nexus Forge v0.3.0](https://github.com/AlyAmgadAly/ne
 - Regression: 47 syntax files, 195 tests, 276 lint entries with 0 errors and 0 warnings.
 - An earlier 0.3.0 packaged build passed fresh-seed smoke: 275 scripts installed (43 curated including 5 generated/level-2 scripts), 1,647 cards served at app version 0.3.0 with `desktop: true`, and clean shutdown with no leftover processes or listening ports. After the final seed-script correction, the executable was rebuilt; under the headless-only instruction it was not relaunched, so this evidence covers the packaging path and seed installation rather than the exact final hash.
 - Open gates: external-network, relay/TURN, clean-machine, 2v2, spectator, and reconnect verification; the user-reported mulligan stall remains under investigation and is not claimed fixed.
+
+### Content milestone — Reckless Revenants (post-0.3.0 batch)
+
+- Applied 18 curated entries from `scripts/batches/2026-10-27-reckless-revenants-01.json`; no generated or level-2 entries.
+- Reckless Revenants is **18/31 text cards verified, 12 missing, one `auto` script** (`01NX020` Draven). Draven and Elise are blocked on level-up/level-two behavior; the remaining per-card gaps are recorded in `docs/scripts/blocked.md`.
+- Added the engine primitives the batch proved: `drain` with actual-damage healing, `reduceCost` with hand-entry cost modifiers, `moveCardToTop`, the `spellKill` event with a landmark guard, `sourceWasBlocked`, enemy-deck `create`, and card-pool `excludeIds`/follower/keyword-text filters.
+- Coverage: **282 scripts present (18.2%)**, **56 verified (3.6%)**, 1,270 missing. Starter cohort: 73 scripted, 47 verified, 106 missing.
+- Regression: 47 syntax files, 215 tests, 288 lint entries with 0 errors and 0 warnings.
+- The 0.3.0 release artifact and tags are unchanged. No build was produced for this post-release batch.
+- Open gates: external-network, relay/TURN, clean-machine, full 1v1, 2v2, spectator, reconnect, and the mulligan-stall investigation.
 
 ## Definition of the first desktop internet release
 

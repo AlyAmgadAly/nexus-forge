@@ -140,7 +140,7 @@ function checkAction(action, path, errors, warnings) {
   }
 
   const needsAmount = new Set([
-    'damage', 'dealDamage', 'damageAll', 'damageNexus',
+    'damage', 'dealDamage', 'damageAll', 'damageNexus', 'drain',
     'heal', 'healUnit', 'healNexus',
   ]);
   if (needsAmount.has(type) && action.amount == null && action.value == null) {

@@ -154,6 +154,7 @@ and update the hash.
 | `equip` | Equipment is attached to a unit | Fields include `equipped`, `equipment`, and `player`. |
 | `detach` | Equipment is removed from a unit | Fields include `equipped`, `equipment`, `cards`, and `reason`. |
 | `countdown` | A landmark countdown advances | Fields include `landmark`, `countdown`, and `destroyed`. |
+| `spellKill` | A spell source kills a non-landmark unit | Watcher event on the spell caster's team; fields include `dead`, `spell`, and `killer`. Landmark destruction is excluded. |
 | `recall` | A unit is returned to hand | Dispatched to the recalled unit and allied watchers. Fields include `recalled`, `player`, and `source`. |
 | `barrier` | A unit gains Barrier | Dispatched to the unit and allied watchers after the status is applied. Fields include `unit` and `source`. |
 | `levelUp` | A champion levels up | After the level-2 card and script swap. |
@@ -185,6 +186,7 @@ are merged into the condition/action context:
 | `lurk` | `attackers`, `lurkers`, `combat` |
 | `targeted` | `target`, `source`, `action`, `spell`, `skill` |
 | `countdown` | `landmark`, `countdown`, `destroyed` |
+| `spellKill` | `dead`, `spell`, `killer` |
 | `recall` | `recalled`, `player`, `source` |
 | `barrier` | `unit`, `source` |
 
@@ -300,6 +302,7 @@ Every action is an object with a `type`. Common fields:
 | `damage` / `dealDamage` | `amount`/`value`, `target` | Deals damage to each resolved target. Unit or Nexus. Lifesteal on the source heals its Nexus. |
 | `damageAll` | `amount`, `team` (`ally` default or `enemy`), `filter`, `includeNexus` | Damages every matching unit on **one** team. `includeNexus` also hits that team's Nexus. |
 | `damageNexus` | `amount`, `who` (`ally` or `enemy`, default `enemy`) | Damages one Nexus. |
+| `drain` | `amount`, `target` | Damages the target, then heals the controller's Nexus for the damage actually dealt. Barrier prevents the heal; Tough and overkill use the dealt amount. |
 | `heal` / `healUnit` | `amount`, `target` | Heals units or Nexuses. |
 | `healNexus` | `amount`, `who` (`ally` default or `enemy`) | Heals one Nexus. |
 | `buff` / `give` | `power`/`attack`, `health`, `duration`, `target` | Adds stats. Negative values are allowed by `buff`. A `handCard` target stores the buff on the hand entry; it applies when the card is played as a unit. |
@@ -329,7 +332,7 @@ Every action is an object with a `type`. Common fields:
 | `draw` | `amount`, `who` (`ally` default, `opponent`, `all`), `fleeting` | Draws cards. Hand-limit burn applies. |
 | `discard` | `amount`, `who` (`ally` default or `opponent`), `random` (default `true`) | Random discard by default. `random: false` discards the first card. |
 | `summon` | `name`/`cardName`/`cardId`, `count` | Summons a token from the card database. By-name lookup picks the first matching token. |
-| `create` | `name`/`cardName`/`cardId` or `filter`, `count`, `destination` (`hand` default or `deck`), `fleeting` | Creates a card. If no named card is found and a filter is present, uses a random matching card. |
+| `create` | `name`/`cardName`/`cardId` or `filter`, `count`, `destination` (`hand` default or `deck`), `fleeting`, `who` (`ally` default or `enemy`) | Creates a card. `who: "enemy"` creates for each enemy-team player. If no named card is found and a filter is present, uses a random matching card. |
 | `createRandom` | `filter`, `count`, `destination`, `fleeting` | Creates random cards matching the filter. |
 | `mana` | `amount` | Adds mana this round. |
 | `spellMana` | `amount` | Adds spell mana. |
@@ -341,6 +344,8 @@ Every action is an object with a `type`. Common fields:
 | `transform` | `cardId` | Transforms the source into the named card and fires `transform`. |
 | `copy` | `target` | Summons a copy of a unit. Cannot copy spells, landmarks, or equipment. |
 | `moveToDeck` | `target`, `position` (`top`, `bottom`, or `shuffle` default) | Removes a unit from play and puts its card into its owner's deck. Attached equipment returns to hand. |
+| `reduceCost` | `amount` (default 1), `target`/`handTarget`, `minimum` (default 0) | Lowers the stored cost of a card in hand. The hand view and play-cost check use the modified value. |
+| `moveCardToTop` | `cardId` or `name` | Moves the matching card from the deck to the top if it is not already in hand or play. |
 | `equipFromHand` | `target` (bearer), `handTarget` (equipment) | Attaches an equipment card from hand to an allied unit without paying its cost. Skips if no legal pair exists. |
 | `pickFromTop` | `count` (default 4), `filter`, `rest` (`shuffle` default) | Reveals the top `count` cards, lets the controller pick one matching `filter`, draws it, then shuffles the rest back (or keeps them on top when `rest: "keep"`). |
 | `capture` | `target` (captor), `secondaryTarget` (captured unit) | Removes the captured unit from play under the captor. It is released to its owner's board when the captor leaves play. |
@@ -465,8 +470,10 @@ Unit target filters:
 `notKeyword`, `region`, `subtype`, and `supertype`. Action filters for
 `create` and `createRandom` use the card-pool filter path in
 `Game.randomCard()`; supported fields include `region`, `regions`, `type`,
-`supertype`, `keyword`, `maxCost`, `minCost`, `excludeRegion` (a single region
-code), and `excludeRegions` (an array of region codes).
+`supertype`, `keyword`, `maxCost`, `minCost`, `excludeIds` (an array of card
+IDs), `excludeRegion` (a single region code), and `excludeRegions` (an array of
+region codes). `type: "follower"` matches non-champion Units, and keyword
+matching also inspects printed card text.
 `addToHandFromDeck` takes no filter and always picks a random card.
 
 ## Conditions
@@ -503,6 +510,7 @@ A condition is evaluated before a trigger's actions. `op` accepts `>`, `>=`,
 | `nightfall` | none | At least one card played by the friendly team this round. |
 | `round` | `op`, `value` | Current round number. |
 | `sourceAttacking` / `sourceBlocking` | none | Source is in the current combat role. |
+| `sourceWasBlocked` | none | True when the source attacker was blocked in the current `block` event. |
 | `sourceLeveled` | none | Source champion is leveled. |
 | `selfStrikesThisGame` | `op`, `value` | Source's lifetime strike count. |
 | `counter` | `counter`, `op`, `value` | Named counter on the source. |
@@ -835,6 +843,11 @@ separate engine batch when a card needs it.
 | `topDeckRegion` | Checks only the top card | Allegiance-style effects need a matching card setup. |
 | `targetChampion` | Reads the event target | Only meaningful on events that supply `target`. |
 | `daybreak` / `nightfall` | Conditions, not triggers | Do not use them as `on` values. |
+| `drain` | Heals for the damage actually dealt | Barrier, Tough, and overkill change the heal amount; this is intended. |
+| `spellKill` | Requires a spell source and excludes landmarks | Landmark destruction and non-spell kills do not count. |
+| `create` with `who: "enemy"` | Creates for every enemy-team player | 2v2 behavior is implemented but only 1v1 is tested. |
+| `reduceCost` | Applies to hand entries only | Deck, discard, and play costs are unaffected. |
+| `moveCardToTop` | Matches a printed name or explicit ID; refuses when already in hand or play | Duplicate names move the first matching deck copy. |
 
 Not yet implemented as events: none of the registered trigger events are
 unimplemented. `behold`, `reputation`, `flow`, `allegiance`, `fated`, and the
@@ -883,5 +896,5 @@ Report **scripts present** and **verified effects** separately:
   "automated."
 
 Use `npm run scripts:coverage` for the current numbers. Do not describe a
-generated script as correct, and do not call 16% coverage "16% of the game
+generated script as correct, and do not call 18% coverage "18% of the game
 works."

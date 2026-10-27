@@ -214,6 +214,10 @@ export class Game {
   unitById(uid) { return this.allUnits().find((u) => u.uid === uid) || null; }
   player(id) { return this.players.get(id) || null; }
   random() { return this.rng(); }
+
+  handCardCost(card, handCard) {
+    return Math.max(0, (card?.cost || 0) + (handCard?.costModifier || 0));
+  }
   isAutoChoice(type) { return !targetNeedsChoice(normalizeTarget(type).type); }
   touch() { if (this.onUpdate) this.onUpdate(this); }
 
@@ -580,6 +584,21 @@ export class Game {
     });
   }
 
+  reduceHandCost(handCard, amount = 1, { minimum = 0 } = {}) {
+    if (!handCard) return false;
+    const card = this.cardDB.get(handCard.cardId);
+    const before = this.handCardCost(card, handCard);
+    const floor = Math.min(before, Math.max(0, minimum ?? 0));
+    const next = Math.max(floor, before - Math.abs(amount || 0));
+    handCard.costModifier = (handCard.costModifier || 0) + (next - before);
+    const owner = [...this.players.values()].find((player) => player.hand.includes(handCard));
+    const suffix = `costs ${next} (was ${before}).`;
+    this.log(`${card?.name || 'Card'} in hand ${suffix}`, 'cost', owner?.id || null, {
+      privateTo: owner?.id || null, publicText: 'A card in hand costs less.',
+    });
+    return next !== before;
+  }
+
   grantKeyword(unit, keyword, duration = 'permanent') {
     if (!unit || unit.dead) return;
     const kw = canonicalKeyword(keyword);
@@ -872,6 +891,29 @@ export class Game {
         }
       }
     }
+    // Spell kills are a separate event so "first time you kill a unit with a
+    // spell" cards can react without guessing from the death source.
+    if (source?.isSpell) {
+      const spellTeam = source.team || null;
+      for (const other of this.allUnits()) {
+        if (!other.script || other.dead) continue;
+        if (spellTeam && other.team !== spellTeam) continue;
+        if (!scriptHasEvent(other.script, EVENTS.SPELL_KILL)) continue;
+        const controller = this.player(other.owner);
+        if (!controller) continue;
+        for (const unit of deadUnits) {
+          if (unit.isLandmark) continue;
+          entries.push({
+            event: EVENTS.SPELL_KILL,
+            script: other.script,
+            source: other,
+            controller,
+            phase: 1,
+            opts: { auto: true, eventCtx: { dead: unit, spell: source.card || null, killer: source } },
+          });
+        }
+      }
+    }
     this.deferEvents(() => {
       this.emitEvents(entries);
       this.recalcAuras();
@@ -1090,6 +1132,27 @@ export class Game {
     return this.addCardToHand(player, card.id, { fleeting });
   }
 
+  moveCardToTop(player, { cardId = null, name = null } = {}) {
+    if (!player || (!cardId && !name)) return false;
+    const wanted = name ? String(name).toLowerCase() : null;
+    const matches = (id) => {
+      const card = this.cardDB.get(id);
+      if (!card) return false;
+      return cardId ? card.id === cardId : String(card.name || '').toLowerCase() === wanted;
+    };
+    // The printed effect only applies while the card is outside hand and play.
+    if (player.hand.some((h) => matches(h.cardId))) return false;
+    if (this.unitsOnTeam(player.team).some((u) => matches(u.cardId))) return false;
+    const index = player.deck.findIndex(matches);
+    if (index < 0) return false;
+    const [id] = player.deck.splice(index, 1);
+    player.deck.unshift(id);
+    this.log(`${this.cardDB.get(id)?.name || 'Card'} moves to the top of ${player.name}'s deck.`, 'effect', player.id, {
+      privateTo: player.id, publicText: `${player.name} moves a card to the top of their deck.`,
+    });
+    return true;
+  }
+
   discardCards(player, count, { random = true, source = null, reason = 'effect' } = {}) {
     if (!player) return;
     const entries = [];
@@ -1128,11 +1191,23 @@ export class Game {
 
   randomCard(filter = {}, player = null) {
     let pool = this.cardDB.enabledCards();
+    if (Array.isArray(filter.excludeIds) && filter.excludeIds.length) {
+      pool = pool.filter((c) => !filter.excludeIds.includes(c.id));
+    }
     if (filter.region) pool = pool.filter((c) => (c.regions || []).includes(filter.region));
     if (filter.regions) pool = pool.filter((c) => (c.regions || []).some((r) => filter.regions.includes(r)));
-    if (filter.type) pool = pool.filter((c) => c.type === filter.type);
+    if (filter.type === 'follower') {
+      pool = pool.filter((c) => c.type === 'Unit' && c.supertype !== 'Champion');
+    } else if (filter.type) {
+      pool = pool.filter((c) => c.type === filter.type);
+    }
     if (filter.supertype) pool = pool.filter((c) => c.supertype === filter.supertype);
-    if (filter.keyword) pool = pool.filter((c) => (c.keywords || []).includes(canonicalKeyword(filter.keyword)));
+    if (filter.keyword) {
+      const key = canonicalKeyword(filter.keyword);
+      const escaped = String(filter.keyword).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const re = new RegExp(`\\b${escaped}\\b`, 'i');
+      pool = pool.filter((c) => (c.keywords || []).map(canonicalKeyword).includes(key) || re.test(c.text || ''));
+    }
     if (filter.maxCost != null) pool = pool.filter((c) => c.cost <= filter.maxCost);
     if (filter.minCost != null) pool = pool.filter((c) => c.cost >= filter.minCost);
     if (filter.excludeRegion) {
@@ -1406,7 +1481,7 @@ export class Game {
     const speed = this.cardSpeed(card);
     if (!this.canPlay(p, card)) return { ok: false, error: 'You cannot play that card now' };
     const team = this.teams[p.team];
-    const cost = Math.max(0, card.cost || 0);
+    const cost = this.handCardCost(card, h);
     const isSpell = card.type === 'Spell';
     const available = team.mana + (isSpell ? team.spellMana : 0);
     if (available < cost) return { ok: false, error: `Not enough mana (${available}/${cost})` };
@@ -2449,6 +2524,7 @@ export class Game {
           return {
             iid: h.iid,
             ...cardView(c),
+            cost: this.handCardCost(c, h),
             attack: (c?.attack || 0) + powerBuff,
             health: (c?.health || 0) + healthBuff,
             keywords,
@@ -2533,7 +2609,8 @@ export class Game {
       canBlock: !!(viewer && this.phase === 'combat' && this.combat?.stage === 'blockers' && viewer.team === this.combat.defendingTeam),
       playable: viewer && canAct ? viewer.hand.filter((h) => {
         const c = this.cardDB.get(h.cardId);
-        return c && this.canPlay(viewer, c) && this.teams[viewer.team].mana + (c.type === 'Spell' ? this.teams[viewer.team].spellMana : 0) >= c.cost;
+        const cost = this.handCardCost(c, h);
+        return c && this.canPlay(viewer, c) && this.teams[viewer.team].mana + (c.type === 'Spell' ? this.teams[viewer.team].spellMana : 0) >= cost;
       }).map((h) => h.iid) : [],
     };
     return {

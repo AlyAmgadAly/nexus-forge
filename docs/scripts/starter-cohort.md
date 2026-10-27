@@ -10,12 +10,12 @@ Coverage is not correctness. **Script present** means an entry exists; **verifie
 | --- | ---: |
 | Unique starter cards | 206 |
 | Unique starter text cards | 179 |
-| Text cards with a script | 61 |
-| Text cards verified | 29 |
-| Text cards missing a script | 118 |
-| Triage: ready | 66 |
-| Triage: engine gap | 52 |
-| Triage: verify existing script | 32 |
+| Text cards with a script | 73 |
+| Text cards verified | 47 |
+| Text cards missing a script | 106 |
+| Triage: ready | 56 |
+| Triage: engine gap | 50 |
+| Triage: verify existing script | 26 |
 
 Triage labels: `ready` means the current DSL can express the printed text; `engine` means a gap is listed and an engine batch is needed; `verify` means an existing script needs clause-by-clause review before it can be marked curated.
 
@@ -116,26 +116,26 @@ Regions: Demacia, Ionia. Text cards: 29; scripted: 29; verified: 29; missing: 0.
 
 ### Reckless Revenants
 
-Regions: Noxus, ShadowIsles. Text cards: 31; scripted: 7; verified: 0; missing: 24.
+Regions: Noxus, ShadowIsles. Text cards: 31; scripted: 19; verified: 18; missing: 12.
 
 #### Attack
 
 | ID | Card | Cost | Type | Status | Triage | Mechanic | Likely gap |
 | --- | --- | ---: | --- | --- | --- | --- | --- |
-| 01NX040 | Legion Saboteur | 1 | Unit | script present | verify | Attack | — |
+| 01NX040 | Legion Saboteur | 1 | Unit | verified | verified | Attack | — |
 | 01SI053 | Elise | 2 | Champion | missing | ready | Attack | — |
 
 #### Buff/Grant
 
 | ID | Card | Cost | Type | Status | Triage | Mechanic | Likely gap |
 | --- | --- | ---: | --- | --- | --- | --- | --- |
-| 07NX003 | All Out | 1 | Spell | missing | ready | Buff/Grant | — |
-| 02SI006 | Barkbeast | 1 | Unit | missing | ready | Buff/Grant | — |
-| 05SI011 | Burgeoning Sentinel | 1 | Unit | missing | ready | Buff/Grant | — |
-| 07NX008 | Elegant Edge | 1 | Unit | script present | verify | Buff/Grant | — |
-| 01SI022 | Mark of the Isles | 1 | Spell | script present | verify | Buff/Grant | — |
+| 07NX003 | All Out | 1 | Spell | verified | verified | Buff/Grant | — |
+| 02SI006 | Barkbeast | 1 | Unit | verified | verified | Buff/Grant | — |
+| 05SI011 | Burgeoning Sentinel | 1 | Unit | verified | verified | Buff/Grant | — |
+| 07NX008 | Elegant Edge | 1 | Unit | verified | verified | Buff/Grant | — |
+| 01SI022 | Mark of the Isles | 1 | Spell | verified | verified | Buff/Grant | — |
 | 09NX025 | The Arena's Greatest | 1 | Landmark | missing | ready | Buff/Grant | — |
-| 04NX019 | Thrashing Snapper | 1 | Unit | missing | ready | Buff/Grant | — |
+| 04NX019 | Thrashing Snapper | 1 | Unit | verified | verified | Buff/Grant | — |
 
 #### Create/Summon
 
@@ -144,7 +144,7 @@ Regions: Noxus, ShadowIsles. Text cards: 31; scripted: 7; verified: 0; missing: 
 | 01SI047 | Fading Memories | 0 | Spell | missing | engine | Create/Summon | player choice, copy variants |
 | 03SI016 | Go Hard | 1 | Spell | missing | engine | Create/Summon | everywhere |
 | 05NX006 | Reborn Grenadier | 1 | Unit | missing | engine | Create/Summon | copy variants, choice discard |
-| 06SI037 | Shadow Isles Tellstones | 1 | Spell | missing | engine | Create/Summon | set mechanic, choice create |
+| 06SI037 | Shadow Isles Tellstones | 1 | Spell | verified | verified | Create/Summon | set mechanic, choice create |
 
 #### Equipment
 
@@ -156,24 +156,24 @@ Regions: Noxus, ShadowIsles. Text cards: 31; scripted: 7; verified: 0; missing: 
 
 | ID | Card | Cost | Type | Status | Triage | Mechanic | Likely gap |
 | --- | --- | ---: | --- | --- | --- | --- | --- |
-| 01SI045 | Absorb Soul | 1 | Spell | missing | ready | Keyword | — |
+| 01SI045 | Absorb Soul | 1 | Spell | verified | verified | Keyword | — |
 
 #### Last Breath
 
 | ID | Card | Cost | Type | Status | Triage | Mechanic | Likely gap |
 | --- | --- | ---: | --- | --- | --- | --- | --- |
-| 03SI015 | Pesky Specter | 0 | Unit | missing | ready | Last Breath | — |
+| 03SI015 | Pesky Specter | 0 | Unit | verified | verified | Last Breath | — |
 | 03NX003 | Blade Squire | 1 | Unit | missing | ready | Last Breath | — |
-| 01SI043 | Hapless Aristocrat | 1 | Unit | script present | verify | Last Breath | — |
+| 01SI043 | Hapless Aristocrat | 1 | Unit | verified | verified | Last Breath | — |
 | 07SI013 | Proliferating Darkwraith | 1 | Unit | missing | engine | Last Breath | copy variants |
 | 08SI003 | Shackled Ghasts | 1 | Unit | missing | engine | Last Breath | revive, copy variants |
-| 01SI026 | Warden's Prey | 1 | Unit | script present | verify | Last Breath | — |
+| 01SI026 | Warden's Prey | 1 | Unit | verified | verified | Last Breath | — |
 
 #### Nightfall
 
 | ID | Card | Cost | Type | Status | Triage | Mechanic | Likely gap |
 | --- | --- | ---: | --- | --- | --- | --- | --- |
-| 03SI003 | Stygian Onlooker | 1 | Unit | missing | ready | Nightfall | — |
+| 03SI003 | Stygian Onlooker | 1 | Unit | verified | verified | Nightfall | — |
 
 #### Other
 
@@ -185,21 +185,21 @@ Regions: Noxus, ShadowIsles. Text cards: 31; scripted: 7; verified: 0; missing: 
 
 | ID | Card | Cost | Type | Status | Triage | Mechanic | Likely gap |
 | --- | --- | ---: | --- | --- | --- | --- | --- |
-| 01SI012 | Oblivious Islander | 1 | Unit | missing | engine | Play | hand buff |
+| 01SI012 | Oblivious Islander | 1 | Unit | verified | verified | Play | hand buff |
 | 04SI004 | The Wings and The Wave | 1 | Unit | missing | ready | Play | — |
 
 #### Stun
 
 | ID | Card | Cost | Type | Status | Triage | Mechanic | Likely gap |
 | --- | --- | ---: | --- | --- | --- | --- | --- |
-| 01NX049 | Guile | 1 | Spell | script present | verify | Stun | — |
+| 01NX049 | Guile | 1 | Spell | verified | verified | Stun | — |
 
 #### Summon
 
 | ID | Card | Cost | Type | Status | Triage | Mechanic | Likely gap |
 | --- | --- | ---: | --- | --- | --- | --- | --- |
-| 04NX018 | Crimson Bloodletter  | 1 | Unit | missing | ready | Summon | — |
-| 01NX035 | Draven's Biggest Fan | 1 | Unit | missing | ready | Summon | — |
+| 04NX018 | Crimson Bloodletter  | 1 | Unit | verified | verified | Summon | — |
+| 01NX035 | Draven's Biggest Fan | 1 | Unit | verified | verified | Summon | — |
 | 06SI003 | Fireth, Reaper of the Sands | 1 | Unit | missing | ready | Summon | — |
 | 01NX020 | Draven | 3 | Champion | script present | verify | Summon | — |
 
@@ -207,7 +207,7 @@ Regions: Noxus, ShadowIsles. Text cards: 31; scripted: 7; verified: 0; missing: 
 
 | ID | Card | Cost | Type | Status | Triage | Mechanic | Likely gap |
 | --- | --- | ---: | --- | --- | --- | --- | --- |
-| 06NX041 | Crimson Pigeon | 1 | Unit | missing | ready | Support | — |
+| 06NX041 | Crimson Pigeon | 1 | Unit | verified | verified | Support | — |
 
 ### Frost & Flame
 

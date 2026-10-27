@@ -45,6 +45,7 @@ export const EVENTS = Object.freeze({
   LEVEL_UP: 'levelUp',
   TRANSFORM: 'transform',
   AURA: 'aura',
+  SPELL_KILL: 'spellKill',
 });
 
 export const TRIGGER_NAMES = Object.freeze(Object.values(EVENTS));
@@ -67,6 +68,7 @@ export const ACTION_TYPES = new Set([
   'toss', 'predict', 'counter', 'shuffle', 'addToHandFromDeck',
   'destroyEquipment', 'detach', 'moveToDeck',
   'equipFromHand', 'pickFromTop', 'capture', 'swap', 'nextSummon', 'addCounter',
+  'reduceCost', 'moveCardToTop', 'drain',
   'log', 'noop',
   ...CONTROL_FLOW_ACTIONS,
 ]);
@@ -107,7 +109,7 @@ export const CONDITION_TYPES = new Set([
   'spellsPlayedThisRound', 'spellsPlayedThisGame', 'manaSpentOnSpellsThisGame',
   'stunnedOrRecalled', 'enlightened', 'deep', 'topDeckRegion',
   'plunder', 'daybreak', 'nightfall', 'round',
-  'sourceAttacking', 'sourceBlocking', 'sourceLeveled', 'targetChampion',
+  'sourceAttacking', 'sourceBlocking', 'sourceWasBlocked', 'sourceLeveled', 'targetChampion',
   'selfStrikesThisGame', 'counter', 'eventTeam', 'eventNotSource', 'lastTargetFollower',
   'event', 'eventCard', 'firstTimeThisRound', 'firstTimeThisGame',
   'cardsPlayedThisRound', 'cardsDrawnThisRound', 'cardsDrawnInARoundThisGame',

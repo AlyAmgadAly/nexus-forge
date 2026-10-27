@@ -1874,6 +1874,34 @@
     },
     "updatedAt": "2026-10-26T00:23:30.967Z"
   },
+  "01NX035": {
+    "script": {
+      "triggers": [
+        {
+          "on": "summon",
+          "actions": [
+            {
+              "type": "moveCardToTop",
+              "name": "Draven"
+            }
+          ]
+        }
+      ]
+    },
+    "status": "curated",
+    "updatedAt": "2026-10-27T15:02:28.449Z",
+    "verification": {
+      "version": 1,
+      "cardTextHash": "5a074c3113a6214effb1cb627e2015f36299ac8dc94bb7eeeee2be693bc7615f",
+      "verifiedAt": "2026-10-27T00:00:00.000Z",
+      "verifiedBy": "agent",
+      "test": "test/reckless-revenants.test.mjs#reckless-dravens-biggest-fan",
+      "clauses": [
+        "When I'm summoned, move Draven to the top of your deck if you don't have him in hand or in play."
+      ],
+      "notes": ""
+    }
+  },
   "01NX036": {
     "status": "auto",
     "script": {
@@ -1922,7 +1950,7 @@
     "updatedAt": "2026-10-26T00:23:30.968Z"
   },
   "01NX040": {
-    "status": "auto",
+    "status": "curated",
     "script": {
       "triggers": [
         {
@@ -1931,19 +1959,24 @@
             {
               "type": "damage",
               "amount": 1,
-              "target": {
-                "type": "enemyNexus",
-                "count": 1,
-                "filter": {}
-              },
-              "condition": null
+              "target": "enemyNexus"
             }
-          ],
-          "auto": false
+          ]
         }
       ]
     },
-    "updatedAt": "2026-10-26T00:23:30.968Z"
+    "updatedAt": "2026-10-27T15:02:28.446Z",
+    "verification": {
+      "version": 1,
+      "cardTextHash": "56f0fe4e7b75d60a0692bcfce91c44cbefc8cd757c625c0c045dfb84d3eec215",
+      "verifiedAt": "2026-10-27T00:00:00.000Z",
+      "verifiedBy": "agent",
+      "test": "test/reckless-revenants.test.mjs#reckless-legion-saboteur",
+      "clauses": [
+        "Attack: Deal 1 to the enemy Nexus."
+      ],
+      "notes": ""
+    }
   },
   "01NX043": {
     "status": "auto",
@@ -2041,7 +2074,7 @@
     "updatedAt": "2026-10-26T00:23:30.968Z"
   },
   "01NX049": {
-    "status": "auto",
+    "status": "curated",
     "script": {
       "triggers": [
         {
@@ -2049,18 +2082,24 @@
           "actions": [
             {
               "type": "stun",
-              "target": {
-                "type": "enemyUnit",
-                "count": 1,
-                "filter": {}
-              },
-              "condition": null
+              "target": "enemyUnit"
             }
           ]
         }
       ]
     },
-    "updatedAt": "2026-10-26T00:23:30.968Z"
+    "updatedAt": "2026-10-27T15:02:28.448Z",
+    "verification": {
+      "version": 1,
+      "cardTextHash": "eb38c963f66ab7bf353eef79923fa1c136fb94ba17fe2ca56b8522153f661386",
+      "verifiedAt": "2026-10-27T00:00:00.000Z",
+      "verifiedBy": "agent",
+      "test": "test/reckless-revenants.test.mjs#reckless-guile",
+      "clauses": [
+        "Stun an enemy."
+      ],
+      "notes": ""
+    }
   },
   "01NX050": {
     "status": "auto",
@@ -2457,6 +2496,48 @@
     },
     "updatedAt": "2026-10-26T00:23:30.971Z"
   },
+  "01SI012": {
+    "script": {
+      "deferTargets": true,
+      "triggers": [
+        {
+          "on": "play",
+          "actions": [
+            {
+              "type": "grantKeyword",
+              "keyword": "Ephemeral",
+              "duration": "permanent",
+              "target": {
+                "type": "handCard",
+                "count": 1,
+                "filter": {
+                  "type": "Unit"
+                }
+              }
+            },
+            {
+              "type": "reduceCost",
+              "amount": 1,
+              "target": "lastTargets"
+            }
+          ]
+        }
+      ]
+    },
+    "status": "curated",
+    "updatedAt": "2026-10-27T15:02:28.450Z",
+    "verification": {
+      "version": 1,
+      "cardTextHash": "d0c7acaec6a00c7d9668274b9a07851d94b391608c5c05b399628510b15fe90f",
+      "verifiedAt": "2026-10-27T00:00:00.000Z",
+      "verifiedBy": "agent",
+      "test": "test/reckless-revenants.test.mjs#reckless-oblivious-islander",
+      "clauses": [
+        "Play: Grant an ally in hand Ephemeral and reduce its cost by 1."
+      ],
+      "notes": ""
+    }
+  },
   "01SI015": {
     "status": "auto",
     "script": {
@@ -2511,7 +2592,7 @@
     }
   },
   "01SI022": {
-    "status": "auto",
+    "status": "curated",
     "script": {
       "triggers": [
         {
@@ -2522,32 +2603,33 @@
               "power": 2,
               "health": 2,
               "duration": "permanent",
-              "target": {
-                "type": "allyUnit",
-                "count": 1,
-                "filter": {}
-              },
-              "condition": null
+              "target": "allyUnit"
             },
             {
               "type": "grantKeyword",
               "keyword": "Ephemeral",
               "duration": "permanent",
-              "target": {
-                "type": "allyUnit",
-                "count": 1,
-                "filter": {}
-              },
-              "condition": null
+              "target": "lastTargets"
             }
           ]
         }
       ]
     },
-    "updatedAt": "2026-10-26T00:23:30.971Z"
+    "updatedAt": "2026-10-27T15:02:28.448Z",
+    "verification": {
+      "version": 1,
+      "cardTextHash": "e83f606b6e79fbf06e452b731a1d0d1028876fb36d7ed1581712586b640b0d95",
+      "verifiedAt": "2026-10-27T00:00:00.000Z",
+      "verifiedBy": "agent",
+      "test": "test/reckless-revenants.test.mjs#reckless-mark-of-the-isles",
+      "clauses": [
+        "Grant an ally +2|+2 and Ephemeral."
+      ],
+      "notes": ""
+    }
   },
   "01SI026": {
-    "status": "auto",
+    "status": "curated",
     "script": {
       "triggers": [
         {
@@ -2557,18 +2639,31 @@
               "type": "createRandom",
               "count": 1,
               "filter": {
-                "type": "Unit",
-                "maxCost": 3
+                "type": "follower",
+                "keyword": "LastBreath",
+                "maxCost": 3,
+                "excludeIds": [
+                  "01SI026"
+                ]
               },
-              "destination": "hand",
-              "condition": null
+              "destination": "hand"
             }
-          ],
-          "auto": false
+          ]
         }
       ]
     },
-    "updatedAt": "2026-10-26T00:23:30.971Z"
+    "updatedAt": "2026-10-27T15:02:28.448Z",
+    "verification": {
+      "version": 1,
+      "cardTextHash": "1234016cd9cc2cc1fd0f420c3f8bf54c527c936fd19c6687f92a320c7c00ae1e",
+      "verifiedAt": "2026-10-27T00:00:00.000Z",
+      "verifiedBy": "agent",
+      "test": "test/reckless-revenants.test.mjs#reckless-wardens-prey",
+      "clauses": [
+        "Last Breath: Create in hand another random Last Breath follower that costs 3 or less."
+      ],
+      "notes": ""
+    }
   },
   "01SI034": {
     "status": "auto",
@@ -2643,7 +2738,7 @@
     "updatedAt": "2026-10-26T00:23:30.971Z"
   },
   "01SI043": {
-    "status": "auto",
+    "status": "curated",
     "script": {
       "triggers": [
         {
@@ -2652,15 +2747,53 @@
             {
               "type": "summon",
               "cardId": "01SI002",
-              "count": 1,
-              "condition": null
+              "count": 1
             }
-          ],
-          "auto": false
+          ]
         }
       ]
     },
-    "updatedAt": "2026-10-26T00:23:30.971Z"
+    "updatedAt": "2026-10-27T15:02:28.448Z",
+    "verification": {
+      "version": 1,
+      "cardTextHash": "e0f3f964be723cb400cd963c0c8cc730dc833a2b388f7d936966050b2ef9a31a",
+      "verifiedAt": "2026-10-27T00:00:00.000Z",
+      "verifiedBy": "agent",
+      "test": "test/reckless-revenants.test.mjs#reckless-hapless-aristocrat",
+      "clauses": [
+        "Last Breath: Summon a Spiderling."
+      ],
+      "notes": ""
+    }
+  },
+  "01SI045": {
+    "script": {
+      "triggers": [
+        {
+          "on": "play",
+          "actions": [
+            {
+              "type": "drain",
+              "amount": 4,
+              "target": "allyUnit"
+            }
+          ]
+        }
+      ]
+    },
+    "status": "curated",
+    "updatedAt": "2026-10-27T15:02:28.449Z",
+    "verification": {
+      "version": 1,
+      "cardTextHash": "5d327e1b71f8fac5eda20b887b80d154d752b3fa80f44d0e2c41ac47c2f67fc9",
+      "verifiedAt": "2026-10-27T00:00:00.000Z",
+      "verifiedBy": "agent",
+      "test": "test/reckless-revenants.test.mjs#reckless-absorb-soul",
+      "clauses": [
+        "Drain 4 from an ally."
+      ],
+      "notes": ""
+    }
   },
   "01SI048": {
     "status": "auto",
@@ -3204,6 +3337,41 @@
       ]
     },
     "updatedAt": "2026-10-26T00:23:30.973Z"
+  },
+  "02SI006": {
+    "script": {
+      "triggers": [
+        {
+          "on": "allyDeath",
+          "condition": {
+            "type": "firstTimeThisGame",
+            "scope": "source"
+          },
+          "actions": [
+            {
+              "type": "buff",
+              "power": 2,
+              "health": 2,
+              "duration": "permanent",
+              "target": "self"
+            }
+          ]
+        }
+      ]
+    },
+    "status": "curated",
+    "updatedAt": "2026-10-27T15:02:28.449Z",
+    "verification": {
+      "version": 1,
+      "cardTextHash": "d12adda68efb24e7e09590a3a033eee51baf025f02d63000193b8f717d399b68",
+      "verifiedAt": "2026-10-27T00:00:00.000Z",
+      "verifiedBy": "agent",
+      "test": "test/reckless-revenants.test.mjs#reckless-barkbeast",
+      "clauses": [
+        "The first time an ally dies, grant me +2|+2."
+      ],
+      "notes": ""
+    }
   },
   "02SI010": {
     "status": "auto",
@@ -4001,6 +4169,48 @@
     },
     "updatedAt": "2026-10-26T00:23:30.977Z"
   },
+  "03SI003": {
+    "script": {
+      "triggers": [
+        {
+          "on": "play",
+          "condition": {
+            "type": "cardsPlayedThisRound",
+            "op": ">=",
+            "value": 2
+          },
+          "actions": [
+            {
+              "type": "buff",
+              "power": 2,
+              "health": 0,
+              "duration": "round",
+              "target": "self"
+            },
+            {
+              "type": "grantKeyword",
+              "keyword": "Fearsome",
+              "duration": "round",
+              "target": "self"
+            }
+          ]
+        }
+      ]
+    },
+    "status": "curated",
+    "updatedAt": "2026-10-27T15:02:28.449Z",
+    "verification": {
+      "version": 1,
+      "cardTextHash": "4456fbeab84eab0888fd08d4dcb020f9f0df70c928754f8be4e1c23047a5e8b9",
+      "verifiedAt": "2026-10-27T00:00:00.000Z",
+      "verifiedBy": "agent",
+      "test": "test/reckless-revenants.test.mjs#reckless-stygian-onlooker",
+      "clauses": [
+        "Nightfall: Give me +2|+0 and Fearsome this round."
+      ],
+      "notes": ""
+    }
+  },
   "03SI013": {
     "status": "auto",
     "script": {
@@ -4019,6 +4229,37 @@
       ]
     },
     "updatedAt": "2026-10-26T00:23:30.977Z"
+  },
+  "03SI015": {
+    "script": {
+      "triggers": [
+        {
+          "on": "death",
+          "actions": [
+            {
+              "type": "create",
+              "cardId": "03SI015",
+              "count": 2,
+              "destination": "deck",
+              "who": "enemy"
+            }
+          ]
+        }
+      ]
+    },
+    "status": "curated",
+    "updatedAt": "2026-10-27T15:02:28.450Z",
+    "verification": {
+      "version": 1,
+      "cardTextHash": "ab33c76f984300e09db9bee7c6448351fb01719df0f9d070d56cc43e3b654ff3",
+      "verifiedAt": "2026-10-27T00:00:00.000Z",
+      "verifiedBy": "agent",
+      "test": "test/reckless-revenants.test.mjs#reckless-pesky-specter",
+      "clauses": [
+        "Last Breath: Create 2 copies of me in the enemy deck."
+      ],
+      "notes": ""
+    }
   },
   "04BW014": {
     "status": "auto",
@@ -4480,6 +4721,80 @@
       ]
     },
     "updatedAt": "2026-10-26T00:23:30.979Z"
+  },
+  "04NX018": {
+    "script": {
+      "triggers": [
+        {
+          "on": "summonOther",
+          "condition": {
+            "type": "firstTimeThisGame",
+            "scope": "source"
+          },
+          "actions": [
+            {
+              "type": "damage",
+              "amount": 1,
+              "target": "eventUnit"
+            },
+            {
+              "type": "buff",
+              "power": 1,
+              "health": 1,
+              "duration": "permanent",
+              "target": "self"
+            }
+          ]
+        }
+      ]
+    },
+    "status": "curated",
+    "updatedAt": "2026-10-27T15:02:28.449Z",
+    "verification": {
+      "version": 1,
+      "cardTextHash": "5830dab399dde4563fe585501605c6240e005460f58d1810a51cc56ea26f00d7",
+      "verifiedAt": "2026-10-27T00:00:00.000Z",
+      "verifiedBy": "agent",
+      "test": "test/reckless-revenants.test.mjs#reckless-crimson-bloodletter",
+      "clauses": [
+        "The next time you summon another ally, deal 1 to it and grant me +1|+1."
+      ],
+      "notes": ""
+    }
+  },
+  "04NX019": {
+    "script": {
+      "triggers": [
+        {
+          "on": "block",
+          "condition": {
+            "type": "sourceWasBlocked"
+          },
+          "actions": [
+            {
+              "type": "buff",
+              "power": 3,
+              "health": 0,
+              "duration": "round",
+              "target": "self"
+            }
+          ]
+        }
+      ]
+    },
+    "status": "curated",
+    "updatedAt": "2026-10-27T15:02:28.450Z",
+    "verification": {
+      "version": 1,
+      "cardTextHash": "67c6422c2a669d0fec1efa9c23aad37880cdd2d7c9b4fa0617193c6f45fa4f4f",
+      "verifiedAt": "2026-10-27T00:00:00.000Z",
+      "verifiedBy": "agent",
+      "test": "test/reckless-revenants.test.mjs#reckless-thrashing-snapper",
+      "clauses": [
+        "When an enemy blocks me, give me +3|+0 this round."
+      ],
+      "notes": ""
+    }
   },
   "04NX022": {
     "status": "auto",
@@ -5629,6 +5944,41 @@
     },
     "updatedAt": "2026-10-26T00:23:30.987Z"
   },
+  "05SI011": {
+    "script": {
+      "triggers": [
+        {
+          "on": "spellKill",
+          "condition": {
+            "type": "firstTimeThisGame",
+            "scope": "source"
+          },
+          "actions": [
+            {
+              "type": "buff",
+              "power": 2,
+              "health": 1,
+              "duration": "permanent",
+              "target": "self"
+            }
+          ]
+        }
+      ]
+    },
+    "status": "curated",
+    "updatedAt": "2026-10-27T15:02:28.450Z",
+    "verification": {
+      "version": 1,
+      "cardTextHash": "71d5171d64383f62f9c79f37c4bcb9d1b0d56e9faa812888b0bf372e98034407",
+      "verifiedAt": "2026-10-27T00:00:00.000Z",
+      "verifiedBy": "agent",
+      "test": "test/reckless-revenants.test.mjs#reckless-burgeoning-sentinel",
+      "clauses": [
+        "The first time you kill a unit with a spell, grant me +2|+1."
+      ],
+      "notes": ""
+    }
+  },
   "06BW045": {
     "status": "auto",
     "script": {
@@ -6359,6 +6709,42 @@
     },
     "updatedAt": "2026-10-26T00:23:30.991Z"
   },
+  "06NX041": {
+    "script": {
+      "triggers": [
+        {
+          "on": "support",
+          "actions": [
+            {
+              "type": "damage",
+              "amount": 1,
+              "target": "supported"
+            },
+            {
+              "type": "buff",
+              "power": 1,
+              "health": 1,
+              "duration": "round",
+              "target": "self"
+            }
+          ]
+        }
+      ]
+    },
+    "status": "curated",
+    "updatedAt": "2026-10-27T15:02:28.449Z",
+    "verification": {
+      "version": 1,
+      "cardTextHash": "bdd377f3143968ffb183481aef767cc8b30f65615b55fe87cd9d083f1b7cc488",
+      "verifiedAt": "2026-10-27T00:00:00.000Z",
+      "verifiedBy": "agent",
+      "test": "test/reckless-revenants.test.mjs#reckless-crimson-pigeon",
+      "clauses": [
+        "Support: Deal 1 to my supported ally to give me +1|+1 this round."
+      ],
+      "notes": ""
+    }
+  },
   "06PZ006": {
     "status": "auto",
     "script": {
@@ -6490,6 +6876,69 @@
       ]
     },
     "updatedAt": "2026-10-26T00:23:30.997Z"
+  },
+  "06SI037": {
+    "script": {
+      "triggers": [
+        {
+          "on": "play",
+          "actions": [
+            {
+              "type": "choose",
+              "prompt": "Choose a card for Shadow Isles Tellstones",
+              "options": [
+                {
+                  "id": "01SI022",
+                  "label": "Mark of the Isles",
+                  "actions": [
+                    {
+                      "type": "create",
+                      "cardId": "01SI022",
+                      "fleeting": true
+                    }
+                  ]
+                },
+                {
+                  "id": "04SI002",
+                  "label": "Spirit Journey",
+                  "actions": [
+                    {
+                      "type": "create",
+                      "cardId": "04SI002",
+                      "fleeting": true
+                    }
+                  ]
+                },
+                {
+                  "id": "03SI008",
+                  "label": "Crumble",
+                  "actions": [
+                    {
+                      "type": "create",
+                      "cardId": "03SI008",
+                      "fleeting": true
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "status": "curated",
+    "updatedAt": "2026-10-27T15:02:28.450Z",
+    "verification": {
+      "version": 1,
+      "cardTextHash": "89a46e496f0537c40a697524650e480fbd20dc780b381a7cd99fe60781f1941d",
+      "verifiedAt": "2026-10-27T00:00:00.000Z",
+      "verifiedBy": "agent",
+      "test": "test/reckless-revenants.test.mjs#reckless-shadow-isles-tellstones",
+      "clauses": [
+        "Create a Fleeting Mark of the Isles, Spirit Journey, or Crumble in hand."
+      ],
+      "notes": ""
+    }
   },
   "06SI046": {
     "status": "auto",
@@ -6704,8 +7153,7 @@
     },
     "updatedAt": "2026-10-26T00:23:30.998Z"
   },
-  "07NX008": {
-    "status": "auto",
+  "07NX003": {
     "script": {
       "triggers": [
         {
@@ -6715,23 +7163,76 @@
               "type": "buff",
               "power": 2,
               "health": 0,
-              "duration": "permanent",
-              "target": {
-                "type": "self",
-                "count": 1,
-                "filter": {}
+              "duration": "round",
+              "target": "allyUnit"
+            },
+            {
+              "type": "if",
+              "condition": {
+                "type": "plunder"
               },
-              "condition": null
+              "actions": [
+                {
+                  "type": "buff",
+                  "power": 0,
+                  "health": 1,
+                  "duration": "round",
+                  "target": "lastTargets"
+                }
+              ]
             }
-          ],
-          "condition": {
-            "type": "plunder"
-          },
-          "auto": false
+          ]
         }
       ]
     },
-    "updatedAt": "2026-10-26T00:23:30.998Z"
+    "status": "curated",
+    "updatedAt": "2026-10-27T15:02:28.449Z",
+    "verification": {
+      "version": 1,
+      "cardTextHash": "4b58640c3e13d8a880d0fb152c0aff3cf6090390a261dd2e66652ab3bf7b530f",
+      "verifiedAt": "2026-10-27T00:00:00.000Z",
+      "verifiedBy": "agent",
+      "test": "test/reckless-revenants.test.mjs#reckless-all-out",
+      "clauses": [
+        "Give an ally +2|+0 this round.",
+        "Plunder: Give it +2|+1 instead."
+      ],
+      "notes": ""
+    }
+  },
+  "07NX008": {
+    "status": "curated",
+    "script": {
+      "triggers": [
+        {
+          "on": "play",
+          "condition": {
+            "type": "plunder"
+          },
+          "actions": [
+            {
+              "type": "buff",
+              "power": 2,
+              "health": 0,
+              "duration": "permanent",
+              "target": "self"
+            }
+          ]
+        }
+      ]
+    },
+    "updatedAt": "2026-10-27T15:02:28.448Z",
+    "verification": {
+      "version": 1,
+      "cardTextHash": "65308fbe4611ab7b0ec08c710b22450bf25d007990e154913d302d3fafbf4caa",
+      "verifiedAt": "2026-10-27T00:00:00.000Z",
+      "verifiedBy": "agent",
+      "test": "test/reckless-revenants.test.mjs#reckless-elegant-edge",
+      "clauses": [
+        "Plunder: Grant me +2|+0."
+      ],
+      "notes": ""
+    }
   },
   "07NX015": {
     "status": "auto",
