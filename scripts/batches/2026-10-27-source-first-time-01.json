@@ -1,0 +1,52 @@
+{
+  "batch": "2026-10-27-source-first-time-01",
+  "cards": {
+    "06DE043": {
+      "script": {
+        "triggers": [
+          {
+            "on": "summonOther",
+            "condition": {
+              "type": "and",
+              "conditions": [
+                {
+                  "type": "eventCard",
+                  "filter": {
+                    "subtype": "ELITE"
+                  }
+                },
+                {
+                  "type": "firstTimeThisGame",
+                  "flag": "trustyRamhoundElite",
+                  "scope": "source"
+                }
+              ]
+            },
+            "actions": [
+              {
+                "type": "buff",
+                "power": 2,
+                "health": 2,
+                "duration": "permanent",
+                "target": "self"
+              }
+            ]
+          }
+        ]
+      },
+      "status": "curated",
+      "updatedAt": "2026-10-27T02:07:37.479Z",
+      "verification": {
+        "version": 1,
+        "cardTextHash": "7a460ce5a0e25cef21067b52e8bdbf2838ac3abdf5b264c76f47a65e785e43b6",
+        "verifiedAt": "2026-10-27T00:00:00.000Z",
+        "verifiedBy": "audit-resume",
+        "test": "test/starter-vanguard.test.mjs#trusty-ramhound-each-copy-tracks-its-own-first-elite-and-keeps-its-grant",
+        "clauses": [
+          "The first time you summon an Elite, grant me +2|+2."
+        ],
+        "notes": "First Elite flag is per unit instance. Regression covers simultaneous and later copies, one trigger per copy, and permanent duration."
+      }
+    }
+  }
+}

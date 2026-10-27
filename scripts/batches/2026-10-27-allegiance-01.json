@@ -1,0 +1,107 @@
+{
+  "batch": "2026-10-27-allegiance-01",
+  "cards": {
+    "01DE001": {
+      "status": "curated",
+      "script": {
+        "triggers": [
+          {
+            "on": "summon",
+            "condition": {
+              "type": "allegiance"
+            },
+            "actions": [
+              {
+                "type": "buff",
+                "power": 1,
+                "health": 1,
+                "duration": "permanent",
+                "target": "allOtherAllyUnits"
+              }
+            ]
+          }
+        ]
+      },
+      "verification": {
+        "version": 1,
+        "cardTextHash": "969014be0216f469d6c4be91a2998a98ca78f9281a15604fab5095074c72932b",
+        "verifiedAt": "2026-10-27T00:00:00.000Z",
+        "verifiedBy": "agent",
+        "test": "test/starter-vanguard.test.mjs#vanguard-bannerman-allegiance-buffs-other-allies",
+        "clauses": [
+          "Allegiance: Grant other allies +1|+1."
+        ],
+        "notes": ""
+      }
+    },
+    "01NX008": {
+      "status": "curated",
+      "script": {
+        "triggers": [
+          {
+            "on": "summon",
+            "condition": {
+              "type": "allegiance"
+            },
+            "actions": [
+              {
+                "type": "buff",
+                "power": 1,
+                "health": 1,
+                "duration": "permanent",
+                "target": "self"
+              },
+              {
+                "type": "grantKeyword",
+                "keyword": "Overwhelm",
+                "duration": "permanent",
+                "target": "self"
+              }
+            ]
+          }
+        ]
+      },
+      "verification": {
+        "version": 1,
+        "cardTextHash": "946169edc43936c6a7f6775788815f38c8e657074e4834a1a2cc5feb240afe5c",
+        "verifiedAt": "2026-10-27T00:00:00.000Z",
+        "verifiedBy": "agent",
+        "test": "test/starter-vanguard.test.mjs#basilisk-rider-allegiance-grants-stats-and-overwhelm",
+        "clauses": [
+          "Allegiance: Grant me +1|+1 and Overwhelm."
+        ],
+        "notes": ""
+      }
+    },
+    "01SI016": {
+      "status": "curated",
+      "script": {
+        "triggers": [
+          {
+            "on": "summon",
+            "condition": {
+              "type": "allegiance"
+            },
+            "actions": [
+              {
+                "type": "summon",
+                "cardId": "01SI014"
+              }
+            ]
+          }
+        ]
+      },
+      "verification": {
+        "version": 1,
+        "cardTextHash": "713ac213481767598439f7441766a501f4fcc699ac3eab164c4d45c8fe40839a",
+        "verifiedAt": "2026-10-27T00:00:00.000Z",
+        "verifiedBy": "agent",
+        "test": "test/starter-vanguard.test.mjs#wraithcaller-allegiance-summons-a-mistwraith",
+        "clauses": [
+          "Allegiance: Summon a Mistwraith."
+        ],
+        "notes": ""
+      }
+    }
+  }
+}

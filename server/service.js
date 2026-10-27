@@ -14,9 +14,11 @@ import {
 import { targetSpecsForScript } from './engine/effects.js';
 import { PeerHub } from './peerhub.js';
 import { dispatchClientMessage } from './dispatch.js';
-import { validateScript } from './script-validation.js';
+import { lintScript } from './script-lint.js';
+import { prepareVerification, validateVerification } from './script-metadata.js';
 import { APP_VERSION, PROTOCOL_VERSION } from '../shared/protocol.js';
 import { sanitizeContentOffer } from './content.js';
+import { normalizeFormat } from '../shared/deck-validator.js';
 
 // Builds the existing HTTP/API/WebSocket application as an explicit lifecycle
 // object. The Electron entry point owns this object; server/index.js remains the
@@ -79,6 +81,7 @@ function publicCard(card, { admin = false } = {}) {
     fullArt: card.fullArt,
     collectible: card.collectible,
     enabled: card.enabled,
+    hasSkill: card.hasSkill,
     scriptStatus: card.scriptStatus,
     source: card.source,
     notes: card.notes,
@@ -233,9 +236,10 @@ app.get('/api/cards/:id', (req, res) => {
 // ---------------------------------------------------------------- decks
 app.get('/api/decks', (req, res) => {
   res.json({
-    decks: store.getDecks().map((d) => ({
-      ...d,
-      summary: store.deckSummary(d.cards || []),
+    decks: store.getDecks().map((deck) => ({
+      ...deck,
+      summary: store.deckSummary(deck.cards || []),
+      validation: validateDeck(deck.cards || [], store.cardDB, store.rules, deck.regions, { format: deck.format }),
     })),
   });
 });
@@ -243,17 +247,23 @@ app.get('/api/decks', (req, res) => {
 app.get('/api/decks/:id', (req, res) => {
   const deck = store.getDeck(req.params.id);
   if (!deck) return res.status(404).json({ error: 'Deck not found' });
-  res.json({ deck, summary: store.deckSummary(deck.cards) });
+  res.json({
+    deck,
+    summary: store.deckSummary(deck.cards),
+    validation: validateDeck(deck.cards, store.cardDB, store.rules, deck.regions, { format: deck.format }),
+  });
 });
 
 app.post('/api/decks/import', (req, res) => {
   try {
     const code = req.body?.code;
     if (!code) return res.status(400).json({ error: 'Deck code required' });
+    const format = normalizeFormat(req.body?.format) || 'Eternal';
     const decoded = deckFromCode(String(code).trim(), store.cardDB);
-    const validation = validateDeck(decoded.cards, store.cardDB, store.rules, decoded.regions);
+    const validation = validateDeck(decoded.cards, store.cardDB, store.rules, decoded.regions, { format });
     res.json({
       ...decoded,
+      format,
       validation,
       summary: summarizeDeck(decoded.cards, store.cardDB),
     });
@@ -265,14 +275,16 @@ app.post('/api/decks/import', (req, res) => {
 app.post('/api/decks/auto', (req, res) => {
   try {
     const regions = Array.isArray(req.body?.regions) ? req.body.regions.slice(0, 2) : [];
+    const format = normalizeFormat(req.body?.format) || 'Eternal';
     const cards = autoBuildDeck(store.cardDB, {
       regions,
       seed: Number(req.body?.seed) || Date.now(),
       rules: store.rules,
+      format,
       preferredChampions: req.body?.champions || [],
     });
-    const validation = validateDeck(cards, store.cardDB, store.rules, regions.length ? regions : undefined);
-    res.json({ cards, validation, regions: validation.regions, summary: summarizeDeck(cards, store.cardDB), code: deckToCode(cards) });
+    const validation = validateDeck(cards, store.cardDB, store.rules, regions.length ? regions : undefined, { format });
+    res.json({ cards, validation, regions: validation.regions, format, summary: summarizeDeck(cards, store.cardDB), code: deckToCode(cards) });
   } catch (err) {
     res.status(400).json({ error: err.message || 'Could not build deck' });
   }
@@ -281,30 +293,32 @@ app.post('/api/decks/auto', (req, res) => {
 app.post('/api/decks/validate', (req, res) => {
   const cards = normalizeCards(req.body?.cards || []);
   const regions = Array.isArray(req.body?.regions) ? req.body.regions : undefined;
-  const validation = validateDeck(cards, store.cardDB, store.rules, regions);
+  const format = normalizeFormat(req.body?.format) || 'Eternal';
+  const validation = validateDeck(cards, store.cardDB, store.rules, regions, { format });
   res.json({ validation, summary: summarizeDeck(cards, store.cardDB) });
 });
 
 app.post('/api/decks', async (req, res) => {
   try {
     const cards = normalizeCards(req.body?.cards || []);
-    const regions = Array.isArray(req.body?.regions) ? req.body.regions.filter((r) => r !== 'Runeterra') : undefined;
-    const validation = validateDeck(cards, store.cardDB, store.rules, regions);
-    if (!validation.ok) return res.status(400).json({ error: 'Deck is not legal', validation });
+    const regions = Array.isArray(req.body?.regions) ? req.body.regions.filter((region) => region !== 'Runeterra') : undefined;
+    const format = normalizeFormat(req.body?.format) || 'Eternal';
+    const validation = validateDeck(cards, store.cardDB, store.rules, regions, { format });
     const id = `deck-${crypto.randomBytes(4).toString('hex')}`;
     const deck = {
       id,
       name: String(req.body?.name || 'Untitled Deck').slice(0, 50),
       author: String(req.body?.author || 'Guest').slice(0, 30),
-      regions: validation.regions,
+      regions: regions ?? validation.regions,
       cards,
       code: deckToCode(cards),
+      format,
       starter: false,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     };
     await store.saveDeck(deck);
-    res.status(201).json({ deck, summary: summarizeDeck(cards, store.cardDB) });
+    res.status(201).json({ deck, validation, summary: summarizeDeck(cards, store.cardDB) });
   } catch (err) {
     res.status(400).json({ error: err.message || 'Could not save deck' });
   }
@@ -316,17 +330,18 @@ app.put('/api/decks/:id', async (req, res) => {
   if (existing.starter) return res.status(403).json({ error: 'Starter decks are read-only; duplicate it instead.' });
   try {
     const cards = normalizeCards(req.body?.cards || existing.cards);
-    const regions = Array.isArray(req.body?.regions) ? req.body.regions.filter((r) => r !== 'Runeterra') : existing.regions;
-    const validation = validateDeck(cards, store.cardDB, store.rules, regions);
-    if (!validation.ok) return res.status(400).json({ error: 'Deck is not legal', validation });
+    const regions = Array.isArray(req.body?.regions) ? req.body.regions.filter((region) => region !== 'Runeterra') : existing.regions;
+    const format = normalizeFormat(req.body?.format) || existing.format || 'Eternal';
+    const validation = validateDeck(cards, store.cardDB, store.rules, regions, { format });
     existing.name = String(req.body?.name || existing.name).slice(0, 50);
     existing.author = String(req.body?.author || existing.author || 'Guest').slice(0, 30);
     existing.cards = cards;
-    existing.regions = validation.regions;
+    existing.regions = regions ?? validation.regions;
     existing.code = deckToCode(cards);
+    existing.format = format;
     existing.updatedAt = new Date().toISOString();
     await store.saveDeck(existing);
-    res.json({ deck: existing, summary: summarizeDeck(cards, store.cardDB) });
+    res.json({ deck: existing, validation, summary: summarizeDeck(cards, store.cardDB) });
   } catch (err) {
     res.status(400).json({ error: err.message || 'Could not save deck' });
   }
@@ -423,22 +438,19 @@ app.post('/api/admin/login', (req, res) => {
 
 app.get('/api/admin/stats', requireAdmin, (req, res) => {
   const stats = store.cardDB.stats();
-  const statusCounts = {};
-  let textCards = 0;
-  let scriptedWithText = 0;
-  for (const c of store.cardDB.collectible()) {
-    statusCounts[c.scriptStatus] = (statusCounts[c.scriptStatus] || 0) + 1;
-    if (c.text) {
-      textCards++;
-      if (c.script) scriptedWithText++;
-    }
-  }
+  const textCards = stats.textCards;
+  const scriptedWithText = stats.scriptedText;
   res.json({
     stats,
-    statusCounts,
+    statusCounts: stats.byStatus,
     textCards,
     scriptedWithText,
+    // Coverage is "a script is present", not "the effect is verified".
     coverage: textCards ? Math.round((scriptedWithText / textCards) * 1000) / 10 : 100,
+    verified: stats.verified,
+    unverified: stats.unverified,
+    missing: stats.missing,
+    verifiedCoverage: textCards ? Math.round((stats.verified / textCards) * 1000) / 10 : 0,
     customCards: store.customCards.length,
     recentCustomCards: store.customCards.slice(-5).reverse().map((c) => ({ id: c.id, name: c.name, type: c.type, cost: c.cost })),
     scripts: Object.keys(store.scripts).length,
@@ -506,13 +518,25 @@ app.put('/api/admin/scripts/:id', requireAdmin, async (req, res) => {
       return res.status(400).json({ error: `Script JSON is invalid: ${err.message}` });
     }
   }
+  let validation = null;
   if (script != null) {
-    const validation = validateScript(script);
-    if (!validation.ok) return res.status(400).json({ error: 'Script shape is invalid', validation });
+    validation = lintScript(script);
+    if (!validation.ok) return res.status(400).json({ error: 'Script is invalid', validation });
   }
-  const entry = store.setScript(card.id, script, req.body?.status || (script ? 'custom' : 'none'));
+  const status = req.body?.status || (script ? 'custom' : 'none');
+  let verification = req.body?.verification ?? null;
+  if (status === 'curated') {
+    if (!script) return res.status(400).json({ error: 'A curated entry needs a script.' });
+    if (!verification) return res.status(400).json({ error: 'A curated entry needs verification metadata.' });
+    verification = prepareVerification(verification, card);
+    const check = validateVerification(verification, { card });
+    if (!check.ok) return res.status(400).json({ error: 'Verification metadata is invalid', validation: check });
+  } else if (verification) {
+    return res.status(400).json({ error: 'Verification metadata is only valid for curated scripts.' });
+  }
+  const entry = store.setScript(card.id, script, status, { verification });
   await store.saveScripts();
-  res.json({ entry, card: publicCard(store.cardDB.get(card.id), { admin: true }) });
+  res.json({ entry, card: publicCard(store.cardDB.get(card.id), { admin: true }), validation });
 });
 
 app.delete('/api/admin/scripts/:id', requireAdmin, async (req, res) => {
@@ -526,7 +550,7 @@ app.post('/api/admin/scripts/validate', requireAdmin, (req, res) => {
   if (typeof script === 'string') {
     try { script = JSON.parse(script); } catch (err) { return res.json({ ok: false, errors: [`JSON: ${err.message}`], warnings: [] }); }
   }
-  res.json(validateScript(script));
+  res.json(lintScript(script));
 });
 
 app.get('/api/admin/mechanics', requireAdmin, (req, res) => {

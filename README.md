@@ -62,7 +62,9 @@ npm run check:syntax
 npm test
 ```
 
-The suite currently contains 23 automated tests: 12 engine tests, 3 data-migration tests, 2 peer/service integration tests, and 6 protocol/content tests. `npm run build:win` runs all checks before packaging the portable Windows x64 artifact into `release/`.
+The suite currently contains 128 automated tests across engine, event ordering and dispatch, state/equipment/support mechanics, migration, protocol/content, deck validation, script vocabulary, verification metadata, seed upgrades, authoring tooling, and coverage reporting. `npm run check:syntax` checks 46 files. `npm run scripts:lint` validates the packaged seed scripts. `npm run build:win` runs all checks before packaging the portable Windows x64 artifact into `release/`.
+
+Current card-effect status: **248 scripts present (16.0% of 1,552 text cards); 0 verified.** Coverage is not correctness. See [docs/effect-dsl.md](docs/effect-dsl.md) and run `npm run scripts:coverage` for the measured report.
 
 For the complete test procedure, including local two-instance checks and the separate-network release gate, see [docs/testing.md](docs/testing.md).
 
@@ -85,7 +87,7 @@ These are same-machine checks. They do not prove reachability across separate in
 - **External network gate pending:** home broadband versus mobile hotspot and friends on separate networks have not been run on this machine. Those results must be recorded before claiming internet play is release-verified.
 - **Relay/TURN gate pending:** public STUN is configured; no working free TURN relay has been proven. Restrictive NAT may prevent a connection.
 - 2v2 and spectator flows over the peer transport have automated server coverage but still need a recorded external session.
-- Card-effect automation remains partial. A card being present does not mean every original behavior is scripted.
+- Card-effect automation remains partial: 248 scripts present (16.0% of text cards), 0 verified. A card being present does not mean every printed behavior is implemented.
 - Rewards, Battle Pass, and Store remain visibly unavailable.
 - macOS/Linux/mobile packaging, automatic updates, accounts, matchmaking, host migration, and cloud saves are out of scope for this release.
 
@@ -109,6 +111,8 @@ These are same-machine checks. They do not prove reachability across separate in
 | `shared/` | Protocol versions, manifest compatibility, deck codes |
 | `test/` | Engine, migration, multiplayer, and protocol regression coverage |
 | `docs/testing.md` | Automated, local desktop, packaged-app, and external-network test procedure |
+| `docs/effect-dsl.md` | Trigger, action, target, condition, and verification reference |
+| `docs/backups.md` | Backup locations and recovery steps for scripts and migrations |
 | `docs/release-0.2.0.md` | Release artifact, checksum, evidence, and open gates |
 
 ## Build the Windows release

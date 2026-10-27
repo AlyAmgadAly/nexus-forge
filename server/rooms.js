@@ -579,9 +579,11 @@ export class RoomManager {
       if (!card) { unknown.push(entry.cardId); continue; }
       if (!card.enabled) enableErrors.push(`${card.name} is disabled in this room's pool`);
     }
-    const validation = validateDeck(deck.cards, room.cardDB, room.rules, deck.regions);
+    const validation = validateDeck(deck.cards, room.cardDB, room.rules, deck.regions, { format: deck.format });
     if (enableErrors.length) validation.errors.push(...enableErrors);
-    validation.ok = validation.errors.length === 0;
+    validation.isValid = validation.errors.length === 0;
+    validation.isPlayable = validation.isValid && validation.totalCards === (room.rules.deckSize ?? 40);
+    validation.ok = validation.isPlayable;
     return { validation, unknown };
   }
 
@@ -590,6 +592,7 @@ export class RoomManager {
       name: deck.name,
       cards: deck.cards.map((entry) => ({ cardId: entry.cardId, count: entry.count })),
       regions: [...(validation.regions || [])],
+      format: validation.format,
     };
     player.deckId = 'submitted';
     player.ready = false;
@@ -748,7 +751,7 @@ export class RoomManager {
       }
       const selected = p.deckId && p.deckId !== 'auto' ? this.store.getDeck(p.deckId) : null;
       if (selected) {
-        const validation = validateDeck(selected.cards, room.cardDB, room.rules, selected.regions);
+        const validation = validateDeck(selected.cards, room.cardDB, room.rules, selected.regions, { format: selected.format });
         if (!validation.ok) {
           this.broadcastLobby(room);
           return this.send(this.clients.get(room.hostId), { type: 'error', message: `Deck "${selected.name}" is not legal in this room: ${validation.errors.join('; ')}` });
@@ -815,7 +818,7 @@ export class RoomManager {
         result = game.playCard(player.id, msg.iid, Array.isArray(msg.targets) ? msg.targets : []);
         break;
       case 'attack':
-        result = game.attack(player.id, Array.isArray(msg.attackers) ? msg.attackers : [], msg.challengers || {});
+        result = game.attack(player.id, Array.isArray(msg.attackers) ? msg.attackers : [], msg.challengers || {}, msg.supports || {});
         break;
       case 'block':
         result = game.declareBlockers(player.id, msg.blocks || {});

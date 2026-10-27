@@ -1,0 +1,35 @@
+{
+  "batch": "2026-10-27-barrier-01",
+  "cards": {
+    "01IO019": {
+      "status": "curated",
+      "script": {
+        "triggers": [
+          {
+            "on": "barrier",
+            "actions": [
+              {
+                "type": "buff",
+                "power": 2,
+                "health": 0,
+                "duration": "permanent",
+                "target": "self"
+              }
+            ]
+          }
+        ]
+      },
+      "verification": {
+        "version": 1,
+        "cardTextHash": "9c529ce6ef45b34ccdbb80e231fd02e9d99b7eada4c7458da5b98934fde4cabb",
+        "verifiedAt": "2026-10-27T00:00:00.000Z",
+        "verifiedBy": "agent",
+        "test": "test/starter-vanguard.test.mjs#greenglade-caretaker-barrier-grants-2-power",
+        "clauses": [
+          "When an ally gets Barrier, grant me +2|+0."
+        ],
+        "notes": ""
+      }
+    }
+  }
+}

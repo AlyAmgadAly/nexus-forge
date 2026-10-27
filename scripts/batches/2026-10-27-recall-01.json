@@ -1,0 +1,32 @@
+{
+  "batch": "2026-10-27-recall-01",
+  "cards": {
+    "04IO015": {
+      "status": "curated",
+      "script": {
+        "triggers": [
+          {
+            "on": "recall",
+            "actions": [
+              {
+                "type": "draw",
+                "amount": 1
+              }
+            ]
+          }
+        ]
+      },
+      "verification": {
+        "version": 1,
+        "cardTextHash": "32efd3e3cbf9940f34027900dde6f2c2daff34d45dee17544fdbf7bce6088d94",
+        "verifiedAt": "2026-10-27T00:00:00.000Z",
+        "verifiedBy": "agent",
+        "test": "test/starter-vanguard.test.mjs#dancing-droplet-recall-draws-1",
+        "clauses": [
+          "When I'm Recalled, draw 1."
+        ],
+        "notes": ""
+      }
+    }
+  }
+}

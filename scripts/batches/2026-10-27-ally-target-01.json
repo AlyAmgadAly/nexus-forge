@@ -1,0 +1,35 @@
+{
+  "batch": "2026-10-27-ally-target-01",
+  "cards": {
+    "01IO004": {
+      "status": "curated",
+      "script": {
+        "triggers": [
+          {
+            "on": "play",
+            "actions": [
+              {
+                "type": "heal",
+                "amount": 3,
+                "target": {
+                  "type": "allyTarget"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "verification": {
+        "version": 1,
+        "cardTextHash": "e28cac4d456fd314aec1ab8b46265ba650a997ece2a7df71ca3df955f74738f6",
+        "verifiedAt": "2026-10-27T00:00:00.000Z",
+        "verifiedBy": "agent",
+        "test": "test/starter-vanguard.test.mjs#health-potion-heals-an-ally-or-your-nexus",
+        "clauses": [
+          "Heal an ally or your Nexus 3."
+        ],
+        "notes": ""
+      }
+    }
+  }
+}

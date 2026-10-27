@@ -1,4 +1,5 @@
 import { encodeDeckCode } from '/shared/deckcode.js';
+import { DeckValidator, cardLegalInFormat } from '/shared/deck-validator.js';
 import {
   cardHtml, cardById, esc, regionLabel, regionColor, toast, openModal, modalConfirm, modalPrompt, copyText,
 } from '../ui.js';
@@ -21,7 +22,7 @@ let deckCurveOpen = false;
 const ALL_REGIONS = ['Demacia', 'Freljord', 'Ionia', 'Noxus', 'PiltoverZaun', 'ShadowIsles', 'Bilgewater', 'Targon', 'Shurima', 'BandleCity'];
 
 function newDraft(state) {
-  return { id: null, name: 'New Deck', author: state.playerName || 'Guest', cards: [], regions: [], code: '', starter: false };
+  return { id: null, name: 'New Deck', author: state.playerName || 'Guest', cards: [], regions: [], code: '', format: 'Eternal', starter: false };
 }
 
 function loadDraft(deck, state, { asCopy = false } = {}) {
@@ -33,6 +34,7 @@ function loadDraft(deck, state, { asCopy = false } = {}) {
     cards,
     regions: [...(deck.regions || [])],
     code: deck.code || '',
+    format: deck.format || 'Eternal',
     starter: false,
   };
 }
@@ -68,32 +70,21 @@ function ensureDraft(state) {
   if (!draft.author || draft.author === 'Guest') draft.author = state.playerName || 'Guest';
 }
 
-function cardRegions(card) {
-  return (card?.regions || []).filter((r) => r !== 'Runeterra');
-}
-
 function deckTotal() { return draft.cards.reduce((n, c) => n + c.count, 0); }
 function copyCount(cardId) { return draft.cards.find((c) => c.cardId === cardId)?.count || 0; }
 
 function canAddCard(card, rules) {
   if (!card) return { ok: false, reason: 'Card not found.' };
-  const max = rules.maxCopies ?? 3;
-  if (copyCount(card.id) >= max) return { ok: false, reason: `Maximum ${max} copies of ${card.name}.` };
-  if (deckTotal() >= (rules.deckSize ?? 40)) return { ok: false, reason: 'The deck already has 40 cards.' };
-  const cr = cardRegions(card);
-  if (!cr.length) return { ok: true };
-  if (cr.some((r) => draft.regions.includes(r))) return { ok: true };
-  if (draft.regions.length < (rules.maxRegions ?? 2)) return { ok: true, addRegion: cr[0] };
-  return { ok: false, reason: `${card.name} needs ${cr.map(regionLabel).join(' or ')}, but the deck already uses ${draft.regions.map(regionLabel).join(' + ')}.` };
+  return new DeckValidator({ get: cardById }, { rules, format: draft.format }).validateAddition(draft.cards, card.id, {
+    regions: draft.regions,
+  });
 }
 
 function addCard(card, state, root, ctx) {
   const check = canAddCard(card, state.meta?.rules || {});
   if (!check.ok) { toast(check.reason, 'error'); return; }
-  if (check.addRegion && !draft.regions.includes(check.addRegion)) draft.regions = [...draft.regions, check.addRegion].slice(0, state.meta?.rules?.maxRegions ?? 2);
-  const entry = draft.cards.find((c) => c.cardId === card.id);
-  if (entry) entry.count++;
-  else draft.cards.push({ cardId: card.id, count: 1 });
+  draft.cards = check.cards;
+  draft.regions = check.regions;
   draft.code = '';
   rerender(root, ctx);
 }
@@ -104,37 +95,18 @@ function removeCard(cardId, state, root, ctx, all = false) {
   if (all) draft.cards.splice(idx, 1);
   else if (draft.cards[idx].count > 1) draft.cards[idx].count--;
   else draft.cards.splice(idx, 1);
+  const validation = new DeckValidator({ get: cardById }, {
+    rules: state.meta?.rules || {}, format: draft.format,
+  }).validate(draft.cards);
+  draft.regions = validation.regions;
   draft.code = '';
   rerender(root, ctx);
 }
 
 function localValidation(state) {
-  const rules = state.meta?.rules || {};
-  const maxCopies = rules.maxCopies ?? 3;
-  const maxRegions = rules.maxRegions ?? 2;
-  const deckSize = rules.deckSize ?? 40;
-  const errors = [];
-  const warnings = [];
-  const total = deckTotal();
-  const counts = new Map();
-  for (const entry of draft.cards) {
-    const card = cardById(entry.cardId);
-    if (!card) { errors.push(`Unknown card: ${entry.cardId}`); continue; }
-    if (entry.count > maxCopies) errors.push(`Too many copies of ${card.name} (${entry.count}/${maxCopies}).`);
-    if (card.type === 'Ability' || card.type === 'Trap') errors.push(`${card.name} cannot be in a deck.`);
-    if (card.enabled === false) warnings.push(`${card.name} is disabled in the current pool.`);
-    counts.set(entry.cardId, (counts.get(entry.cardId) || 0) + entry.count);
-  }
-  for (const [id, count] of counts) if (count > maxCopies) errors.push(`Too many copies of ${cardById(id)?.name || id}.`);
-  if (draft.regions.length > maxRegions) errors.push(`The deck uses ${draft.regions.length} regions; the limit is ${maxRegions}.`);
-  for (const entry of draft.cards) {
-    const card = cardById(entry.cardId);
-    if (!card) continue;
-    const cr = cardRegions(card);
-    if (cr.length && !cr.some((r) => draft.regions.includes(r))) errors.push(`${card.name} doesn't belong to ${draft.regions.map(regionLabel).join(' + ')}.`);
-  }
-  if (total !== deckSize) errors.push(`The deck has ${total} cards; exactly ${deckSize} are required.`);
-  return { ok: errors.length === 0, errors, warnings, total };
+  return new DeckValidator({ get: cardById }, {
+    rules: state.meta?.rules || {}, format: draft.format,
+  }).validate(draft.cards, { regions: draft.regions });
 }
 
 function curveData() {
@@ -152,12 +124,10 @@ function codeNow() {
 }
 
 async function saveDeck(root, ctx) {
-  const validation = localValidation(ctx.state);
-  if (!validation.ok) { toast('Fix the deck rules before saving.', 'error'); return false; }
   const name = String(draft.name || '').trim();
   if (!name) { toast('Give the deck a name.', 'error'); return false; }
   try {
-    const payload = { name, author: ctx.state.playerName || draft.author || 'Guest', cards: draft.cards, regions: draft.regions };
+    const payload = { name, author: ctx.state.playerName || draft.author || 'Guest', cards: draft.cards, regions: draft.regions, format: draft.format };
     let data;
     if (draft.id) data = await apiPut(`/api/decks/${draft.id}`, payload);
     else data = await apiPost('/api/decks', payload);
@@ -183,10 +153,11 @@ async function autoBuild(root, ctx) {
   const rules = ctx.state.meta?.rules || {};
   let regions = draft.regions.length ? draft.regions.slice(0, rules.maxRegions ?? 2) : ['Demacia', 'Ionia'];
   try {
-    const data = await apiPost('/api/decks/auto', { regions });
+    const data = await apiPost('/api/decks/auto', { regions, format: draft.format });
     draft.cards = data.cards || [];
     draft.regions = data.validation?.regions || regions;
     draft.code = data.code || '';
+    draft.format = data.format || draft.format;
     draft.id = null;
     draftSource = 'new';
     sourceStarter = false;
@@ -239,7 +210,7 @@ function openImport(root, ctx) {
           const result = modal.querySelector('#import-result');
           if (!code) { toast('Paste a deck code.', 'error'); return; }
           try {
-            const data = await apiPost('/api/decks/import', { code });
+            const data = await apiPost('/api/decks/import', { code, format: draft.format });
             draft = {
               id: null,
               name: 'Imported Deck',
@@ -247,6 +218,7 @@ function openImport(root, ctx) {
               cards: data.cards || [],
               regions: data.regions || [],
               code: data.code || code.toUpperCase(),
+              format: data.format || draft.format,
               starter: false,
             };
             sourceStarter = false;
@@ -388,7 +360,7 @@ export function renderDeckBuilder(root, ctx) {
     if (filters.cost === '8' ? (c.cost || 0) < 8 : filters.cost !== '' && String(c.cost ?? 0) !== filters.cost) return false;
     if (filters.rarity && c.rarity !== filters.rarity) return false;
     if (filters.set && c.set !== filters.set) return false;
-    if (filters.format === 'standard' && !c.formats?.includes('client_Formats_Standard_name')) return false;
+    if (filters.format === 'standard' && !cardLegalInFormat(c, 'Standard')) return false;
     if (filters.scope === 'in' && !copyCount(c.id)) return false;
     if (filters.scope === 'out' && copyCount(c.id)) return false;
     if (q && !`${c.name} ${c.text || ''} ${(c.keywords || []).join(' ')}`.toLowerCase().includes(q)) return false;
@@ -408,15 +380,14 @@ export function renderDeckBuilder(root, ctx) {
   const maxCurve = Math.max(1, ...Object.values(curve));
   const deckGroups = {};
   for (const entry of draft.cards) {
-    const card = cardById(entry.cardId);
-    if (!card) continue;
+    const card = cardById(entry.cardId) || { id: entry.cardId, name: `Missing card: ${entry.cardId}`, cost: 0, missing: true };
     const cost = card.cost ?? 0;
     (deckGroups[cost] ||= []).push({ ...entry, card });
   }
   const deckRows = Object.keys(deckGroups).sort((a, b) => Number(a) - Number(b)).map((cost) => `
     ${deckGroups[cost].sort((a, b) => String(a.card.name).localeCompare(String(b.card.name))).map((entry) => `
-      <button class="builder-deck-row" id="deck-card-${esc(entry.cardId)}" data-deck-row="${esc(entry.cardId)}" data-rarity="${esc(entry.card.rarity || '')}" aria-label="Remove one ${esc(entry.card.name)}, ${entry.count} in deck">
-        <img class="builder-row-art" src="/art/${encodeURIComponent(entry.cardId)}" alt="" loading="lazy" draggable="false">
+      <button class="builder-deck-row" id="deck-card-${esc(entry.cardId)}" data-deck-row="${esc(entry.cardId)}" data-card-type="${entry.card.supertype === 'Champion' ? 'champion' : entry.card.type === 'Spell' ? 'spell' : 'unit'}" data-rarity="${esc(entry.card.rarity || '')}" aria-label="Remove one ${esc(entry.card.name)}, ${entry.count} in deck">
+        ${entry.card.missing ? '<span class="builder-row-art" aria-hidden="true"></span>' : `<img class="builder-row-art" src="/art/${encodeURIComponent(entry.cardId)}" alt="" loading="lazy" draggable="false">`}
         <span class="builder-row-cost">${esc(entry.card.cost ?? 0)}</span>
         <span class="builder-row-name">${esc(entry.card.name)}</span>
         <span class="builder-row-count">${entry.count}</span>
@@ -444,7 +415,7 @@ export function renderDeckBuilder(root, ctx) {
       <label for="deck-load">Load deck</label><select class="select input-sm" id="deck-load">${deckOptions}</select>
       <div class="row wrap"><button class="btn btn-sm" id="deck-new">New deck</button><button class="btn btn-sm" id="deck-auto">Auto-build</button><button class="btn btn-sm" id="deck-clear">Clear cards</button></div>
       <div class="row wrap"><button class="btn btn-sm" id="deck-import">Import code</button><button class="btn btn-sm" id="deck-export">Export code</button><button class="btn btn-sm" id="deck-copy">Copy code</button></div>
-      <button class="btn btn-primary" id="deck-save" ${validation.ok ? '' : 'disabled'}>${draft.id ? 'Save deck' : 'Create deck'}</button>
+      <button class="btn btn-primary" id="deck-save">${draft.id ? 'Save deck' : 'Create deck'}</button>
       ${draft.id ? '<div class="row wrap"><button class="btn btn-sm" id="deck-duplicate">Duplicate</button><button class="btn btn-sm btn-danger" id="deck-delete">Delete</button></div>' : ''}
       ${sourceStarter ? '<p class="small">Saving creates your own copy of this starter deck.</p>' : ''}
       <p class="small muted">Author: ${esc(draft.author || 'Guest')}</p>

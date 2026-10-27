@@ -1,0 +1,40 @@
+{
+  "batch": "2026-10-27-champion-status-audit-01",
+  "cards": {
+    "01DE012": {
+      "status": "partial",
+      "script": {
+        "triggers": [
+          {
+            "on": "summon",
+            "actions": [
+              {
+                "type": "buff",
+                "power": 1,
+                "health": 1,
+                "duration": "round",
+                "target": "allOtherAllyUnits"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "01IO032": {
+      "status": "partial",
+      "script": {
+        "triggers": [
+          {
+            "on": "support",
+            "actions": [
+              {
+                "type": "barrier",
+                "target": "supported"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  }
+}

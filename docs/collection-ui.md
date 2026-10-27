@@ -29,4 +29,4 @@ The layout uses four card columns in the collection and three alongside the desk
 
 Screenshots: [collection](qa/collection/cards-1916x1079.png), [builder](qa/collection/builder-1916x1079.png), [filters](qa/collection/filters-1916x1079.png), [regions](qa/collection/regions-1916x1079.png), [mobile builder](qa/collection/builder-390x844.png), and [centered decks](qa/collection/decks-centered-1916x1079.png). [Scenario results](qa/collection/verification.json) retain the evidence identifiers and step outcomes.
 
-This verification used the source service through REA and Microsoft Edge. A new native Electron run, portable release build, and external-network acceptance test were not performed for this UI update. Existing packaged release downloads do not include these uncommitted source changes.
+The initial verification above used the source service through REA and Microsoft Edge. The subsequent [left deck editor update](deck-editor-ui.md) rebuilt the local portable UI preview and verified it in packaged Electron. External-network acceptance testing remains separate.

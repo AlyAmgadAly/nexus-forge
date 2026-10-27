@@ -2,7 +2,8 @@
 // desktop per-user directory. Only writable user files are copied; immutable
 // seed cards stay in the packaged seed folder.
 import path from 'node:path';
-import { access, copyFile, cp, mkdir, readFile, writeFile } from 'node:fs/promises';
+import { access, copyFile, cp, mkdir, readFile, rename, writeFile } from 'node:fs/promises';
+import { mergeSeedScripts, DEFAULT_SEED_META } from './scripts-upgrade.js';
 
 export const WRITABLE_FILES = [
   'settings.json',
@@ -15,6 +16,59 @@ export const WRITABLE_FILES = [
 
 async function exists(file) {
   try { await access(file); return true; } catch { return false; }
+}
+
+async function readJson(file, fallback) {
+  try {
+    return JSON.parse(await readFile(file, 'utf8'));
+  } catch (err) {
+    if (err.code === 'ENOENT') return fallback;
+    throw err;
+  }
+}
+
+async function writeJsonAtomic(file, value) {
+  const tmp = `${file}.tmp`;
+  await writeFile(tmp, JSON.stringify(value, null, 2));
+  await rename(tmp, file);
+}
+
+async function upgradeScriptsInPlace({ seedDir, dataDir, logger = () => {} }) {
+  const seedScripts = await readJson(path.join(seedDir, 'scripts.json'), null);
+  if (!seedScripts) return null;
+  const seedMeta = { ...DEFAULT_SEED_META, ...(await readJson(path.join(seedDir, 'scripts-seed.json'), {})) };
+  let userMeta = await readJson(path.join(dataDir, 'scripts-upgrade.json'), null);
+  let userScripts = {};
+  let corrupt = false;
+  try {
+    userScripts = await readJson(path.join(dataDir, 'scripts.json'), {});
+  } catch {
+    corrupt = true;
+    userMeta = null;
+  }
+  const cardsPayload = await readJson(path.join(seedDir, 'cards.json'), { cards: [] });
+  const cardsById = new Map((cardsPayload.cards || []).map((card) => [card.id, card]));
+  const { scripts, report } = mergeSeedScripts({ seedScripts, seedMeta, userScripts, userMeta, cardsById });
+  report.corruptUserFile = corrupt;
+  if (report.changed) {
+    const backupDir = path.join(dataDir, 'backups');
+    await mkdir(backupDir, { recursive: true });
+    const stamp = new Date().toISOString().replace(/[:.]/g, '-');
+    const backupFile = path.join(backupDir, `scripts-${stamp}.json`);
+    await writeFile(backupFile, JSON.stringify(userScripts, null, 2));
+    report.backupFile = backupFile;
+    await writeJsonAtomic(path.join(dataDir, 'scripts.json'), scripts);
+    logger(`Upgraded card scripts to seed ${seedMeta.version}. Backup: ${backupFile}`);
+  }
+  const keepUserVersion = report.skipped === 'up-to-date-or-newer';
+  await writeJsonAtomic(path.join(dataDir, 'scripts-upgrade.json'), {
+    version: keepUserVersion ? (userMeta?.version || seedMeta.version) : seedMeta.version,
+    scriptsVersion: keepUserVersion ? (userMeta?.scriptsVersion ?? seedMeta.scriptsVersion ?? 0) : (seedMeta.scriptsVersion ?? 0),
+    origin: keepUserVersion ? (userMeta?.origin || seedMeta.origin || 'seed') : (seedMeta.origin || 'seed'),
+    mergedAt: new Date().toISOString(),
+    lastReport: report,
+  });
+  return report;
 }
 
 async function copyIfPresent(fromDir, toDir, names) {
@@ -85,6 +139,7 @@ export async function prepareUserData({
   if (await exists(path.join(source, 'art'))) {
     await cp(path.join(source, 'art'), path.join(targetData, 'art'), { recursive: true, force: false, errorOnExist: false });
   }
+  const scriptsUpgrade = await upgradeScriptsInPlace({ seedDir: targetSeed, dataDir: targetData, logger });
   const marker = {
     migratedAt: new Date().toISOString(),
     source,
@@ -92,10 +147,11 @@ export async function prepareUserData({
     backupDir,
     copied,
     targetBackup,
+    scriptsUpgrade,
   };
   await writeFile(markerFile, JSON.stringify(marker, null, 2));
   logger(`Migrated legacy data from ${source} to ${targetData}. Backup: ${backupDir}`);
-  return { migrated: true, reason: 'migrated', dataDir: targetData, backupDir, copied, targetBackup, marker };
+  return { migrated: true, reason: 'migrated', dataDir: targetData, backupDir, copied, targetBackup, marker, scriptsUpgrade };
 }
 
 export async function migrationInfo(dataDir) {

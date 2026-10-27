@@ -1,4 +1,6 @@
 import { cleanKeywords } from './constants.js';
+import { SCRIPT_STATUSES } from '../../shared/script-vocabulary.js';
+import { isVerified, normalizeCardText } from '../script-metadata.js';
 
 // A normalized view over Riot + custom cards and their scripts.
 export class CardDB {
@@ -36,13 +38,29 @@ export class CardDB {
       const best = candidates.sort((a, b) => (b.attack + b.health) - (a.attack + a.health))[0];
       if (best) card.level2Id = best.id;
     }
+    for (const card of this.byId.values()) {
+      card.hasSkill = (card.associatedCardRefs || []).some((id) => {
+        const associated = this.byId.get(id);
+        return associated?.type === 'Ability' && (associated.rawKeywords || associated.keywords || []).includes('Skill');
+      });
+    }
   }
 
   decorate(card) {
     if (!card || !card.id) return null;
     const scriptEntry = this.scripts[card.id];
     const script = scriptEntry?.script || (scriptEntry?.triggers ? scriptEntry : null) || card.script || null;
-    const status = scriptEntry?.status || (scriptEntry?.triggers ? 'curated' : (card.scriptStatus || (script ? 'custom' : (card.text ? 'manual' : 'none'))));
+    const hasText = !!normalizeCardText(card.text);
+    let status = scriptEntry?.status;
+    if (!SCRIPT_STATUSES.has(status)) {
+      status = script ? 'custom' : (hasText ? 'manual' : 'none');
+    }
+    // The pinned payload carries scriptStatus: "none" on every card. Never let
+    // that stale field hide a text card or a script. An entry that says
+    // "manual" but carries a script is a local script, not an unimplemented
+    // text card.
+    if (script && (status === 'none' || status === 'manual')) status = 'custom';
+    else if (status === 'none' && hasText) status = 'manual';
     const disabled = new Set(this.settings?.pool?.disabledCards || []);
     const disabledSets = new Set(this.settings?.pool?.disabledSets || []);
     const enabled = !disabled.has(card.id) && !disabledSets.has(card.set) && card.enabled !== false;
@@ -53,6 +71,8 @@ export class CardDB {
       rawKeywords: card.keywords || card.keywordRefs || [],
       script,
       scriptStatus: status,
+      verified: isVerified(scriptEntry, card),
+      verification: scriptEntry?.verification || null,
       enabled,
       level2: card.level2Id || null,
       tokenOverrides: tokens.get(card.name.toLowerCase()) || null,
@@ -112,10 +132,23 @@ export class CardDB {
       for (const r of c.regions || []) byRegion[r] = (byRegion[r] || 0) + 1;
       byStatus[c.scriptStatus] = (byStatus[c.scriptStatus] || 0) + 1;
     }
+    const textCards = cards.filter((c) => !!normalizeCardText(c.text));
+    const scriptedText = textCards.filter((c) => !!c.script);
+    const verified = scriptedText.filter((c) => c.verified);
+    const total = cards.length;
+    const text = textCards.length;
     return {
-      total: cards.length,
+      total,
       enabled: cards.filter((c) => c.enabled).length,
+      championsEnabled: cards.filter((c) => c.enabled && c.supertype === 'Champion').length,
+      textCards: text,
       scripted: cards.filter((c) => !!c.script).length,
+      scriptedText: scriptedText.length,
+      missing: text - scriptedText.length,
+      verified: verified.length,
+      unverified: scriptedText.length - verified.length,
+      coverage: text ? scriptedText.length / text : 0,
+      verifiedCoverage: text ? verified.length / text : 0,
       bySet,
       byRegion,
       byStatus,

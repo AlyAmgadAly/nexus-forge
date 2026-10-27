@@ -202,7 +202,8 @@ function dashboardHtml(state) {
     ${adminError ? `<div class=\"notice warn mb\">${esc(adminError)}</div>` : ''}
     <div class=\"admin-stats\">
       <div class=\"stat-card\"><span>Collectible cards</span><strong>${esc(s.total ?? 0)}</strong><small>${esc(s.enabled ?? 0)} enabled in the pool</small></div>
-      <div class=\"stat-card\"><span>Script coverage</span><strong>${esc(stats.coverage ?? 0)}%</strong><small>${esc(stats.scriptedWithText ?? 0)} of ${esc(stats.textCards ?? 0)} text cards automated</small></div>
+      <div class=\"stat-card\"><span>Scripts present</span><strong>${esc(stats.coverage ?? 0)}%</strong><small>${esc(stats.scriptedWithText ?? 0)} of ${esc(stats.textCards ?? 0)} text cards have a script</small></div>
+      <div class=\"stat-card\"><span>Verified effects</span><strong>${esc(stats.verifiedCoverage ?? 0)}%</strong><small>${esc(stats.verified ?? 0)} of ${esc(stats.textCards ?? 0)} text cards verified</small></div>
       <div class=\"stat-card\"><span>Custom cards</span><strong>${esc(custom)}</strong><small>forged on this server</small></div>
       <div class=\"stat-card\"><span>Starter + user decks</span><strong>${esc(stats.decks ?? 0)}</strong><small>${esc(totalSets)} sets imported</small></div>
     </div>
@@ -211,7 +212,7 @@ function dashboardHtml(state) {
         <div class=\"panel-head\"><h3>Script status</h3><span class=\"tag\">collectible</span></div>
         <div class=\"panel-body\">
           ${Object.entries(statusCounts).sort((a, b) => b[1] - a[1]).map(([status, count]) => `<div class=\"status-bar-row\"><span class=\"status-name\">${esc(status)}</span><div class=\"status-track\"><span style=\"width:${s.total ? Math.max(2, (count / s.total) * 100) : 0}%\"></span></div><strong>${esc(count)}</strong></div>`).join('') || '<div class=\"muted small\">No script statuses.</div>'}
-          <div class=\"notice small mt\">Scripted cards resolve automatically. Manual cards use the tabletop tools. You can upgrade any card from the <strong>Scripts</strong> tab.</div>
+          <div class=\"notice small mt\">Scripts present are not necessarily verified. Generated scripts are unverified; manual cards use the tabletop tools. You can review any card from the <strong>Scripts</strong> tab.</div>
         </div>
       </div>
       <div class=\"panel\">
@@ -285,7 +286,7 @@ function cardsHtml(state) {
 
 function pickerHtml() {
   return `
-    <div class=\"row between wrap mb\"><div><div class=\"eyebrow\">Automation</div><h1>Script workshop</h1><div class=\"muted small\">Attach a data-driven script to any card. Cards without a script stay playable through tabletop tools.</div></div></div>
+    <div class=\"row between wrap mb\"><div><div class=\"eyebrow\">Automation</div><h1>Script workshop</h1><div class=\"muted small\">Attach a data-driven script to any card. Cards without a script stay playable through tabletop tools. <a class=\"gold\" href=\"https://github.com/AlyAmgadAly/nexus-forge/blob/main/docs/effect-dsl.md\" target=\"_blank\" rel=\"noopener\">DSL reference ↗</a></div></div></div>
     <div class=\"panel mb\"><div class=\"panel-body\"><form class=\"admin-filters\" id=\"script-picker-form\">
       <div class=\"field grow\"><label class=\"label\">Find a card</label><input class=\"input input-sm\" id=\"script-picker-q\" value=\"${esc(picker.q)}\" placeholder=\"Card name or ID…\"></div>
       <div class=\"field\"><label class=\"label\">Status</label><select class=\"select input-sm\" id=\"script-picker-status\"><option value=\"\">Any</option>${STATUSES.filter(Boolean).map((s) => `<option value=\"${s}\" ${picker.status === s ? 'selected' : ''}>${s}</option>`).join('')}</select></div>

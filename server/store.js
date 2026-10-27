@@ -1,4 +1,4 @@
-import { mkdir, readFile, writeFile, rename, access, copyFile } from 'node:fs/promises';
+import { mkdir, readFile, writeFile, rename, access } from 'node:fs/promises';
 import path from 'node:path';
 import crypto from 'node:crypto';
 import { fileURLToPath } from 'node:url';
@@ -6,6 +6,8 @@ import { CardDB } from './engine/carddb.js';
 import { makeStarterDecks, randomDeck, validateDeck, findDeckRegions } from './decks.js';
 import { contentManifest } from './content.js';
 import { MAX_CUSTOM_ART_BYTES } from '../shared/protocol.js';
+import { mergeSeedScripts, DEFAULT_SEED_META } from './scripts-upgrade.js';
+import { cardTextHash, prepareVerification, scriptHash } from './script-metadata.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 export const ROOT = path.resolve(__dirname, '..');
@@ -17,6 +19,8 @@ const DEFAULT_RULES = {
   deckSize: 40,
   maxCopies: 3,
   maxRegions: 2,
+  maxChampions: 6,
+  format: 'Eternal',
   handStart: 4,
   handMax: 10,
   boardMax: 6,
@@ -63,17 +67,76 @@ export class Store {
   file(name) { return path.join(this.dataDir, name); }
   seedFile(name) { return path.join(this.seedDir, name); }
 
-  async ensureSeedFile(name) {
-    const target = this.file(name);
+  async backupScripts(raw, reason = 'upgrade') {
+    const dir = path.join(this.dataDir, 'backups');
+    await mkdir(dir, { recursive: true });
+    const stamp = new Date().toISOString().replace(/[:.]/g, '-');
+    const file = path.join(dir, `scripts-${reason}-${stamp}.json`);
+    await writeFile(file, typeof raw === 'string' ? raw : JSON.stringify(raw, null, 2));
+    return file;
+  }
+
+  async upgradeScripts() {
+    const seedScripts = await readJson(this.seedFile('scripts.json'), null);
+    const seedMeta = await readJson(this.seedFile('scripts-seed.json'), DEFAULT_SEED_META);
+    let userMeta = await readJson(this.file('scripts-upgrade.json'), null);
+    let raw = null;
+    let userFileExists = true;
     try {
-      await access(target);
-      return;
-    } catch {}
-    try {
-      await copyFile(this.seedFile(name), target);
+      raw = await readFile(this.file('scripts.json'), 'utf8');
     } catch (err) {
-      if (err.code !== 'ENOENT') throw err;
+      if (err.code === 'ENOENT') userFileExists = false;
+      else throw err;
     }
+    let userScripts = {};
+    let corrupt = false;
+    if (userFileExists) {
+      try {
+        userScripts = raw.trim() ? JSON.parse(raw) : {};
+      } catch {
+        corrupt = true;
+        userScripts = {};
+        userMeta = null;
+      }
+    } else {
+      userMeta = null;
+    }
+
+    if (!seedScripts) {
+      this.scripts = userScripts;
+      this.scriptsUpgrade = null;
+      return null;
+    }
+
+    const cardsById = new Map((this.cardsPayload?.cards || []).map((card) => [card.id, card]));
+    const { scripts, report } = mergeSeedScripts({
+      seedScripts,
+      seedMeta: { ...DEFAULT_SEED_META, ...seedMeta },
+      userScripts,
+      userMeta,
+      cardsById,
+    });
+    report.userFileExisted = userFileExists;
+    report.corruptUserFile = corrupt;
+    if (corrupt && raw != null) {
+      report.backupFile = await this.backupScripts(raw, 'corrupt');
+    } else if (report.changed && userFileExists && raw != null) {
+      report.backupFile = await this.backupScripts(raw, 'upgrade');
+    }
+    this.scripts = scripts;
+    this.scriptsUpgrade = report;
+    if (report.changed || !userFileExists) {
+      await writeJsonAtomic(this.file('scripts.json'), this.scripts);
+    }
+    const keepUserVersion = report.skipped === 'up-to-date-or-newer';
+    await writeJsonAtomic(this.file('scripts-upgrade.json'), {
+      version: keepUserVersion ? (userMeta?.version || seedMeta.version) : (seedMeta.version || DEFAULT_SEED_META.version),
+      scriptsVersion: keepUserVersion ? (userMeta?.scriptsVersion ?? seedMeta.scriptsVersion ?? 0) : (seedMeta.scriptsVersion ?? DEFAULT_SEED_META.scriptsVersion),
+      origin: keepUserVersion ? (userMeta?.origin || seedMeta.origin || DEFAULT_SEED_META.origin) : (seedMeta.origin || DEFAULT_SEED_META.origin),
+      mergedAt: new Date().toISOString(),
+      lastReport: report,
+    });
+    return report;
   }
 
   async init() {
@@ -93,12 +156,12 @@ export class Store {
     } catch {
       throw new Error(`Card data is missing. Run "npm run import:cards" first (expected ${cardsFile}).`);
     }
-    // scripts.json is writable (Card Forge), but starts from the packaged seed.
-    await this.ensureSeedFile('scripts.json');
     this.cardsPayload = await readJson(cardsFile, null);
     if (!this.cardsPayload?.cards?.length) throw new Error('data/cards.json is empty or invalid.');
     this.customCards = await readJson(this.file('custom-cards.json'), []);
-    this.scripts = await readJson(this.file('scripts.json'), {});
+    // scripts.json is writable (Card Forge), but starts from the packaged seed
+    // and upgrades through a backed-up merge on later releases.
+    await this.upgradeScripts();
     this.mechanics = await readJson(this.file('mechanics.json'), []);
     this.keywords = await readJson(this.file('keywords.json'), []);
     await this.refreshTransferCards();
@@ -251,9 +314,44 @@ export class Store {
   }
 
   // ---------------------------------------------------------------- scripts
-  setScript(cardId, script, status = 'custom') {
-    if (!script) delete this.scripts[cardId];
-    else this.scripts[cardId] = { script, status, updatedAt: new Date().toISOString() };
+  setScript(cardId, script, status = 'custom', metadata = {}) {
+    if (!script) {
+      delete this.scripts[cardId];
+      this.rebuild();
+      return null;
+    }
+    const existing = this.scripts[cardId] || null;
+    const card = this.cardDB?.get(cardId)
+      || (this.customCards || []).find((candidate) => candidate.id === cardId)
+      || null;
+    const scriptChanged = !existing || scriptHash(existing.script) !== scriptHash(script);
+    const textChanged = !!existing?.verification
+      && existing.verification.cardTextHash !== cardTextHash(card?.text || '');
+    let nextStatus = status;
+    let verification = metadata.verification ?? null;
+    if (verification) {
+      verification = prepareVerification(verification, card);
+    } else if (existing?.verification && !scriptChanged && !textChanged && nextStatus === 'curated') {
+      verification = existing.verification;
+    }
+    if (nextStatus === 'curated' && !verification) {
+      // A curated entry without verification is not verified. Keep the script
+      // but downgrade the stored status until a reviewer adds metadata.
+      nextStatus = 'partial';
+    }
+    if (nextStatus !== 'curated') verification = null;
+    const next = {
+      ...(existing || {}),
+      script,
+      status: nextStatus,
+      updatedAt: new Date().toISOString(),
+    };
+    if (verification) next.verification = verification;
+    else delete next.verification;
+    const seed = metadata.seed ?? existing?.seed;
+    if (seed) next.seed = seed;
+    else delete next.seed;
+    this.scripts[cardId] = next;
     this.rebuild();
     return this.scripts[cardId] || null;
   }
@@ -288,7 +386,7 @@ export class Store {
       setName: card.setName || 'Custom Forge',
       collectible: true,
       spellSpeed: card.spellSpeed || '',
-      formats: ['Standard'],
+      formats: ['Standard', 'Eternal'],
       associatedCardRefs: card.associatedCardRefs || [],
       art: card.art || null,
       fullArt: card.fullArt || card.art || null,

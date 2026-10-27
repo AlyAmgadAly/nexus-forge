@@ -1,0 +1,92 @@
+{
+  "batch": "2026-10-27-support-01",
+  "cards": {
+    "01IO032": {
+      "status": "curated",
+      "script": {
+        "triggers": [
+          {
+            "on": "support",
+            "actions": [
+              {
+                "type": "barrier",
+                "target": "supported"
+              }
+            ]
+          }
+        ]
+      },
+      "verification": {
+        "version": 1,
+        "cardTextHash": "4d2a96213123c5cace1efd25cfc820df6f4f0bba169c1c1b661779e7dcbfe219",
+        "verifiedAt": "2026-10-27T00:00:00.000Z",
+        "verifiedBy": "agent",
+        "test": "test/starter-vanguard.test.mjs#shen-support-grants-the-supported-ally-barrier",
+        "clauses": [
+          "Support: Give my supported ally Barrier this round."
+        ],
+        "notes": ""
+      }
+    },
+    "03IO001": {
+      "status": "curated",
+      "script": {
+        "triggers": [
+          {
+            "on": "supported",
+            "actions": [
+              {
+                "type": "buff",
+                "power": 2,
+                "health": 0,
+                "duration": "permanent",
+                "target": "self"
+              }
+            ]
+          }
+        ]
+      },
+      "verification": {
+        "version": 1,
+        "cardTextHash": "7bc3c447ccd3522cf361a062512fa17d599c305fb169194b13c4248fba8e0197",
+        "verifiedAt": "2026-10-27T00:00:00.000Z",
+        "verifiedBy": "agent",
+        "test": "test/starter-vanguard.test.mjs#flower-child-being-supported-grants-2-power",
+        "clauses": [
+          "When I'm supported, grant me +2|+0."
+        ],
+        "notes": ""
+      }
+    },
+    "03IO017": {
+      "status": "curated",
+      "script": {
+        "triggers": [
+          {
+            "on": "support",
+            "actions": [
+              {
+                "type": "buff",
+                "power": 2,
+                "health": 1,
+                "duration": "round",
+                "target": "supported"
+              }
+            ]
+          }
+        ]
+      },
+      "verification": {
+        "version": 1,
+        "cardTextHash": "c0b860e4b1b1a0aa0270a73611cc878092bdefcc02b849be449cb14598ea3097",
+        "verifiedAt": "2026-10-27T00:00:00.000Z",
+        "verifiedBy": "agent",
+        "test": "test/starter-vanguard.test.mjs#pix-support-gives-the-supported-ally-2-1-this-round",
+        "clauses": [
+          "Support: Give my supported ally +2|+1 this round."
+        ],
+        "notes": ""
+      }
+    }
+  }
+}

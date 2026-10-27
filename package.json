@@ -12,12 +12,17 @@
     "desktop:dev": "electron . --dev",
     "import:cards": "node scripts/import-cards.mjs",
     "autoscript": "node scripts/autoscript.mjs",
+    "scripts:coverage": "node scripts/coverage-report.mjs",
+    "scripts:starter-cohort": "node scripts/starter-cohort.mjs",
+    "scripts:apply": "node scripts/apply-batch.mjs",
+    "scripts:lint": "node scripts/lint-scripts.mjs",
+    "build:seed": "node scripts/build-seed.mjs",
     "vendor:peerjs": "node scripts/vendor-peerjs.mjs",
     "migrate:data": "node scripts/migrate-data.mjs",
     "check:syntax": "node scripts/check-syntax.mjs",
     "test": "node --test test/*.test.mjs",
-    "test:all": "npm run check:syntax && npm test",
-    "build:win": "npm run test:all && electron-builder --win portable"
+    "test:all": "npm run check:syntax && npm run scripts:lint && npm test",
+    "build:win": "npm run test:all && npm run build:seed && electron-builder --win portable"
   },
   "engines": {
     "node": ">=20"
@@ -54,8 +59,12 @@
         "to": "seed/cards.json"
       },
       {
-        "from": "data/scripts.json",
+        "from": "dist/seed/scripts.json",
         "to": "seed/scripts.json"
+      },
+      {
+        "from": "data/scripts-seed.json",
+        "to": "seed/scripts-seed.json"
       }
     ],
     "asarUnpack": [

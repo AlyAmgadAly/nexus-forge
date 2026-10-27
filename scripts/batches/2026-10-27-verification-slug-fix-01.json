@@ -1,0 +1,107 @@
+{
+  "batch": "2026-10-27-verification-slug-fix-01",
+  "cards": {
+    "01DE024": {
+      "status": "curated",
+      "script": {
+        "triggers": [
+          {
+            "on": "death",
+            "actions": [
+              {
+                "type": "createRandom",
+                "count": 1,
+                "filter": {
+                  "type": "Spell",
+                  "minCost": 6,
+                  "excludeRegion": "Demacia"
+                },
+                "destination": "hand"
+              }
+            ]
+          }
+        ]
+      },
+      "verification": {
+        "version": 1,
+        "cardTextHash": "a39137a1542f467e5408f97162caa41f2e80e675797b798904a0808fb27063d4",
+        "verifiedAt": "2026-10-27T00:00:00.000Z",
+        "verifiedBy": "agent",
+        "test": "test/starter-vanguard.test.mjs#mageseeker-conservator-last-breath-creates-a-non-demacia-6-spell",
+        "clauses": [
+          "Last Breath: Create in hand a random 6+ cost spell from a region other than Demacia."
+        ],
+        "notes": ""
+      }
+    },
+    "01IO019": {
+      "status": "curated",
+      "script": {
+        "triggers": [
+          {
+            "on": "barrier",
+            "actions": [
+              {
+                "type": "buff",
+                "power": 2,
+                "health": 0,
+                "duration": "permanent",
+                "target": "self"
+              }
+            ]
+          }
+        ]
+      },
+      "verification": {
+        "version": 1,
+        "cardTextHash": "9c529ce6ef45b34ccdbb80e231fd02e9d99b7eada4c7458da5b98934fde4cabb",
+        "verifiedAt": "2026-10-27T00:00:00.000Z",
+        "verifiedBy": "agent",
+        "test": "test/starter-vanguard.test.mjs#greenglade-caretaker-ally-barrier-grants-2-power",
+        "clauses": [
+          "When an ally gets Barrier, grant me +2|+0."
+        ],
+        "notes": ""
+      }
+    },
+    "04DE014": {
+      "status": "curated",
+      "script": {
+        "triggers": [
+          {
+            "on": "playCard",
+            "condition": {
+              "type": "eventCard",
+              "filter": {
+                "subtype": "DRAGON"
+              }
+            },
+            "continueOnSourceDeath": true,
+            "actions": [
+              {
+                "type": "strike",
+                "striker": "eventCard",
+                "target": "self"
+              },
+              {
+                "type": "draw",
+                "amount": 1
+              }
+            ]
+          }
+        ]
+      },
+      "verification": {
+        "version": 1,
+        "cardTextHash": "cce79964b6623dcc732c1d4ab63884c937383a3deaa63d2fa0286db713925bd8",
+        "verifiedAt": "2026-10-27T00:00:00.000Z",
+        "verifiedBy": "agent",
+        "test": "test/starter-vanguard.test.mjs#dragon-chow-played-dragon-strikes-it-and-draws-1",
+        "clauses": [
+          "When you play a Dragon, it strikes me and you draw 1."
+        ],
+        "notes": ""
+      }
+    }
+  }
+}

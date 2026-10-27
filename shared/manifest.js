@@ -1,11 +1,8 @@
 // Content compatibility helpers shared by the local API, the host, and the client.
 // These are pure functions: no Node-only imports, so the browser can use them.
+import { KNOWN_TRIGGERS, TRIGGER_NAMES } from './script-vocabulary.js';
 
-export const KNOWN_TRIGGERS = new Set([
-  'play', 'summon', 'attack', 'strike', 'nexusStrike', 'death', 'allyDeath',
-  'enemyDeath', 'summonOther', 'enemySummon', 'roundStart', 'roundEnd',
-  'surviveDamage', 'castSpell', 'enemySpell', 'levelUp', 'transform', 'aura',
-]);
+export { KNOWN_TRIGGERS, TRIGGER_NAMES };
 
 export function compareManifests(local, host) {
   const errors = [];

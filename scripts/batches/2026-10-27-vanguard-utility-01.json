@@ -1,0 +1,67 @@
+{
+  "batch": "2026-10-27-vanguard-utility-01",
+  "cards": {
+    "04DE007": {
+      "status": "curated",
+      "script": {
+        "triggers": [
+          {
+            "on": "summon",
+            "condition": {
+              "type": "behold",
+              "filter": {
+                "subtype": "ELITE"
+              }
+            },
+            "actions": [
+              {
+                "type": "create",
+                "cardId": "04DE007T1",
+                "count": 1,
+                "destination": "hand"
+              }
+            ]
+          }
+        ]
+      },
+      "verification": {
+        "version": 1,
+        "cardTextHash": "91a70765ca221066471f1fa1dcd3e5e79c0e0456b5367242ca0e0a5f6f84aafa",
+        "verifiedAt": "2026-10-27T00:00:00.000Z",
+        "verifiedBy": "agent",
+        "test": "test/starter-vanguard.test.mjs#penitent-squire-behold-elite-creates-tattered-banner",
+        "clauses": [
+          "When I'm summoned, if you Behold an Elite, create a Tattered Banner in hand."
+        ],
+        "notes": ""
+      }
+    },
+    "05IO026": {
+      "status": "curated",
+      "script": {
+        "triggers": [
+          {
+            "on": "nexusStrike",
+            "actions": [
+              {
+                "type": "recall",
+                "target": "self"
+              }
+            ]
+          }
+        ]
+      },
+      "verification": {
+        "version": 1,
+        "cardTextHash": "149590d0428b217004dfe436c2f54775f920f97632bebb7a729cdd901fc3c7f2",
+        "verifiedAt": "2026-10-27T00:00:00.000Z",
+        "verifiedBy": "agent",
+        "test": "test/starter-vanguard.test.mjs#the-mourned-nexus-strike-recalls-it",
+        "clauses": [
+          "Nexus Strike: Recall me."
+        ],
+        "notes": ""
+      }
+    }
+  }
+}

@@ -1,0 +1,38 @@
+{
+  "batch": "2026-10-27-region-exclusion-01",
+  "cards": {
+    "01DE024": {
+      "status": "curated",
+      "script": {
+        "triggers": [
+          {
+            "on": "death",
+            "actions": [
+              {
+                "type": "createRandom",
+                "count": 1,
+                "filter": {
+                  "type": "Spell",
+                  "minCost": 6,
+                  "excludeRegion": "Demacia"
+                },
+                "destination": "hand"
+              }
+            ]
+          }
+        ]
+      },
+      "verification": {
+        "version": 1,
+        "cardTextHash": "a39137a1542f467e5408f97162caa41f2e80e675797b798904a0808fb27063d4",
+        "verifiedAt": "2026-10-27T00:00:00.000Z",
+        "verifiedBy": "agent",
+        "test": "test/starter-vanguard.test.mjs#mageseeker-conservator-last-breath-creates-non-demacia-spell",
+        "clauses": [
+          "Last Breath: Create in hand a random 6+ cost spell from a region other than Demacia."
+        ],
+        "notes": ""
+      }
+    }
+  }
+}

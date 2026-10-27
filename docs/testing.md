@@ -9,14 +9,17 @@ Prerequisites: Node.js 20 or newer and npm.
 ```powershell
 npm ci
 npm run check:syntax
+npm run scripts:lint
 npm test
 ```
 
 Expected for this release:
 
-- Syntax check: 34 files.
-- Tests: 23 passing (12 engine, 3 data migration, 2 service/peer, 6 protocol/content).
-- `npm run build:win` reruns both checks before packaging.
+- Syntax check: 46 files.
+- Seed script lint: 249 entries, 0 errors, 0 warnings.
+- Tests: 128 passing across engine, event ordering and dispatch, state/equipment/support mechanics, migration, protocol/content, deck validation, script vocabulary, verification metadata, seed upgrades, authoring tooling, and coverage reporting.
+- Coverage report: 248 scripts present (16.0% of 1,552 text cards), 0 verified, 1,304 missing. Run `npm run scripts:coverage` to reproduce it.
+- `npm run build:win` reruns the checks before packaging.
 
 Record:
 
@@ -25,6 +28,9 @@ Record:
 - Node.js and npm versions.
 - Windows version.
 - Pass/fail output for each command.
+
+Seed upgrades and batch merges write backups before changing `scripts.json`.
+See [backups.md](backups.md) for backup locations and restore steps.
 
 ## 2. Browser development smoke test
 

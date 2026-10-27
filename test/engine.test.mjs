@@ -28,6 +28,7 @@ const cards = [
   card('T13', 'Drawer', { cost: 1, attack: 1, health: 1, text: 'Last Breath: Draw 1.' }),
   card('T14', 'Duelist', { cost: 2, attack: 3, health: 2, keywords: ['Challenger'], rawKeywords: ['Challenger'] }),
   card('T15', 'Frost Mage', { cost: 2, attack: 2, health: 2, text: 'Play: Frostbite an enemy.' }),
+  card('T16', 'Summon Watcher', { cost: 1, attack: 1, health: 1, text: 'Summon watchers.' }),
 ];
 
 const scripts = {
@@ -36,6 +37,13 @@ const scripts = {
   T12: { status: 'curated', triggers: [{ on: 'play', actions: [{ type: 'summon', name: 'Poro' }] }] },
   T13: { status: 'curated', triggers: [{ on: 'death', actions: [{ type: 'draw', amount: 1 }] }] },
   T15: { status: 'curated', triggers: [{ on: 'play', actions: [{ type: 'frostbite', target: 'enemyUnit' }] }] },
+  T16: {
+    status: 'curated',
+    triggers: [
+      { on: 'summonOther', actions: [{ type: 'draw', amount: 1 }] },
+      { on: 'enemySummon', actions: [{ type: 'draw', amount: 1 }] },
+    ],
+  },
 };
 
 const payload = { cards, globals: { keywords: [], regions: [] } };
@@ -197,6 +205,21 @@ test('play effect summons a token', () => {
   assert.ok(summoner);
   assert.equal(g.teams.A.board.length, 2);
   assert.ok(g.teams.A.board.some((u) => u.name === 'Poro'));
+});
+
+test('summonOther and enemySummon watchers both fire for a summoned unit', () => {
+  const g = newGame();
+  const p1 = g.player('p1');
+  const p2 = g.player('p2');
+  g.summonUnit(db.get('T16'), p1, { token: true });
+  g.summonUnit(db.get('T16'), p2, { token: true });
+  const p1Before = p1.hand.length;
+  const p2Before = p2.hand.length;
+
+  g.summonUnit(db.get('T11'), p1, { token: true });
+
+  assert.equal(p1.hand.length, p1Before + 1);
+  assert.equal(p2.hand.length, p2Before + 1);
 });
 
 test('2v2 shares board/nexus but keeps hands separate', () => {

@@ -1,0 +1,203 @@
+{
+  "date": "2026-10-27",
+  "syntaxFiles": 36,
+  "automatedTests": {
+    "passed": 24,
+    "failed": 0
+  },
+  "sourceInteractionGroups": 9,
+  "packagedInteractionGroups": 9,
+  "scenarios": [
+    {
+      "name": "leftRailRea",
+      "evidenceId": "ev_f76a1b8e81403cfe3379bf065c1af5986fa8f5f19f3c7070651490f2ded5ce53",
+      "steps": [
+        {
+          "id": "scenario_start",
+          "status": "completed",
+          "error": null
+        },
+        {
+          "id": "left-pane",
+          "status": "completed",
+          "error": null
+        },
+        {
+          "id": "keyboard-preview",
+          "status": "completed",
+          "error": null
+        },
+        {
+          "id": "full-face",
+          "status": "completed",
+          "error": null
+        }
+      ],
+      "events": {
+        "retained": 0,
+        "dropped": 0,
+        "items": [],
+        "omissions": {
+          "by_kind": [],
+          "network_transactions": [],
+          "network_transaction_range": null
+        }
+      }
+    },
+    {
+      "name": "leftRailNewFlow",
+      "evidenceId": "ev_b216b7ffbd7e4e999acbd4927814d304a8d5127b1b75d145addbb02853e4c7b3",
+      "steps": [
+        {
+          "id": "scenario_start",
+          "status": "completed",
+          "error": null
+        },
+        {
+          "id": "new-deck",
+          "status": "completed",
+          "error": null
+        },
+        {
+          "id": "name",
+          "status": "completed",
+          "error": null
+        },
+        {
+          "id": "tools",
+          "status": "completed",
+          "error": null
+        },
+        {
+          "id": "auto-build",
+          "status": "completed",
+          "error": null
+        },
+        {
+          "id": "valid-deck",
+          "status": "completed",
+          "error": null
+        },
+        {
+          "id": "close-tools",
+          "status": "completed",
+          "error": null
+        },
+        {
+          "id": "done",
+          "status": "completed",
+          "error": null
+        },
+        {
+          "id": "selected-copy",
+          "status": "completed",
+          "error": null
+        },
+        {
+          "id": "favorite",
+          "status": "completed",
+          "error": null
+        },
+        {
+          "id": "art-ready",
+          "status": "completed",
+          "error": null
+        }
+      ],
+      "events": {
+        "retained": 0,
+        "dropped": 0,
+        "items": [],
+        "omissions": {
+          "by_kind": [],
+          "network_transactions": [],
+          "network_transaction_range": null
+        }
+      }
+    },
+    {
+      "name": "leftRailMobileSelection",
+      "evidenceId": "ev_cf9db72ef002a9237834880906b77cc6ae1b642dc69d266a5fade4dd3fcd28b0",
+      "steps": [
+        {
+          "id": "scenario_start",
+          "status": "completed",
+          "error": null
+        },
+        {
+          "id": "ready",
+          "status": "completed",
+          "error": null
+        },
+        {
+          "id": "select-deck",
+          "status": "completed",
+          "error": null
+        },
+        {
+          "id": "edit-visible",
+          "status": "completed",
+          "error": null
+        },
+        {
+          "id": "face-ready",
+          "status": "completed",
+          "error": null
+        }
+      ],
+      "events": {
+        "retained": 0,
+        "dropped": 0,
+        "items": [],
+        "omissions": {
+          "by_kind": [],
+          "network_transactions": [],
+          "network_transaction_range": null
+        }
+      }
+    },
+    {
+      "name": "leftRailNativeRea",
+      "evidenceId": "ev_e7bad912531b4410550c4730ada70643be1dc9fbcb7ebaef41c6704a001e6551",
+      "steps": [
+        {
+          "id": "scenario_start",
+          "status": "completed",
+          "error": null
+        },
+        {
+          "id": "packaged-left-pane",
+          "status": "completed",
+          "error": null
+        },
+        {
+          "id": "full-card-preview",
+          "status": "completed",
+          "error": null
+        },
+        {
+          "id": "face-loaded",
+          "status": "completed",
+          "error": null
+        }
+      ],
+      "events": {
+        "retained": 0,
+        "dropped": 0,
+        "items": [],
+        "omissions": {
+          "by_kind": [],
+          "network_transactions": [],
+          "network_transaction_range": null
+        }
+      }
+    }
+  ],
+  "build": {
+    "filename": "NexusForge-0.2.0-ui-preview-portable.exe",
+    "bytes": 121438754,
+    "sha256": "20E70019AA4F01E7DDC48509EF6373F5F7EFB22F5EDF910F09859336CA673BFB",
+    "electron": "45.0.0",
+    "unsigned": true
+  }
+}

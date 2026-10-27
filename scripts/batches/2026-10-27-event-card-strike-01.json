@@ -1,0 +1,44 @@
+{
+  "batch": "2026-10-27-event-card-strike-01",
+  "cards": {
+    "04DE014": {
+      "status": "curated",
+      "script": {
+        "triggers": [
+          {
+            "on": "playCard",
+            "condition": {
+              "type": "eventCard",
+              "filter": {
+                "subtype": "DRAGON"
+              }
+            },
+            "continueOnSourceDeath": true,
+            "actions": [
+              {
+                "type": "strike",
+                "striker": "eventCard",
+                "target": "self"
+              },
+              {
+                "type": "draw",
+                "amount": 1
+              }
+            ]
+          }
+        ]
+      },
+      "verification": {
+        "version": 1,
+        "cardTextHash": "cce79964b6623dcc732c1d4ab63884c937383a3deaa63d2fa0286db713925bd8",
+        "verifiedAt": "2026-10-27T00:00:00.000Z",
+        "verifiedBy": "agent",
+        "test": "test/starter-vanguard.test.mjs#dragon-chow-played-dragon-strikes-and-draws",
+        "clauses": [
+          "When you play a Dragon, it strikes me and you draw 1."
+        ],
+        "notes": ""
+      }
+    }
+  }
+}

@@ -1,32 +1,37 @@
 {
   "01DE001": {
-    "status": "auto",
+    "status": "curated",
     "script": {
       "triggers": [
         {
-          "on": "play",
+          "on": "summon",
+          "condition": {
+            "type": "allegiance"
+          },
           "actions": [
             {
               "type": "buff",
               "power": 1,
               "health": 1,
               "duration": "permanent",
-              "target": {
-                "type": "allOtherAllyUnits",
-                "filter": {}
-              },
-              "condition": null
+              "target": "allOtherAllyUnits"
             }
-          ],
-          "condition": {
-            "type": "topDeckRegion",
-            "region": "Demacia"
-          },
-          "auto": false
+          ]
         }
       ]
     },
-    "updatedAt": "2026-10-26T00:23:30.957Z"
+    "updatedAt": "2026-10-27T02:03:11.349Z",
+    "verification": {
+      "version": 1,
+      "cardTextHash": "969014be0216f469d6c4be91a2998a98ca78f9281a15604fab5095074c72932b",
+      "verifiedAt": "2026-10-27T00:00:00.000Z",
+      "verifiedBy": "agent",
+      "test": "test/starter-vanguard.test.mjs#vanguard-bannerman-allegiance-buffs-other-allies",
+      "clauses": [
+        "Allegiance: Grant other allies +1|+1."
+      ],
+      "notes": ""
+    }
   },
   "01DE002": {
     "status": "auto",
@@ -138,7 +143,7 @@
     "updatedAt": "2026-10-26T00:23:30.959Z"
   },
   "01DE012": {
-    "status": "auto",
+    "status": "partial",
     "script": {
       "triggers": [
         {
@@ -149,18 +154,13 @@
               "power": 1,
               "health": 1,
               "duration": "round",
-              "target": {
-                "type": "allOtherAllyUnits",
-                "filter": {}
-              },
-              "condition": null
+              "target": "allOtherAllyUnits"
             }
-          ],
-          "auto": false
+          ]
         }
       ]
     },
-    "updatedAt": "2026-10-26T00:23:30.959Z"
+    "updatedAt": "2026-10-27T06:28:29.178Z"
   },
   "01DE014": {
     "status": "auto",
@@ -195,7 +195,7 @@
     "updatedAt": "2026-10-26T00:23:30.959Z"
   },
   "01DE018": {
-    "status": "auto",
+    "status": "curated",
     "script": {
       "triggers": [
         {
@@ -206,18 +206,24 @@
               "power": 1,
               "health": 1,
               "duration": "round",
-              "target": {
-                "type": "allyUnit",
-                "count": 1,
-                "filter": {}
-              },
-              "condition": null
+              "target": "allyUnit"
             }
           ]
         }
       ]
     },
-    "updatedAt": "2026-10-26T00:23:30.959Z"
+    "updatedAt": "2026-10-27T02:02:29.519Z",
+    "verification": {
+      "version": 1,
+      "cardTextHash": "b42a937f0b43f96606898c308733b67d1d3e0142a437b26a2556080a23241ade",
+      "verifiedAt": "2026-10-27T00:00:00.000Z",
+      "verifiedBy": "agent",
+      "test": "test/starter-vanguard.test.mjs#radiant-strike-grants-an-ally-1-1-this-round",
+      "clauses": [
+        "Give an ally +1|+1 this round."
+      ],
+      "notes": ""
+    }
   },
   "01DE021": {
     "status": "auto",
@@ -237,7 +243,7 @@
     "updatedAt": "2026-10-26T00:23:30.959Z"
   },
   "01DE024": {
-    "status": "auto",
+    "status": "curated",
     "script": {
       "triggers": [
         {
@@ -248,17 +254,27 @@
               "count": 1,
               "filter": {
                 "type": "Spell",
-                "minCost": 6
+                "minCost": 6,
+                "excludeRegion": "Demacia"
               },
-              "destination": "hand",
-              "condition": null
+              "destination": "hand"
             }
-          ],
-          "auto": false
+          ]
         }
       ]
     },
-    "updatedAt": "2026-10-26T00:23:30.959Z"
+    "updatedAt": "2026-10-27T02:26:50.925Z",
+    "verification": {
+      "version": 1,
+      "cardTextHash": "a39137a1542f467e5408f97162caa41f2e80e675797b798904a0808fb27063d4",
+      "verifiedAt": "2026-10-27T00:00:00.000Z",
+      "verifiedBy": "agent",
+      "test": "test/starter-vanguard.test.mjs#mageseeker-conservator-last-breath-creates-a-non-demacia-6-spell",
+      "clauses": [
+        "Last Breath: Create in hand a random 6+ cost spell from a region other than Demacia."
+      ],
+      "notes": ""
+    }
   },
   "01DE027": {
     "status": "auto",
@@ -285,7 +301,7 @@
     "updatedAt": "2026-10-26T00:23:30.960Z"
   },
   "01DE029": {
-    "status": "auto",
+    "status": "curated",
     "script": {
       "triggers": [
         {
@@ -295,19 +311,24 @@
               "type": "grantKeyword",
               "keyword": "Challenger",
               "duration": "permanent",
-              "target": {
-                "type": "self",
-                "count": 1,
-                "filter": {}
-              },
-              "condition": null
+              "target": "self"
             }
-          ],
-          "auto": false
+          ]
         }
       ]
     },
-    "updatedAt": "2026-10-26T00:23:30.960Z"
+    "updatedAt": "2026-10-27T02:02:29.519Z",
+    "verification": {
+      "version": 1,
+      "cardTextHash": "13cf841e62324130768a44e93e96997931107597c5ece60671f2a48255f7269e",
+      "verifiedAt": "2026-10-27T00:00:00.000Z",
+      "verifiedBy": "agent",
+      "test": "test/starter-vanguard.test.mjs#fleetfeather-tracker-summoning-another-ally-grants-challenger",
+      "clauses": [
+        "When you summon another ally, grant me Challenger."
+      ],
+      "notes": ""
+    }
   },
   "01DE031": {
     "status": "auto",
@@ -929,7 +950,7 @@
     "updatedAt": "2026-10-26T00:23:30.963Z"
   },
   "01IO004": {
-    "status": "auto",
+    "status": "curated",
     "script": {
       "triggers": [
         {
@@ -939,17 +960,25 @@
               "type": "heal",
               "amount": 3,
               "target": {
-                "type": "anyTarget",
-                "count": 1,
-                "filter": {}
-              },
-              "condition": null
+                "type": "allyTarget"
+              }
             }
           ]
         }
       ]
     },
-    "updatedAt": "2026-10-26T00:23:30.963Z"
+    "updatedAt": "2026-10-27T02:16:01.783Z",
+    "verification": {
+      "version": 1,
+      "cardTextHash": "e28cac4d456fd314aec1ab8b46265ba650a997ece2a7df71ca3df955f74738f6",
+      "verifiedAt": "2026-10-27T00:00:00.000Z",
+      "verifiedBy": "agent",
+      "test": "test/starter-vanguard.test.mjs#health-potion-heals-an-ally-or-your-nexus",
+      "clauses": [
+        "Heal an ally or your Nexus 3."
+      ],
+      "notes": ""
+    }
   },
   "01IO006": {
     "status": "auto",
@@ -1021,7 +1050,7 @@
     "updatedAt": "2026-10-26T00:23:30.965Z"
   },
   "01IO017": {
-    "status": "auto",
+    "status": "curated",
     "script": {
       "triggers": [
         {
@@ -1031,19 +1060,55 @@
               "type": "grantKeyword",
               "keyword": "Elusive",
               "duration": "round",
-              "target": {
-                "type": "self",
-                "count": 1,
-                "filter": {}
-              },
-              "condition": null
+              "target": "self"
             }
-          ],
-          "auto": false
+          ]
         }
       ]
     },
-    "updatedAt": "2026-10-26T00:23:30.965Z"
+    "updatedAt": "2026-10-27T02:02:29.519Z",
+    "verification": {
+      "version": 1,
+      "cardTextHash": "b19d1699b380059f8c6d526551d8dfe574f1847964619c2b58b9da05850772e1",
+      "verifiedAt": "2026-10-27T00:00:00.000Z",
+      "verifiedBy": "agent",
+      "test": "test/starter-vanguard.test.mjs#navori-bladescout-summon-grants-elusive-this-round",
+      "clauses": [
+        "When I'm summoned, give me Elusive this round."
+      ],
+      "notes": ""
+    }
+  },
+  "01IO019": {
+    "script": {
+      "triggers": [
+        {
+          "on": "barrier",
+          "actions": [
+            {
+              "type": "buff",
+              "power": 2,
+              "health": 0,
+              "duration": "permanent",
+              "target": "self"
+            }
+          ]
+        }
+      ]
+    },
+    "status": "curated",
+    "updatedAt": "2026-10-27T02:26:50.926Z",
+    "verification": {
+      "version": 1,
+      "cardTextHash": "9c529ce6ef45b34ccdbb80e231fd02e9d99b7eada4c7458da5b98934fde4cabb",
+      "verifiedAt": "2026-10-27T00:00:00.000Z",
+      "verifiedBy": "agent",
+      "test": "test/starter-vanguard.test.mjs#greenglade-caretaker-ally-barrier-grants-2-power",
+      "clauses": [
+        "When an ally gets Barrier, grant me +2|+0."
+      ],
+      "notes": ""
+    }
   },
   "01IO020": {
     "status": "auto",
@@ -1122,7 +1187,7 @@
     "updatedAt": "2026-10-26T00:23:30.965Z"
   },
   "01IO026": {
-    "status": "auto",
+    "status": "curated",
     "script": {
       "triggers": [
         {
@@ -1135,17 +1200,44 @@
               "duration": "permanent",
               "target": {
                 "type": "handCard",
-                "count": 1,
-                "filter": {}
-              },
-              "condition": null
+                "filter": {
+                  "type": "Unit"
+                }
+              }
             }
-          ],
-          "auto": false
+          ]
         }
       ]
     },
-    "updatedAt": "2026-10-26T00:23:30.966Z"
+    "updatedAt": "2026-10-27T02:18:16.449Z",
+    "verification": {
+      "version": 1,
+      "cardTextHash": "136b9397f14205cc11058455b7f1b72772bb2a5a8628be98b8fef7d9c9ccb1f7",
+      "verifiedAt": "2026-10-27T00:00:00.000Z",
+      "verifiedBy": "agent",
+      "test": "test/starter-vanguard.test.mjs#inspiring-mentor-grants-hand-ally-1-power",
+      "clauses": [
+        "Play: Grant an ally in hand +1|+0."
+      ],
+      "notes": ""
+    }
+  },
+  "01IO032": {
+    "script": {
+      "triggers": [
+        {
+          "on": "support",
+          "actions": [
+            {
+              "type": "barrier",
+              "target": "supported"
+            }
+          ]
+        }
+      ]
+    },
+    "status": "partial",
+    "updatedAt": "2026-10-27T06:28:29.179Z"
   },
   "01IO038": {
     "status": "auto",
@@ -1194,7 +1286,7 @@
     "updatedAt": "2026-10-26T00:23:30.966Z"
   },
   "01IO042": {
-    "status": "auto",
+    "status": "curated",
     "script": {
       "triggers": [
         {
@@ -1205,19 +1297,24 @@
               "power": 1,
               "health": 1,
               "duration": "round",
-              "target": {
-                "type": "self",
-                "count": 1,
-                "filter": {}
-              },
-              "condition": null
+              "target": "self"
             }
-          ],
-          "auto": false
+          ]
         }
       ]
     },
-    "updatedAt": "2026-10-26T00:23:30.966Z"
+    "updatedAt": "2026-10-27T02:02:29.519Z",
+    "verification": {
+      "version": 1,
+      "cardTextHash": "29248f87d5558eaafabb3cb81bd9e0f2cf77ec50b88b6c9e67936c577180c4c3",
+      "verifiedAt": "2026-10-27T00:00:00.000Z",
+      "verifiedBy": "agent",
+      "test": "test/starter-vanguard.test.mjs#sparring-student-summoning-another-ally-grants-1-1-this-round",
+      "clauses": [
+        "When you summon another ally, give me +1|+1 this round."
+      ],
+      "notes": ""
+    }
   },
   "01IO057": {
     "status": "auto",
@@ -1288,45 +1385,44 @@
     "updatedAt": "2026-10-26T00:23:30.967Z"
   },
   "01NX008": {
-    "status": "auto",
+    "status": "curated",
     "script": {
       "triggers": [
         {
-          "on": "play",
+          "on": "summon",
+          "condition": {
+            "type": "allegiance"
+          },
           "actions": [
             {
               "type": "buff",
               "power": 1,
               "health": 1,
               "duration": "permanent",
-              "target": {
-                "type": "self",
-                "count": 1,
-                "filter": {}
-              },
-              "condition": null
+              "target": "self"
             },
             {
               "type": "grantKeyword",
               "keyword": "Overwhelm",
               "duration": "permanent",
-              "target": {
-                "type": "self",
-                "count": 1,
-                "filter": {}
-              },
-              "condition": null
+              "target": "self"
             }
-          ],
-          "condition": {
-            "type": "topDeckRegion",
-            "region": "Noxus"
-          },
-          "auto": false
+          ]
         }
       ]
     },
-    "updatedAt": "2026-10-26T00:23:30.967Z"
+    "updatedAt": "2026-10-27T02:03:11.350Z",
+    "verification": {
+      "version": 1,
+      "cardTextHash": "946169edc43936c6a7f6775788815f38c8e657074e4834a1a2cc5feb240afe5c",
+      "verifiedAt": "2026-10-27T00:00:00.000Z",
+      "verifiedBy": "agent",
+      "test": "test/starter-vanguard.test.mjs#basilisk-rider-allegiance-grants-stats-and-overwhelm",
+      "clauses": [
+        "Allegiance: Grant me +1|+1 and Overwhelm."
+      ],
+      "notes": ""
+    }
   },
   "01NX020": {
     "status": "auto",
@@ -2087,28 +2183,35 @@
     "updatedAt": "2026-10-26T00:23:30.971Z"
   },
   "01SI016": {
-    "status": "auto",
+    "status": "curated",
     "script": {
       "triggers": [
         {
-          "on": "play",
+          "on": "summon",
+          "condition": {
+            "type": "allegiance"
+          },
           "actions": [
             {
               "type": "summon",
-              "cardId": "01SI014",
-              "count": 1,
-              "condition": null
+              "cardId": "01SI014"
             }
-          ],
-          "condition": {
-            "type": "topDeckRegion",
-            "region": "ShadowIsles"
-          },
-          "auto": false
+          ]
         }
       ]
     },
-    "updatedAt": "2026-10-26T00:23:30.971Z"
+    "updatedAt": "2026-10-27T02:03:11.350Z",
+    "verification": {
+      "version": 1,
+      "cardTextHash": "713ac213481767598439f7441766a501f4fcc699ac3eab164c4d45c8fe40839a",
+      "verifiedAt": "2026-10-27T00:00:00.000Z",
+      "verifiedBy": "agent",
+      "test": "test/starter-vanguard.test.mjs#wraithcaller-allegiance-summons-a-mistwraith",
+      "clauses": [
+        "Allegiance: Summon a Mistwraith."
+      ],
+      "notes": ""
+    }
   },
   "01SI022": {
     "status": "auto",
@@ -2565,7 +2668,7 @@
     "updatedAt": "2026-10-26T00:23:30.973Z"
   },
   "02DE007": {
-    "status": "auto",
+    "status": "curated",
     "script": {
       "triggers": [
         {
@@ -2575,18 +2678,24 @@
               "type": "grantKeyword",
               "keyword": "Tough",
               "duration": "round",
-              "target": {
-                "type": "allAllyUnits",
-                "count": 1,
-                "filter": {}
-              },
-              "condition": null
+              "target": "allAllyUnits"
             }
           ]
         }
       ]
     },
-    "updatedAt": "2026-10-26T00:23:30.973Z"
+    "updatedAt": "2026-10-27T02:02:29.519Z",
+    "verification": {
+      "version": 1,
+      "cardTextHash": "5d46f1e67d2852292badd86a47a21164c433763566637f869247c5db862f3444",
+      "verifiedAt": "2026-10-27T00:00:00.000Z",
+      "verifiedBy": "agent",
+      "test": "test/starter-vanguard.test.mjs#rangers-resolve-grants-allies-tough-this-round",
+      "clauses": [
+        "Give allies Tough this round."
+      ],
+      "notes": ""
+    }
   },
   "02DE009": {
     "status": "auto",
@@ -3004,6 +3113,37 @@
     },
     "updatedAt": "2026-10-26T00:23:30.975Z"
   },
+  "03IO001": {
+    "script": {
+      "triggers": [
+        {
+          "on": "supported",
+          "actions": [
+            {
+              "type": "buff",
+              "power": 2,
+              "health": 0,
+              "duration": "permanent",
+              "target": "self"
+            }
+          ]
+        }
+      ]
+    },
+    "status": "curated",
+    "updatedAt": "2026-10-27T02:02:04.122Z",
+    "verification": {
+      "version": 1,
+      "cardTextHash": "7bc3c447ccd3522cf361a062512fa17d599c305fb169194b13c4248fba8e0197",
+      "verifiedAt": "2026-10-27T00:00:00.000Z",
+      "verifiedBy": "agent",
+      "test": "test/starter-vanguard.test.mjs#flower-child-being-supported-grants-2-power",
+      "clauses": [
+        "When I'm supported, grant me +2|+0."
+      ],
+      "notes": ""
+    }
+  },
   "03IO006": {
     "status": "auto",
     "script": {
@@ -3024,6 +3164,37 @@
       ]
     },
     "updatedAt": "2026-10-26T00:23:30.975Z"
+  },
+  "03IO017": {
+    "script": {
+      "triggers": [
+        {
+          "on": "support",
+          "actions": [
+            {
+              "type": "buff",
+              "power": 2,
+              "health": 1,
+              "duration": "round",
+              "target": "supported"
+            }
+          ]
+        }
+      ]
+    },
+    "status": "curated",
+    "updatedAt": "2026-10-27T02:02:04.122Z",
+    "verification": {
+      "version": 1,
+      "cardTextHash": "c0b860e4b1b1a0aa0270a73611cc878092bdefcc02b849be449cb14598ea3097",
+      "verifiedAt": "2026-10-27T00:00:00.000Z",
+      "verifiedBy": "agent",
+      "test": "test/starter-vanguard.test.mjs#pix-support-gives-the-supported-ally-2-1-this-round",
+      "clauses": [
+        "Support: Give my supported ally +2|+1 this round."
+      ],
+      "notes": ""
+    }
   },
   "03MT020": {
     "status": "auto",
@@ -3579,7 +3750,7 @@
     "updatedAt": "2026-10-26T00:23:30.978Z"
   },
   "04DE006": {
-    "status": "auto",
+    "status": "curated",
     "script": {
       "triggers": [
         {
@@ -3590,18 +3761,100 @@
               "power": 1,
               "health": 1,
               "duration": "permanent",
-              "target": {
-                "type": "allyUnit",
-                "count": 1,
-                "filter": {}
-              },
-              "condition": null
+              "target": "allyUnit"
             }
           ]
         }
       ]
     },
-    "updatedAt": "2026-10-26T00:23:30.978Z"
+    "updatedAt": "2026-10-27T02:02:29.519Z",
+    "verification": {
+      "version": 1,
+      "cardTextHash": "efd0a73b3231bfab66f4e1fd0f93ebfa8d100fd69a7fc2b14eddf7af45bd4e0a",
+      "verifiedAt": "2026-10-27T00:00:00.000Z",
+      "verifiedBy": "agent",
+      "test": "test/starter-vanguard.test.mjs#battlefield-prowess-grants-an-ally-1-1-permanently",
+      "clauses": [
+        "Grant an ally +1|+1."
+      ],
+      "notes": ""
+    }
+  },
+  "04DE007": {
+    "script": {
+      "triggers": [
+        {
+          "on": "summon",
+          "condition": {
+            "type": "behold",
+            "filter": {
+              "subtype": "ELITE"
+            }
+          },
+          "actions": [
+            {
+              "type": "create",
+              "cardId": "04DE007T1",
+              "count": 1,
+              "destination": "hand"
+            }
+          ]
+        }
+      ]
+    },
+    "status": "curated",
+    "updatedAt": "2026-10-27T02:09:59.159Z",
+    "verification": {
+      "version": 1,
+      "cardTextHash": "91a70765ca221066471f1fa1dcd3e5e79c0e0456b5367242ca0e0a5f6f84aafa",
+      "verifiedAt": "2026-10-27T00:00:00.000Z",
+      "verifiedBy": "agent",
+      "test": "test/starter-vanguard.test.mjs#penitent-squire-behold-elite-creates-tattered-banner",
+      "clauses": [
+        "When I'm summoned, if you Behold an Elite, create a Tattered Banner in hand."
+      ],
+      "notes": ""
+    }
+  },
+  "04DE014": {
+    "script": {
+      "triggers": [
+        {
+          "on": "playCard",
+          "condition": {
+            "type": "eventCard",
+            "filter": {
+              "subtype": "DRAGON"
+            }
+          },
+          "continueOnSourceDeath": true,
+          "actions": [
+            {
+              "type": "strike",
+              "striker": "eventCard",
+              "target": "self"
+            },
+            {
+              "type": "draw",
+              "amount": 1
+            }
+          ]
+        }
+      ]
+    },
+    "status": "curated",
+    "updatedAt": "2026-10-27T02:26:50.926Z",
+    "verification": {
+      "version": 1,
+      "cardTextHash": "cce79964b6623dcc732c1d4ab63884c937383a3deaa63d2fa0286db713925bd8",
+      "verifiedAt": "2026-10-27T00:00:00.000Z",
+      "verifiedBy": "agent",
+      "test": "test/starter-vanguard.test.mjs#dragon-chow-played-dragon-strikes-it-and-draws-1",
+      "clauses": [
+        "When you play a Dragon, it strikes me and you draw 1."
+      ],
+      "notes": ""
+    }
   },
   "04FR011": {
     "status": "auto",
@@ -3676,6 +3929,71 @@
       ]
     },
     "updatedAt": "2026-10-26T00:23:30.979Z"
+  },
+  "04IO014": {
+    "script": {
+      "triggers": [
+        {
+          "on": "summonOther",
+          "condition": {
+            "type": "eventCard",
+            "filter": {
+              "keyword": "Ephemeral"
+            }
+          },
+          "actions": [
+            {
+              "type": "buff",
+              "power": 1,
+              "health": 0,
+              "duration": "round",
+              "target": "self"
+            }
+          ]
+        }
+      ]
+    },
+    "status": "curated",
+    "updatedAt": "2026-10-27T02:07:37.478Z",
+    "verification": {
+      "version": 1,
+      "cardTextHash": "c0e4cf4783e394abf2514bc9ef4fcfc1836182dd0026c8945cd2d7bd4ade8d0b",
+      "verifiedAt": "2026-10-27T00:00:00.000Z",
+      "verifiedBy": "agent",
+      "test": "test/starter-vanguard.test.mjs#shadow-apprentice-ephemeral-summon-grants-1-0-this-round",
+      "clauses": [
+        "When you summon an Ephemeral ally, give me +1|+0 this round."
+      ],
+      "notes": ""
+    }
+  },
+  "04IO015": {
+    "script": {
+      "triggers": [
+        {
+          "on": "recall",
+          "actions": [
+            {
+              "type": "draw",
+              "amount": 1
+            }
+          ]
+        }
+      ]
+    },
+    "status": "curated",
+    "updatedAt": "2026-10-27T02:12:56.597Z",
+    "verification": {
+      "version": 1,
+      "cardTextHash": "32efd3e3cbf9940f34027900dde6f2c2daff34d45dee17544fdbf7bce6088d94",
+      "verifiedAt": "2026-10-27T00:00:00.000Z",
+      "verifiedBy": "agent",
+      "test": "test/starter-vanguard.test.mjs#dancing-droplet-recall-draws-1",
+      "clauses": [
+        "When I'm Recalled, draw 1."
+      ],
+      "notes": ""
+    }
   },
   "04MT004": {
     "status": "auto",
@@ -4834,7 +5152,7 @@
     "updatedAt": "2026-10-26T00:23:30.986Z"
   },
   "05IO026": {
-    "status": "auto",
+    "status": "curated",
     "script": {
       "triggers": [
         {
@@ -4842,19 +5160,24 @@
           "actions": [
             {
               "type": "recall",
-              "target": {
-                "type": "self",
-                "count": 1,
-                "filter": {}
-              },
-              "condition": null
+              "target": "self"
             }
-          ],
-          "auto": false
+          ]
         }
       ]
     },
-    "updatedAt": "2026-10-26T00:23:30.986Z"
+    "updatedAt": "2026-10-27T02:09:59.160Z",
+    "verification": {
+      "version": 1,
+      "cardTextHash": "149590d0428b217004dfe436c2f54775f920f97632bebb7a729cdd901fc3c7f2",
+      "verifiedAt": "2026-10-27T00:00:00.000Z",
+      "verifiedBy": "agent",
+      "test": "test/starter-vanguard.test.mjs#the-mourned-nexus-strike-recalls-it",
+      "clauses": [
+        "Nexus Strike: Recall me."
+      ],
+      "notes": ""
+    }
   },
   "05MT002": {
     "status": "auto",
@@ -5006,6 +5329,136 @@
     },
     "updatedAt": "2026-10-26T00:23:30.990Z"
   },
+  "06BW047": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "castSpell",
+          "actions": [
+            {
+              "type": "summon",
+              "cardId": "02BW032T1",
+              "count": 1,
+              "condition": null
+            }
+          ],
+          "auto": false
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.994Z"
+  },
+  "06DE042": {
+    "script": {
+      "triggers": [
+        {
+          "on": "play",
+          "actions": [
+            {
+              "type": "choose",
+              "prompt": "Choose a card for Demacian Tellstones",
+              "options": [
+                {
+                  "id": "01DE032",
+                  "label": "Prismatic Barrier",
+                  "actions": [
+                    {
+                      "type": "create",
+                      "cardId": "01DE032",
+                      "fleeting": true
+                    }
+                  ]
+                },
+                {
+                  "id": "01DE025",
+                  "label": "Detain",
+                  "actions": [
+                    {
+                      "type": "create",
+                      "cardId": "01DE025",
+                      "fleeting": true
+                    }
+                  ]
+                },
+                {
+                  "id": "01DE035",
+                  "label": "For Demacia!",
+                  "actions": [
+                    {
+                      "type": "create",
+                      "cardId": "01DE035",
+                      "fleeting": true
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "status": "curated",
+    "updatedAt": "2026-10-27T06:29:03.628Z",
+    "verification": {
+      "version": 1,
+      "cardTextHash": "61cc70eaa58d1647e7f691edf4c049a58e9c5f0bd7802c9600bc40e8e7da34aa",
+      "verifiedAt": "2026-10-27T00:00:00.000Z",
+      "verifiedBy": "audit-resume",
+      "test": "test/choices.test.mjs#tellstones-every-branch-creates-only-the-selected-fleeting-card",
+      "clauses": [
+        "Create a Fleeting Prismatic Barrier, Detain, or For Demacia! in hand."
+      ],
+      "notes": "Verifies the printed creation effect only. Generated cards have separate implementation gaps tracked in docs/scripts/blocked.md."
+    }
+  },
+  "06DE043": {
+    "script": {
+      "triggers": [
+        {
+          "on": "summonOther",
+          "condition": {
+            "type": "and",
+            "conditions": [
+              {
+                "type": "eventCard",
+                "filter": {
+                  "subtype": "ELITE"
+                }
+              },
+              {
+                "type": "firstTimeThisGame",
+                "flag": "trustyRamhoundElite",
+                "scope": "source"
+              }
+            ]
+          },
+          "actions": [
+            {
+              "type": "buff",
+              "power": 2,
+              "health": 2,
+              "duration": "permanent",
+              "target": "self"
+            }
+          ]
+        }
+      ]
+    },
+    "status": "curated",
+    "updatedAt": "2026-10-27T02:07:37.479Z",
+    "verification": {
+      "version": 1,
+      "cardTextHash": "7a460ce5a0e25cef21067b52e8bdbf2838ac3abdf5b264c76f47a65e785e43b6",
+      "verifiedAt": "2026-10-27T00:00:00.000Z",
+      "verifiedBy": "audit-resume",
+      "test": "test/starter-vanguard.test.mjs#trusty-ramhound-each-copy-tracks-its-own-first-elite-and-keeps-its-grant",
+      "clauses": [
+        "The first time you summon an Elite, grant me +2|+2."
+      ],
+      "notes": "First Elite flag is per unit instance. Regression covers simultaneous and later copies, one trigger per copy, and permanent duration."
+    }
+  },
   "06DE045": {
     "status": "auto",
     "script": {
@@ -5030,116 +5483,6 @@
     },
     "updatedAt": "2026-10-26T00:23:30.990Z"
   },
-  "06FR033": {
-    "status": "auto",
-    "script": {
-      "triggers": [
-        {
-          "on": "death",
-          "actions": [
-            {
-              "type": "emptyManaGem",
-              "condition": null
-            }
-          ],
-          "auto": false
-        }
-      ]
-    },
-    "updatedAt": "2026-10-26T00:23:30.991Z"
-  },
-  "06IO003": {
-    "status": "auto",
-    "script": {
-      "triggers": [
-        {
-          "on": "play",
-          "actions": [
-            {
-              "type": "stun",
-              "target": {
-                "type": "enemyUnit",
-                "count": 1,
-                "filter": {}
-              },
-              "condition": null
-            }
-          ],
-          "auto": false
-        }
-      ]
-    },
-    "updatedAt": "2026-10-26T00:23:30.991Z"
-  },
-  "06MT044": {
-    "status": "auto",
-    "script": {
-      "triggers": [
-        {
-          "on": "play",
-          "actions": [
-            {
-              "type": "buff",
-              "power": 0,
-              "health": 2,
-              "duration": "round",
-              "target": {
-                "type": "allOtherAllyUnits",
-                "filter": {}
-              },
-              "condition": null
-            }
-          ],
-          "condition": {
-            "type": "daybreak"
-          },
-          "auto": false
-        }
-      ]
-    },
-    "updatedAt": "2026-10-26T00:23:30.991Z"
-  },
-  "06SI026": {
-    "status": "auto",
-    "script": {
-      "triggers": [
-        {
-          "on": "death",
-          "actions": [
-            {
-              "type": "create",
-              "cardId": "06SI009",
-              "count": 1,
-              "destination": "hand",
-              "condition": null
-            }
-          ],
-          "auto": false
-        }
-      ]
-    },
-    "updatedAt": "2026-10-26T00:23:30.993Z"
-  },
-  "06BW047": {
-    "status": "auto",
-    "script": {
-      "triggers": [
-        {
-          "on": "castSpell",
-          "actions": [
-            {
-              "type": "summon",
-              "cardId": "02BW032T1",
-              "count": 1,
-              "condition": null
-            }
-          ],
-          "auto": false
-        }
-      ]
-    },
-    "updatedAt": "2026-10-26T00:23:30.994Z"
-  },
   "06FR012": {
     "status": "auto",
     "script": {
@@ -5160,6 +5503,24 @@
       ]
     },
     "updatedAt": "2026-10-26T00:23:30.995Z"
+  },
+  "06FR033": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "death",
+          "actions": [
+            {
+              "type": "emptyManaGem",
+              "condition": null
+            }
+          ],
+          "auto": false
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.991Z"
   },
   "06FR036": {
     "status": "auto",
@@ -5205,8 +5566,31 @@
     },
     "updatedAt": "2026-10-26T00:23:30.995Z"
   },
-  "06IO013": {
+  "06IO003": {
     "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "play",
+          "actions": [
+            {
+              "type": "stun",
+              "target": {
+                "type": "enemyUnit",
+                "count": 1,
+                "filter": {}
+              },
+              "condition": null
+            }
+          ],
+          "auto": false
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.991Z"
+  },
+  "06IO013": {
+    "status": "curated",
     "script": {
       "triggers": [
         {
@@ -5217,25 +5601,122 @@
               "power": 2,
               "health": 0,
               "duration": "round",
-              "target": {
-                "type": "allyUnit",
-                "count": 1,
-                "filter": {}
-              },
-              "condition": null
+              "target": "allyUnit"
             },
             {
               "type": "create",
               "cardId": "06IO013T1",
               "count": 1,
-              "destination": "hand",
-              "condition": null
+              "destination": "hand"
             }
           ]
         }
       ]
     },
-    "updatedAt": "2026-10-26T00:23:30.995Z"
+    "updatedAt": "2026-10-27T02:02:29.519Z",
+    "verification": {
+      "version": 1,
+      "cardTextHash": "8a6622a874b163074befb9c46721cb4487f5ecab0640df6884c1f0378405ad89",
+      "verifiedAt": "2026-10-27T00:00:00.000Z",
+      "verifiedBy": "agent",
+      "test": "test/starter-vanguard.test.mjs#wuju-style-grants-2-power-and-creates-meditate-in-hand",
+      "clauses": [
+        "Give an ally +2|+0 this round.",
+        "Create a Meditate in hand."
+      ],
+      "notes": ""
+    }
+  },
+  "06IO036": {
+    "script": {
+      "triggers": [
+        {
+          "on": "play",
+          "actions": [
+            {
+              "type": "choose",
+              "prompt": "Choose a card for Ionian Tellstones",
+              "options": [
+                {
+                  "id": "06IO005",
+                  "label": "Gruesome Theater",
+                  "actions": [
+                    {
+                      "type": "create",
+                      "cardId": "06IO005",
+                      "fleeting": true
+                    }
+                  ]
+                },
+                {
+                  "id": "01IO001",
+                  "label": "Ritual of Renewal",
+                  "actions": [
+                    {
+                      "type": "create",
+                      "cardId": "01IO001",
+                      "fleeting": true
+                    }
+                  ]
+                },
+                {
+                  "id": "01IO010",
+                  "label": "Stand United",
+                  "actions": [
+                    {
+                      "type": "create",
+                      "cardId": "01IO010",
+                      "fleeting": true
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "status": "curated",
+    "updatedAt": "2026-10-27T06:29:03.629Z",
+    "verification": {
+      "version": 1,
+      "cardTextHash": "9cd1de47cfba9b02c55e39fda2f4404e3d83809337b93566bbe70da0ced141fd",
+      "verifiedAt": "2026-10-27T00:00:00.000Z",
+      "verifiedBy": "audit-resume",
+      "test": "test/choices.test.mjs#tellstones-every-branch-creates-only-the-selected-fleeting-card",
+      "clauses": [
+        "Create a Fleeting Gruesome Theater, Ritual of Renewal, or Stand United in hand."
+      ],
+      "notes": "Verifies the printed creation effect only. Generated cards have separate implementation gaps tracked in docs/scripts/blocked.md."
+    }
+  },
+  "06MT044": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "play",
+          "actions": [
+            {
+              "type": "buff",
+              "power": 0,
+              "health": 2,
+              "duration": "round",
+              "target": {
+                "type": "allOtherAllyUnits",
+                "filter": {}
+              },
+              "condition": null
+            }
+          ],
+          "condition": {
+            "type": "daybreak"
+          },
+          "auto": false
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.991Z"
   },
   "06PZ006": {
     "status": "auto",
@@ -5325,6 +5806,27 @@
       ]
     },
     "updatedAt": "2026-10-26T00:23:30.996Z"
+  },
+  "06SI026": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "death",
+          "actions": [
+            {
+              "type": "create",
+              "cardId": "06SI009",
+              "count": 1,
+              "destination": "hand",
+              "condition": null
+            }
+          ],
+          "auto": false
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.993Z"
   },
   "06SI036": {
     "status": "auto",
@@ -5459,6 +5961,32 @@
     },
     "updatedAt": "2026-10-26T00:23:30.998Z"
   },
+  "07FR017": {
+    "status": "auto",
+    "script": {
+      "triggers": [
+        {
+          "on": "play",
+          "actions": [
+            {
+              "type": "damageAll",
+              "team": "ally",
+              "amount": 2,
+              "condition": null
+            },
+            {
+              "type": "damageAll",
+              "team": "enemy",
+              "amount": 2,
+              "condition": null
+            }
+          ],
+          "auto": false
+        }
+      ]
+    },
+    "updatedAt": "2026-10-26T00:23:30.999Z"
+  },
   "07IO009": {
     "status": "auto",
     "script": {
@@ -5591,32 +6119,6 @@
       ]
     },
     "updatedAt": "2026-10-26T00:23:30.998Z"
-  },
-  "07FR017": {
-    "status": "auto",
-    "script": {
-      "triggers": [
-        {
-          "on": "play",
-          "actions": [
-            {
-              "type": "damageAll",
-              "team": "ally",
-              "amount": 2,
-              "condition": null
-            },
-            {
-              "type": "damageAll",
-              "team": "enemy",
-              "amount": 2,
-              "condition": null
-            }
-          ],
-          "auto": false
-        }
-      ]
-    },
-    "updatedAt": "2026-10-26T00:23:30.999Z"
   },
   "08FR002": {
     "status": "auto",
@@ -5942,7 +6444,7 @@
         }
       ]
     },
-    "status": "manual",
+    "status": "custom",
     "updatedAt": "2026-10-26T01:03:45.486Z"
   }
 }

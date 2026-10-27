@@ -1,0 +1,129 @@
+{
+  "batch": "2026-10-27-choice-create-01",
+  "cards": {
+    "06DE042": {
+      "status": "curated",
+      "script": {
+        "triggers": [
+          {
+            "on": "play",
+            "actions": [
+              {
+                "type": "choose",
+                "prompt": "Choose a card for Demacian Tellstones",
+                "options": [
+                  {
+                    "id": "01DE032",
+                    "label": "Prismatic Barrier",
+                    "actions": [
+                      {
+                        "type": "create",
+                        "cardId": "01DE032",
+                        "fleeting": true
+                      }
+                    ]
+                  },
+                  {
+                    "id": "01DE025",
+                    "label": "Detain",
+                    "actions": [
+                      {
+                        "type": "create",
+                        "cardId": "01DE025",
+                        "fleeting": true
+                      }
+                    ]
+                  },
+                  {
+                    "id": "01DE035",
+                    "label": "For Demacia!",
+                    "actions": [
+                      {
+                        "type": "create",
+                        "cardId": "01DE035",
+                        "fleeting": true
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "verification": {
+        "version": 1,
+        "cardTextHash": "61cc70eaa58d1647e7f691edf4c049a58e9c5f0bd7802c9600bc40e8e7da34aa",
+        "verifiedAt": "2026-10-27T00:00:00.000Z",
+        "verifiedBy": "audit-resume",
+        "test": "test/choices.test.mjs#tellstones-every-branch-creates-only-the-selected-fleeting-card",
+        "clauses": [
+          "Create a Fleeting Prismatic Barrier, Detain, or For Demacia! in hand."
+        ],
+        "notes": "Verifies the printed creation effect only. Generated cards have separate implementation gaps tracked in docs/scripts/blocked.md."
+      }
+    },
+    "06IO036": {
+      "status": "curated",
+      "script": {
+        "triggers": [
+          {
+            "on": "play",
+            "actions": [
+              {
+                "type": "choose",
+                "prompt": "Choose a card for Ionian Tellstones",
+                "options": [
+                  {
+                    "id": "06IO005",
+                    "label": "Gruesome Theater",
+                    "actions": [
+                      {
+                        "type": "create",
+                        "cardId": "06IO005",
+                        "fleeting": true
+                      }
+                    ]
+                  },
+                  {
+                    "id": "01IO001",
+                    "label": "Ritual of Renewal",
+                    "actions": [
+                      {
+                        "type": "create",
+                        "cardId": "01IO001",
+                        "fleeting": true
+                      }
+                    ]
+                  },
+                  {
+                    "id": "01IO010",
+                    "label": "Stand United",
+                    "actions": [
+                      {
+                        "type": "create",
+                        "cardId": "01IO010",
+                        "fleeting": true
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "verification": {
+        "version": 1,
+        "cardTextHash": "9cd1de47cfba9b02c55e39fda2f4404e3d83809337b93566bbe70da0ced141fd",
+        "verifiedAt": "2026-10-27T00:00:00.000Z",
+        "verifiedBy": "audit-resume",
+        "test": "test/choices.test.mjs#tellstones-every-branch-creates-only-the-selected-fleeting-card",
+        "clauses": [
+          "Create a Fleeting Gruesome Theater, Ritual of Renewal, or Stand United in hand."
+        ],
+        "notes": "Verifies the printed creation effect only. Generated cards have separate implementation gaps tracked in docs/scripts/blocked.md."
+      }
+    }
+  }
+}

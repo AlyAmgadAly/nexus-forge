@@ -11,6 +11,7 @@ import { dispatchClientMessage } from '../server/dispatch.js';
 import { startNexusService } from '../server/service.js';
 import { APP_VERSION, PROTOCOL_VERSION } from '../shared/protocol.js';
 import { randomDeck } from '../server/decks.js';
+import { cardTextHash } from '../server/script-metadata.js';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const SEED = path.join(ROOT, 'data');
@@ -290,14 +291,57 @@ test('desktop service binds loopback, serves shared modules, and stops cleanly',
   // A Card Forge card uses an arbitrary id, so the deck must still save even
   // though Riot deck-code encoding cannot represent it.
   const adminHeaders = { 'content-type': 'application/json', 'x-admin-token': service.store.adminToken };
+  const adminStats = await (await fetch(`${service.url}/api/admin/stats`, {
+    headers: { 'x-admin-token': service.store.adminToken },
+  })).json();
+  assert.equal(adminStats.textCards, 1552);
+  const expectedStats = service.store.cardDB.stats();
+  assert.equal(adminStats.scriptedWithText, expectedStats.scriptedText);
+  assert.equal(adminStats.coverage, Math.round(expectedStats.coverage * 1000) / 10);
+  assert.equal(adminStats.verified, expectedStats.verified);
+  assert.equal(adminStats.verifiedCoverage, Math.round(expectedStats.verifiedCoverage * 1000) / 10);
+  assert.deepEqual(adminStats.statusCounts, expectedStats.byStatus);
+
   const custom = await fetch(`${service.url}/api/admin/cards`, {
     method: 'POST',
     headers: adminHeaders,
     body: JSON.stringify({
       id: 'C343DC2', name: 'Saved Custom', type: 'Unit', cost: 1, attack: 1, health: 1, regions: ['Runeterra'],
+      text: 'Play: Draw 1.',
     }),
   });
   assert.equal(custom.status, 201);
+
+  // The admin script API accepts and returns verification metadata, and the
+  // store fills the normalized card-text hash.
+  const verifiedScript = {
+    triggers: [{ on: 'play', actions: [{ type: 'draw', amount: 1 }] }],
+  };
+  const scriptPut = await fetch(`${service.url}/api/admin/scripts/C343DC2`, {
+    method: 'PUT',
+    headers: adminHeaders,
+    body: JSON.stringify({
+      status: 'curated',
+      script: verifiedScript,
+      verification: {
+        version: 1,
+        verifiedAt: '2026-10-27T00:00:00.000Z',
+        verifiedBy: 'test',
+        test: 'test/multiplayer.test.mjs#service',
+        clauses: ['Play: Draw 1.'],
+      },
+    }),
+  });
+  assert.equal(scriptPut.status, 200);
+  const scriptBody = await scriptPut.json();
+  assert.equal(scriptBody.entry.status, 'curated');
+  assert.equal(scriptBody.entry.verification.cardTextHash, cardTextHash('Play: Draw 1.'));
+  assert.equal(scriptBody.card.scriptStatus, 'curated');
+  const scriptGet = await (await fetch(`${service.url}/api/admin/scripts/C343DC2`, {
+    headers: { 'x-admin-token': service.store.adminToken },
+  })).json();
+  assert.equal(scriptGet.entry.verification.test, 'test/multiplayer.test.mjs#service');
+  assert.deepEqual(scriptGet.entry.script, verifiedScript);
   const auto = await (await fetch(`${service.url}/api/decks/auto`, {
     method: 'POST',
     headers: { 'content-type': 'application/json' },

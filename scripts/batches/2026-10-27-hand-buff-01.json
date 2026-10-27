@@ -1,0 +1,40 @@
+{
+  "batch": "2026-10-27-hand-buff-01",
+  "cards": {
+    "01IO026": {
+      "status": "curated",
+      "script": {
+        "triggers": [
+          {
+            "on": "play",
+            "actions": [
+              {
+                "type": "buff",
+                "power": 1,
+                "health": 0,
+                "duration": "permanent",
+                "target": {
+                  "type": "handCard",
+                  "filter": {
+                    "type": "Unit"
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "verification": {
+        "version": 1,
+        "cardTextHash": "136b9397f14205cc11058455b7f1b72772bb2a5a8628be98b8fef7d9c9ccb1f7",
+        "verifiedAt": "2026-10-27T00:00:00.000Z",
+        "verifiedBy": "agent",
+        "test": "test/starter-vanguard.test.mjs#inspiring-mentor-grants-hand-ally-1-power",
+        "clauses": [
+          "Play: Grant an ally in hand +1|+0."
+        ],
+        "notes": ""
+      }
+    }
+  }
+}

@@ -1,0 +1,249 @@
+{
+  "batch": "2026-10-27-vanguard-buffs-01",
+  "cards": {
+    "01DE012": {
+      "status": "curated",
+      "script": {
+        "triggers": [
+          {
+            "on": "summon",
+            "actions": [
+              {
+                "type": "buff",
+                "power": 1,
+                "health": 1,
+                "duration": "round",
+                "target": "allOtherAllyUnits"
+              }
+            ]
+          }
+        ]
+      },
+      "verification": {
+        "version": 1,
+        "cardTextHash": "b8615bfd5164e7aec6a30c08a92233477fa65bc2601274cb057e680ec0970bdb",
+        "verifiedAt": "2026-10-27T00:00:00.000Z",
+        "verifiedBy": "agent",
+        "test": "test/starter-vanguard.test.mjs#garen-summon-gives-other-allies-1-1-this-round",
+        "clauses": [
+          "When I'm summoned, give other allies +1|+1 this round."
+        ],
+        "notes": ""
+      }
+    },
+    "01DE018": {
+      "status": "curated",
+      "script": {
+        "triggers": [
+          {
+            "on": "play",
+            "actions": [
+              {
+                "type": "buff",
+                "power": 1,
+                "health": 1,
+                "duration": "round",
+                "target": "allyUnit"
+              }
+            ]
+          }
+        ]
+      },
+      "verification": {
+        "version": 1,
+        "cardTextHash": "b42a937f0b43f96606898c308733b67d1d3e0142a437b26a2556080a23241ade",
+        "verifiedAt": "2026-10-27T00:00:00.000Z",
+        "verifiedBy": "agent",
+        "test": "test/starter-vanguard.test.mjs#radiant-strike-grants-an-ally-1-1-this-round",
+        "clauses": [
+          "Give an ally +1|+1 this round."
+        ],
+        "notes": ""
+      }
+    },
+    "01DE029": {
+      "status": "curated",
+      "script": {
+        "triggers": [
+          {
+            "on": "summonOther",
+            "actions": [
+              {
+                "type": "grantKeyword",
+                "keyword": "Challenger",
+                "duration": "permanent",
+                "target": "self"
+              }
+            ]
+          }
+        ]
+      },
+      "verification": {
+        "version": 1,
+        "cardTextHash": "13cf841e62324130768a44e93e96997931107597c5ece60671f2a48255f7269e",
+        "verifiedAt": "2026-10-27T00:00:00.000Z",
+        "verifiedBy": "agent",
+        "test": "test/starter-vanguard.test.mjs#fleetfeather-tracker-summoning-another-ally-grants-challenger",
+        "clauses": [
+          "When you summon another ally, grant me Challenger."
+        ],
+        "notes": ""
+      }
+    },
+    "01IO017": {
+      "status": "curated",
+      "script": {
+        "triggers": [
+          {
+            "on": "summon",
+            "actions": [
+              {
+                "type": "grantKeyword",
+                "keyword": "Elusive",
+                "duration": "round",
+                "target": "self"
+              }
+            ]
+          }
+        ]
+      },
+      "verification": {
+        "version": 1,
+        "cardTextHash": "b19d1699b380059f8c6d526551d8dfe574f1847964619c2b58b9da05850772e1",
+        "verifiedAt": "2026-10-27T00:00:00.000Z",
+        "verifiedBy": "agent",
+        "test": "test/starter-vanguard.test.mjs#navori-bladescout-summon-grants-elusive-this-round",
+        "clauses": [
+          "When I'm summoned, give me Elusive this round."
+        ],
+        "notes": ""
+      }
+    },
+    "01IO042": {
+      "status": "curated",
+      "script": {
+        "triggers": [
+          {
+            "on": "summonOther",
+            "actions": [
+              {
+                "type": "buff",
+                "power": 1,
+                "health": 1,
+                "duration": "round",
+                "target": "self"
+              }
+            ]
+          }
+        ]
+      },
+      "verification": {
+        "version": 1,
+        "cardTextHash": "29248f87d5558eaafabb3cb81bd9e0f2cf77ec50b88b6c9e67936c577180c4c3",
+        "verifiedAt": "2026-10-27T00:00:00.000Z",
+        "verifiedBy": "agent",
+        "test": "test/starter-vanguard.test.mjs#sparring-student-summoning-another-ally-grants-1-1-this-round",
+        "clauses": [
+          "When you summon another ally, give me +1|+1 this round."
+        ],
+        "notes": ""
+      }
+    },
+    "02DE007": {
+      "status": "curated",
+      "script": {
+        "triggers": [
+          {
+            "on": "play",
+            "actions": [
+              {
+                "type": "grantKeyword",
+                "keyword": "Tough",
+                "duration": "round",
+                "target": "allAllyUnits"
+              }
+            ]
+          }
+        ]
+      },
+      "verification": {
+        "version": 1,
+        "cardTextHash": "5d46f1e67d2852292badd86a47a21164c433763566637f869247c5db862f3444",
+        "verifiedAt": "2026-10-27T00:00:00.000Z",
+        "verifiedBy": "agent",
+        "test": "test/starter-vanguard.test.mjs#rangers-resolve-grants-allies-tough-this-round",
+        "clauses": [
+          "Give allies Tough this round."
+        ],
+        "notes": ""
+      }
+    },
+    "04DE006": {
+      "status": "curated",
+      "script": {
+        "triggers": [
+          {
+            "on": "play",
+            "actions": [
+              {
+                "type": "buff",
+                "power": 1,
+                "health": 1,
+                "duration": "permanent",
+                "target": "allyUnit"
+              }
+            ]
+          }
+        ]
+      },
+      "verification": {
+        "version": 1,
+        "cardTextHash": "efd0a73b3231bfab66f4e1fd0f93ebfa8d100fd69a7fc2b14eddf7af45bd4e0a",
+        "verifiedAt": "2026-10-27T00:00:00.000Z",
+        "verifiedBy": "agent",
+        "test": "test/starter-vanguard.test.mjs#battlefield-prowess-grants-an-ally-1-1-permanently",
+        "clauses": [
+          "Grant an ally +1|+1."
+        ],
+        "notes": ""
+      }
+    },
+    "06IO013": {
+      "status": "curated",
+      "script": {
+        "triggers": [
+          {
+            "on": "play",
+            "actions": [
+              {
+                "type": "buff",
+                "power": 2,
+                "health": 0,
+                "duration": "round",
+                "target": "allyUnit"
+              },
+              {
+                "type": "create",
+                "cardId": "06IO013T1",
+                "count": 1,
+                "destination": "hand"
+              }
+            ]
+          }
+        ]
+      },
+      "verification": {
+        "version": 1,
+        "cardTextHash": "8a6622a874b163074befb9c46721cb4487f5ecab0640df6884c1f0378405ad89",
+        "verifiedAt": "2026-10-27T00:00:00.000Z",
+        "verifiedBy": "agent",
+        "test": "test/starter-vanguard.test.mjs#wuju-style-grants-2-power-and-creates-meditate-in-hand",
+        "clauses": [
+          "Give an ally +2|+0 this round.",
+          "Create a Meditate in hand."
+        ],
+        "notes": ""
+      }
+    }
+  }
+}

@@ -29,5 +29,8 @@ jobs:
       - name: Check JavaScript syntax
         run: npm run check:syntax
 
+      - name: Lint card scripts
+        run: npm run scripts:lint
+
       - name: Run automated tests
         run: npm test

@@ -131,6 +131,15 @@ body.collection-mode { overflow: hidden; background: #262426; }
 .builder-row-art { position: absolute; inset: 0 28px 0 auto; width: 85%; height: 100%; object-fit: cover; object-position: center 34%; z-index: -2; }
 .builder-deck-row::before { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, #16272d 7%, #1b292bd9 35%, #17242b55 75%, #11182055); z-index: -1; }
 .builder-deck-row[data-rarity='Epic'] { border-color: #9584ce; }.builder-deck-row[data-rarity='Champion'] { border-color: #d4a64d; }
+.builder-deck-row[data-card-type='unit'] { border-color: #9a83c9; background: #211f31; box-shadow: 0 0 0 2px #24203b, 0 2px 5px #0005; }
+.builder-deck-row[data-card-type='unit']::before { background: linear-gradient(90deg, #242039 7%, #292442d9 35%, #27213b55 75%, #17152255); }
+.builder-deck-row[data-card-type='unit'] .builder-row-cost { border-color: #b8a9df; background: radial-gradient(circle at 35% 20%, #527cac, #153e68 55%, #092440); }
+.builder-deck-row[data-card-type='champion'] { border-color: #e0b85e; background: #30271b; box-shadow: 0 0 0 2px #40321d, 0 2px 5px #0005; }
+.builder-deck-row[data-card-type='champion']::before { background: linear-gradient(90deg, #302719 7%, #3a2e1bd9 35%, #33271455 75%, #1d180f55); }
+.builder-deck-row[data-card-type='champion'] .builder-row-cost { border-color: #f0d48a; border-radius: 0; clip-path: polygon(50% 0, 93% 24%, 93% 76%, 50% 100%, 7% 76%, 7% 24%); background: radial-gradient(circle at 35% 20%, #527da2, #174564 55%, #082a43); text-shadow: 0 2px 2px #000, 0 0 3px #e9c569; }
+.builder-deck-row[data-card-type='spell'] { border-color: #cb834c; background: #30231f; box-shadow: 0 0 0 2px #40271e, 0 2px 5px #0005; }
+.builder-deck-row[data-card-type='spell']::before { background: linear-gradient(90deg, #33231e 7%, #3c2921d9 35%, #37251e55 75%, #21171355); }
+.builder-deck-row[data-card-type='spell'] .builder-row-cost { border-color: #dfa06b; background: radial-gradient(circle at 35% 20%, #9b694d, #653b2d 55%, #35231f); }
 .builder-deck-row:hover, .builder-deck-row:focus-visible { filter: brightness(1.2); outline: 2px solid #78d4e2; outline-offset: 2px; }
 .builder-row-cost { display: grid; place-items: center; width: 52px; height: 52px; margin-left: -10px; border: 3px solid #cab780; border-radius: 50%; background: radial-gradient(circle at 35% 20%, #396a92, #033a52 55%, #001f32); box-shadow: inset 0 0 0 3px #a5d7db66, 0 2px 2px #0008; font: bold 30px Georgia, serif; }
 .builder-row-name { min-width: 0; padding: 0 9px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; text-shadow: 0 2px 2px #000; font: bold clamp(16px, 1.55vw, 30px) Georgia, serif; }

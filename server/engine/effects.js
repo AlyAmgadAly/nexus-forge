@@ -3,35 +3,16 @@
 //   { triggers: [{ on: "play", condition: {...}, actions: [{ type: "damage", amount: 2, target: "enemyUnit" }] }] }
 // Targets are resolved lazily. Top-level plays can prompt the controller; triggers auto-resolve.
 import { canonicalKeyword, clamp } from './constants.js';
-
-const CHOICE_TARGETS = new Set([
-  'allyUnit', 'otherAllyUnit', 'enemyUnit', 'anyUnit', 'chosenUnit', 'chosenAlly', 'chosenEnemy',
-  'anyNexus', 'anyTarget', 'allyChampion', 'enemyChampion', 'allyFollower', 'enemyFollower',
-  'allyLandmark', 'enemyLandmark', 'handCard', 'deckChoice', 'allyEquipment', 'enemyEquipment',
-]);
-
-const AUTO_TARGETS = new Set([
-  'self', 'owner', 'allyNexus', 'enemyNexus', 'strongestAlly', 'weakestAlly', 'strongestEnemy',
-  'weakestEnemy', 'randomAllyUnit', 'randomEnemyUnit', 'randomUnit', 'randomOtherAllyUnit',
-  'allAllyUnits', 'allEnemyUnits', 'allUnits', 'allOtherAllyUnits', 'allOtherEnemyUnits',
-  'allAttackingUnits', 'allDefendingUnits', 'allBattlingUnits', 'allDamagedAllyUnits',
-  'allDamagedEnemyUnits', 'allChampionAllies', 'allChampionEnemies', 'attacker', 'blocker',
-  'strikeTarget', 'topDeck', 'bottomDeck', 'none',
-]);
+import { CHOICE_TARGETS, EVENTS } from '../../shared/script-vocabulary.js';
 
 export function targetNeedsChoice(type) {
-  return CHOICE_TARGETS.has(type) || (!AUTO_TARGETS.has(type) && type !== 'allAllies' && type !== 'allEnemies');
+  return CHOICE_TARGETS.has(type);
 }
 
 export function normalizeTarget(spec) {
   if (!spec) return { type: 'none', count: 1, filter: {} };
   if (typeof spec === 'string') return { type: spec, count: 1, filter: {} };
   return { type: spec.type || 'none', count: spec.count ?? 1, filter: spec.filter || {}, prompt: spec.prompt };
-}
-
-export function getTriggerEntries(script, event) {
-  if (!script?.triggers) return [];
-  return script.triggers.filter((t) => t.on === event);
 }
 
 function matchesFilter(game, unit, filter = {}) {
@@ -53,6 +34,7 @@ function matchesFilter(game, unit, filter = {}) {
   if (filter.damaged === false && unit.damage > 0) return false;
   if (filter.region && !(unit.card?.regions || []).includes(filter.region)) return false;
   if (filter.subtype && !(unit.card?.subtypes || []).includes(filter.subtype)) return false;
+  if (filter.supertype && unit.card?.supertype !== filter.supertype) return false;
   if (filter.excludeSource && unit === filter.excludeSource) return false;
   if (filter.excludeUid && unit.uid === filter.excludeUid) return false;
   if (filter.champion === true && unit.card?.supertype !== 'Champion') return false;
@@ -76,18 +58,36 @@ export function targetOptions(game, rawSpec, ctx = {}) {
   const allyUnits = () => game.unitsOnTeam(team).filter((u) => !u.isLandmark || spec.type.includes('Landmark'));
   const enemyUnits = () => game.unitsOnTeam(enemyTeam).filter((u) => !u.isLandmark || spec.type.includes('Landmark'));
   switch (spec.type) {
+    case 'none': return [];
     case 'self': return ctx.source ? [{ id: `u:${ctx.source.uid}`, kind: 'unit', label: ctx.source.name, uid: ctx.source.uid }] : [];
     case 'attacker': return ctx.combat?.attacker ? [{ id: `u:${ctx.combat.attacker.uid}`, kind: 'unit', label: ctx.combat.attacker.name, uid: ctx.combat.attacker.uid }] : [];
     case 'blocker': return ctx.combat?.blocker ? [{ id: `u:${ctx.combat.blocker.uid}`, kind: 'unit', label: ctx.combat.blocker.name, uid: ctx.combat.blocker.uid }] : [];
     case 'strikeTarget': return ctx.combat?.target ? [{ id: `u:${ctx.combat.target.uid}`, kind: 'unit', label: ctx.combat.target.name, uid: ctx.combat.target.uid }] : [];
+    case 'supporter': return ctx.supporter ? [{ id: `u:${ctx.supporter.uid}`, kind: 'unit', label: ctx.supporter.name, uid: ctx.supporter.uid }] : [];
+    case 'supported': return ctx.supported ? [{ id: `u:${ctx.supported.uid}`, kind: 'unit', label: ctx.supported.name, uid: ctx.supported.uid }] : [];
     case 'allyNexus': return [{ id: `n:${team}`, kind: 'nexus', team, label: 'Your Nexus' }];
     case 'enemyNexus': return [{ id: `n:${enemyTeam}`, kind: 'nexus', team: enemyTeam, label: 'Enemy Nexus' }];
     case 'anyNexus': return [{ id: `n:${team}`, kind: 'nexus', team, label: 'Your Nexus' }, { id: `n:${enemyTeam}`, kind: 'nexus', team: enemyTeam, label: 'Enemy Nexus' }];
     case 'anyTarget': return [...targetOptions(game, 'anyUnit', ctx), ...targetOptions(game, 'anyNexus', ctx)];
+    case 'allyTarget': {
+      allyUnits().forEach(addUnit);
+      addNexus(team, 'Your Nexus');
+      break;
+    }
     case 'allyUnit': allyUnits().forEach(addUnit); break;
     case 'otherAllyUnit': allyUnits().filter((u) => u !== ctx.source).forEach(addUnit); break;
     case 'enemyUnit': enemyUnits().forEach(addUnit); break;
     case 'anyUnit': [...allyUnits(), ...enemyUnits()].forEach(addUnit); break;
+    case 'randomAllyUnit': allyUnits().forEach(addUnit); break;
+    case 'randomOtherAllyUnit': allyUnits().filter((u) => u !== ctx.source).forEach(addUnit); break;
+    case 'randomEnemyUnit': enemyUnits().forEach(addUnit); break;
+    case 'randomUnit': [...allyUnits(), ...enemyUnits()].forEach(addUnit); break;
+    case 'strongestAlly':
+    case 'weakestAlly':
+      return allyUnits().filter((u) => matchesFilter(game, u, filter)).map((u) => ({ id: `u:${u.uid}`, kind: 'unit', label: u.name, uid: u.uid }));
+    case 'strongestEnemy':
+    case 'weakestEnemy':
+      return enemyUnits().filter((u) => matchesFilter(game, u, filter)).map((u) => ({ id: `u:${u.uid}`, kind: 'unit', label: u.name, uid: u.uid }));
     case 'allyChampion': allyUnits().filter((u) => u.card?.supertype === 'Champion').forEach(addUnit); break;
     case 'enemyChampion': enemyUnits().filter((u) => u.card?.supertype === 'Champion').forEach(addUnit); break;
     case 'allyFollower': allyUnits().filter((u) => u.card?.supertype !== 'Champion').forEach(addUnit); break;
@@ -108,7 +108,11 @@ export function targetOptions(game, rawSpec, ctx = {}) {
     case 'allOtherAllyUnits': return allyUnits().filter((u) => u !== ctx.source && matchesFilter(game, u, filter)).map((u) => ({ id: `u:${u.uid}`, kind: 'unit', label: u.name, uid: u.uid }));
     case 'allEnemyUnits': return enemyUnits().filter((u) => matchesFilter(game, u, filter)).map((u) => ({ id: `u:${u.uid}`, kind: 'unit', label: u.name, uid: u.uid }));
     case 'allOtherEnemyUnits': return enemyUnits().filter((u) => u !== ctx.source && matchesFilter(game, u, filter)).map((u) => ({ id: `u:${u.uid}`, kind: 'unit', label: u.name, uid: u.uid }));
-    case 'allUnits': return [...game.unitsOnTeam('A'), ...game.unitsOnTeam('B')].filter((u) => matchesFilter(game, u, filter)).map((u) => ({ id: `u:${u.uid}`, kind: 'unit', label: u.name, uid: u.uid }));
+    case 'allUnits': return [...game.unitsOnTeam(team), ...game.unitsOnTeam(enemyTeam)].filter((u) => !u.isLandmark && matchesFilter(game, u, filter)).map((u) => ({ id: `u:${u.uid}`, kind: 'unit', label: u.name, uid: u.uid }));
+    case 'allDamagedAllyUnits': return allyUnits().filter((u) => u.damage > 0 && matchesFilter(game, u, filter)).map((u) => ({ id: `u:${u.uid}`, kind: 'unit', label: u.name, uid: u.uid }));
+    case 'allDamagedEnemyUnits': return enemyUnits().filter((u) => u.damage > 0 && matchesFilter(game, u, filter)).map((u) => ({ id: `u:${u.uid}`, kind: 'unit', label: u.name, uid: u.uid }));
+    case 'allChampionAllies': return allyUnits().filter((u) => u.card?.supertype === 'Champion' && matchesFilter(game, u, filter)).map((u) => ({ id: `u:${u.uid}`, kind: 'unit', label: u.name, uid: u.uid }));
+    case 'allChampionEnemies': return enemyUnits().filter((u) => u.card?.supertype === 'Champion' && matchesFilter(game, u, filter)).map((u) => ({ id: `u:${u.uid}`, kind: 'unit', label: u.name, uid: u.uid }));
     case 'allBattlingUnits': {
       const list = [...(ctx.combat ? [ctx.combat.attacker, ctx.combat.blocker].filter(Boolean) : [])];
       return list.map((u) => ({ id: `u:${u.uid}`, kind: 'unit', label: u.name, uid: u.uid }));
@@ -116,8 +120,11 @@ export function targetOptions(game, rawSpec, ctx = {}) {
     case 'allAttackingUnits': return (ctx.combat?.attackers || []).map((u) => ({ id: `u:${u.uid}`, kind: 'unit', label: u.name, uid: u.uid }));
     case 'allDefendingUnits': return (ctx.combat?.blockers || []).map((u) => ({ id: `u:${u.uid}`, kind: 'unit', label: u.name, uid: u.uid }));
     default:
-      // Fall back to all units for unknown explicit target types, useful for custom cards.
-      [...allyUnits(), ...enemyUnits()].forEach(addUnit);
+      // Never silently broaden an unknown target to both boards. Semantic lint
+      // rejects these before a script reaches the engine; this is the last line
+      // of defence for hand-edited or peer-supplied data.
+      game.log(`Unknown target type "${spec.type}" — effect has no targets.`, 'error');
+      return [];
   }
   return opts;
 }
@@ -134,10 +141,14 @@ export function autoTargetIds(game, rawSpec, ctx) {
     case 'attacker': return ctx.combat?.attacker ? [`u:${ctx.combat.attacker.uid}`] : [];
     case 'blocker': return ctx.combat?.blocker ? [`u:${ctx.combat.blocker.uid}`] : [];
     case 'strikeTarget': return ctx.combat?.target ? [`u:${ctx.combat.target.uid}`] : [];
+    case 'supporter': return ctx.supporter ? [`u:${ctx.supporter.uid}`] : [];
+    case 'supported': return ctx.supported ? [`u:${ctx.supported.uid}`] : [];
     case 'allyNexus': return [`n:${team}`];
     case 'enemyNexus': return [`n:${enemyTeam}`];
     case 'anyNexus': return [`n:${enemyTeam}`];
     case 'allAllyUnits': case 'allOtherAllyUnits': case 'allEnemyUnits': case 'allOtherEnemyUnits': case 'allUnits':
+    case 'allDamagedAllyUnits': case 'allDamagedEnemyUnits':
+    case 'allChampionAllies': case 'allChampionEnemies':
       return opts.map((o) => o.id);
     case 'allBattlingUnits': case 'allAttackingUnits': case 'allDefendingUnits':
       return opts.map((o) => o.id);
@@ -186,6 +197,41 @@ export function resolveEntity(game, id) {
     }
   }
   return null;
+}
+
+function matchesCardFilter(game, card, filter = {}) {
+  if (!card) return false;
+  const type = filter.type;
+  if (type && type !== 'any') {
+    if (type === 'champion') {
+      if (card.supertype !== 'Champion') return false;
+    } else if (type === 'follower') {
+      if (card.type !== 'Unit' || card.supertype === 'Champion') return false;
+    } else if (type === 'landmark') {
+      if (card.type !== 'Landmark') return false;
+    } else if (type === 'equipment') {
+      if (card.type !== 'Equipment') return false;
+    } else if (type === 'unit') {
+      if (card.type !== 'Unit' && card.type !== 'Champion') return false;
+    } else if (type === 'spell') {
+      if (card.type !== 'Spell') return false;
+    } else if (card.type !== type) {
+      return false;
+    }
+  }
+  if (filter.region && !(card.regions || []).includes(filter.region)) return false;
+  if (filter.subtype && !(card.subtypes || []).includes(filter.subtype)) return false;
+  if (filter.supertype && card.supertype !== filter.supertype) return false;
+  if (filter.keyword) {
+    const key = canonicalKeyword(filter.keyword);
+    const keywords = (card.keywords || []).map(canonicalKeyword);
+    const escaped = String(filter.keyword).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const textMatch = new RegExp(`\\b${escaped}\\b`, 'i').test(card.text || '');
+    if (!keywords.includes(key) && !textMatch) return false;
+  }
+  if (filter.minCost != null && (card.cost ?? 0) < filter.minCost) return false;
+  if (filter.maxCost != null && (card.cost ?? 0) > filter.maxCost) return false;
+  return true;
 }
 
 export function evalCondition(game, condition, ctx = {}) {
@@ -244,6 +290,11 @@ export function evalCondition(game, condition, ctx = {}) {
     }
     case 'allyDiedThisRound': return (game.teams[team].alliesDiedThisRound || 0) > 0;
     case 'unitsDiedThisRound': return (game.teams[team].unitsDiedThisRound || 0) > 0;
+    case 'cardsPlayedThisRound': return cmp(game.teams[team].cardsPlayedThisRound || 0, c.op || '>=', c.value ?? 1);
+    case 'cardsDrawnThisRound': return cmp(controller.stats.cardsDrawnThisRound || 0, c.op || '>=', c.value ?? 1);
+    case 'cardsDrawnInARoundThisGame': return cmp(controller.stats.maxCardsDrawnInRound || 0, c.op || '>=', c.value ?? 1);
+    case 'damageTakenThisRound': return cmp(game.teams[team].damageTakenThisRound || 0, c.op || '>=', c.value ?? 1);
+    case 'damageDealtThisRound': return cmp(game.teams[team].damageDealtThisRound || 0, c.op || '>=', c.value ?? 1);
     case 'spellsPlayedThisRound': return cmp(game.teams[team].spellsPlayedThisRound || 0, c.op || '>=', c.value ?? 1);
     case 'spellsPlayedThisGame': return cmp(controller.stats.spellsPlayed || 0, c.op || '>=', c.value ?? 1);
     case 'manaSpentOnSpellsThisGame': return cmp(controller.stats.spellManaSpent || 0, c.op || '>=', c.value ?? 0);
@@ -260,9 +311,61 @@ export function evalCondition(game, condition, ctx = {}) {
     case 'sourceLeveled': return !!source?.leveled;
     case 'targetChampion': return ctx.target?.card?.supertype === 'Champion';
     case 'event': return c.value == null || ctx.event === c.value;
-    case 'firstTimeThisRound': return !controller.flags?.[c.flag || 'firstTime'];
-    case 'custom': return true; // custom conditions are resolved by admin JS extensions
-    default: return true;
+    case 'eventCard': {
+      const eventEntity = ctx.summoned || ctx.played || ctx.card || ctx.spell
+        || ctx.equipment || ctx.target || null;
+      return matchesCardFilter(game, eventEntity?.card || eventEntity, c.filter || {});
+    }
+    case 'firstTimeThisRound': {
+      if (!controller) return false;
+      const flag = c.flag || 'firstTime';
+      controller.roundFlags = controller.roundFlags || {};
+      if (controller.roundFlags[flag]) return false;
+      controller.roundFlags[flag] = true;
+      return true;
+    }
+    case 'firstTimeThisGame': {
+      const holder = c.scope === 'source' ? source : controller;
+      if (!holder) return false;
+      const flag = c.flag || 'firstTime';
+      holder.gameFlags = holder.gameFlags || {};
+      if (holder.gameFlags[flag]) return false;
+      holder.gameFlags[flag] = true;
+      return true;
+    }
+    case 'equipsThisGame': return cmp(controller.stats.equipsThisGame || 0, c.op || '>=', c.value ?? 1);
+    case 'sourceEquipped': return !!(source?.equipment?.length);
+    case 'attackerEquipped': {
+      const attackers = ctx.attackers || (ctx.attacker ? [ctx.attacker] : []);
+      return attackers.some((u) => (u?.equipment || []).length > 0);
+    }
+    case 'behold': {
+      if (!controller || !team) return false;
+      const cards = [
+        ...controller.hand.map((h) => game.cardDB.get(h.cardId)),
+        ...game.unitsOnTeam(team).flatMap((u) => [u.card, ...(u.equipment || []).map((e) => e.card)]),
+      ];
+      return cards.some((card) => matchesCardFilter(game, card, c.filter || {}));
+    }
+    case 'healWasDamaged': return !!ctx.wasDamaged && ctx.healed?.team === team;
+    case 'reputation': return cmp(controller.stats.damageToEnemyNexus || 0, c.op || '>=', c.value ?? 4);
+    case 'allegiance': {
+      const top = controller.deck[0] ? game.cardDB.get(controller.deck[0]) : null;
+      if (!top) return false;
+      const regions = c.region ? [c.region] : (source?.card?.regions || []);
+      return regions.some((r) => (top.regions || []).includes(r));
+    }
+    case 'lurkActive': return !!game.teams[team].lurkActiveThisRound;
+    case 'fated': return !!source && (game.hasKeyword(source, 'Fated') || /fated/i.test(source.card?.text || ''));
+    case 'flow': return !!source && game.hasKeyword(source, 'Flow');
+    case 'evolve': return !!source && game.hasKeyword(source, 'Evolve');
+    case 'augment': return !!source && game.hasKeyword(source, 'Augment');
+    case 'hallowed': return !!source && game.hasKeyword(source, 'Hallowed');
+    case 'brash': return !!source && game.hasKeyword(source, 'Brash');
+    case 'formidable': return !!source && game.hasKeyword(source, 'Formidable');
+    default:
+      game.log(`Unknown condition type "${c.type}" — treated as false.`, 'error');
+      return false;
   }
 }
 
@@ -316,64 +419,49 @@ export class EffectRunner {
     this.game = game;
   }
 
-  // Runs a script trigger. Returns true if a choice paused the runner.
-  run({ script, event, source, controller, presetTargets = [], auto = false, onDone = null, eventCtx = {} }) {
-    const entries = getTriggerEntries(script, event);
-    if (!entries.length) {
-      if (onDone) onDone();
-      return false;
-    }
-    let remaining = entries.length;
-    for (const trigger of entries) {
-      const ctx = {
-        event,
-        source,
-        controller,
-        target: eventCtx.target || null,
-        killer: eventCtx.killer || null,
-        combat: eventCtx.combat || this.game.combat || null,
-        ...eventCtx,
-      };
-      if (!evalCondition(this.game, trigger.condition, ctx)) {
-        remaining--;
-        continue;
-      }
-      const resolution = {
-        script,
-        trigger,
-        controller,
-        actions: trigger.actions || [],
-        index: 0,
-        chosen: new Map(),
-        ctx,
-        auto: auto || !!trigger.auto,
-        presetTargets: [...presetTargets],
-        onDone: () => {
-          remaining--;
-          if (remaining <= 0 && onDone) onDone();
-        },
-      };
-      this.game.resolutionStack.push(resolution);
-    }
-    if (!this.game.resolutionStack.length) {
-      if (onDone) onDone();
-      return false;
-    }
-    this.pump();
-    return !!this.game.pending;
-  }
-
   pump() {
     const game = this.game;
     if (game.pumping) return;
     game.pumping = true;
+    game.eventsProcessed = 0;
+    game.eventQueueGuardLogged = false;
     let guard = 0;
     try {
-      while (game.resolutionStack.length && !game.pending && guard++ < 20000) {
+      while (!game.pending && guard++ < 20000) {
+        if (!game.resolutionStack.length) {
+          if (!game.eventQueue.length) break;
+          if (game.eventsProcessed >= game.maxEventsPerPump) {
+            const dropped = game.eventQueue.length;
+            game.eventQueue.length = 0;
+            game.log(`Event storm guard: dropped ${dropped} queued event(s) after ${game.maxEventsPerPump} dispatches.`, 'error');
+            break;
+          }
+          const batch = game.eventQueue.shift();
+          game.eventsProcessed++;
+          // The batch was sorted active-team-first. Push entries and their
+          // trigger arrays in reverse so the first sorted entry and its first
+          // declared trigger resolve first on the LIFO stack.
+          for (let i = batch.entries.length - 1; i >= 0; i--) {
+            const entry = batch.entries[i];
+            for (let j = entry.resolutions.length - 1; j >= 0; j--) {
+              game.resolutionStack.push(entry.resolutions[j]);
+            }
+          }
+          continue;
+        }
         const res = game.resolutionStack[game.resolutionStack.length - 1];
+        if (res.sourceDeadAtStart == null) res.sourceDeadAtStart = !!res.ctx.source?.dead;
         if (res.index >= res.actions.length) {
           game.resolutionStack.pop();
           if (res.onDone) res.onDone();
+          continue;
+        }
+        // Source-death policy: a trigger already queued still resolves, but if
+        // its source dies during this resolution, stop the remaining actions.
+        // Death triggers are exempt because their source is dead by design.
+        if (res.ctx.source?.uid && res.ctx.source.dead && !res.sourceDeadAtStart && res.ctx.event !== EVENTS.DEATH && !res.continueOnSourceDeath) {
+          game.log(`${res.ctx.source.name} died during its ${res.ctx.event} trigger; remaining actions skipped.`, 'event');
+          res.index = res.actions.length;
           continue;
         }
         const action = res.actions[res.index];
@@ -407,6 +495,46 @@ export class EffectRunner {
             for (let i = 0; i < times; i++) {
               game.resolutionStack.push({ ...res, actions: action.actions, index: 0, chosen: new Map(), onDone: null, parent: res });
             }
+          }
+          continue;
+        }
+        if (action.type === 'choose') {
+          const options = Array.isArray(action.options) ? action.options : [];
+          if (!options.length) {
+            res.index++;
+            game.log(`${res.ctx.source?.name || 'Effect'}: choose action has no options, effect skipped.`, 'effect');
+            continue;
+          }
+          if (!res.chosen.has(path)) {
+            if (res.auto || options.length === 1) {
+              res.chosen.set(path, [options[0].id]);
+            } else {
+              const player = res.controller;
+              game.pending = {
+                playerId: player.id,
+                playerName: player.name,
+                prompt: action.prompt || 'Choose one',
+                options: options.map((option) => ({ id: option.id, label: option.label || option.id, kind: 'branch' })),
+                min: 1,
+                max: 1,
+                path,
+                resolution: res,
+              };
+              game.log(`${player.name} is choosing an option…`, 'choice');
+              this.pumpPending();
+              return;
+            }
+          }
+          res.index++;
+          const chosenId = res.chosen.get(path)[0];
+          const option = options.find((entry) => entry.id === chosenId);
+          if (!option) {
+            game.log(`Unknown choice option "${chosenId}" — effect skipped.`, 'error');
+            continue;
+          }
+          const actions = [...(option.actions || []), ...(action.then || [])];
+          if (actions.length) {
+            game.resolutionStack.push({ ...res, actions, index: 0, chosen: new Map(), onDone: null, parent: res });
           }
           continue;
         }
@@ -484,21 +612,31 @@ export class EffectRunner {
     const target = targets[0] || null;
     const amount = amountValue(game, action, res.ctx, target);
 
+    if (targets.length && action.target && source?.isSpell) {
+      for (const t of targets) {
+        if (t.uid) game.recordTargeting(t, { source, action: action.type, spell: true });
+      }
+    }
+
     switch (action.type) {
       case 'damage':
       case 'dealDamage': {
+        const dead = [];
         for (const t of targets) {
           if (t.nexus) game.damageNexus(t.nexus, amount, source, { spell: res.ctx.event === 'cast', skill: true });
           else if (t.uid) {
-            const dealt = game.damageUnit(t, amount, source, { spell: res.ctx.event === 'cast', skill: true });
-            if (source && game.hasKeyword(source, 'Lifesteal')) game.healNexus(team, dealt);
+            const dealt = game.damageUnit(t, amount, source, { spell: res.ctx.event === 'cast', skill: true, deathBatch: dead });
+            if (source && game.hasKeyword(source, 'Lifesteal')) game.healNexus(team, dealt, source);
           }
         }
+        if (dead.length) game.emitDeaths(dead, { source });
         break;
       }
       case 'damageAll': {
         const list = game.unitsOnTeam(action.team === 'enemy' ? enemyTeam : team).filter((u) => matchesFilter(game, u, action.filter || {}));
-        for (const u of list) game.damageUnit(u, amount, source, { spell: true, skill: true });
+        const dead = [];
+        for (const u of list) game.damageUnit(u, amount, source, { spell: true, skill: true, deathBatch: dead });
+        if (dead.length) game.emitDeaths(dead, { source });
         if (action.includeNexus) game.damageNexus(action.team === 'enemy' ? enemyTeam : team, amount, source, { spell: true });
         break;
       }
@@ -510,24 +648,30 @@ export class EffectRunner {
       case 'heal':
       case 'healUnit': {
         for (const t of targets) {
-          if (t.nexus) game.healNexus(t.nexus, amount);
-          else if (t.uid) game.healUnit(t, amount);
+          if (t.nexus) game.healNexus(t.nexus, amount, source);
+          else if (t.uid) game.healUnit(t, amount, source);
         }
         break;
       }
-      case 'healNexus': game.healNexus(action.who === 'enemy' ? enemyTeam : team, amount); break;
+      case 'healNexus': game.healNexus(action.who === 'enemy' ? enemyTeam : team, amount, source); break;
       case 'buff':
       case 'give': {
         for (const t of targets) {
-          if (!t.uid) continue;
-          game.buffUnit(t, action.power ?? action.attack ?? 0, action.health ?? 0, action.duration || 'permanent', source);
+          const power = action.power ?? action.attack ?? 0;
+          const health = action.health ?? 0;
+          const duration = action.duration || 'permanent';
+          if (t.uid) game.buffUnit(t, power, health, duration, source);
+          else if (t.handCard) game.buffHandCard(t.handCard, power, health, duration, source);
         }
         break;
       }
       case 'debuff': {
         for (const t of targets) {
-          if (!t.uid) continue;
-          game.buffUnit(t, -(action.power ?? 0), -(action.health ?? 0), action.duration || 'permanent', source);
+          const power = -(action.power ?? 0);
+          const health = -(action.health ?? 0);
+          const duration = action.duration || 'permanent';
+          if (t.uid) game.buffUnit(t, power, health, duration, source);
+          else if (t.handCard) game.buffHandCard(t.handCard, power, health, duration, source);
         }
         break;
       }
@@ -541,13 +685,26 @@ export class EffectRunner {
         for (const t of targets) if (t.uid) game.removeKeyword(t, canonicalKeyword(action.keyword));
         break;
       }
-      case 'barrier': for (const t of targets) if (t.uid) game.grantStatus(t, 'barrier'); break;
+      case 'barrier': for (const t of targets) if (t.uid) game.grantStatus(t, 'barrier', source); break;
       case 'spellShield': for (const t of targets) if (t.uid) game.grantStatus(t, 'spellShield'); break;
       case 'stun': for (const t of targets) if (t.uid) game.stunUnit(t); break;
       case 'frostbite': for (const t of targets) if (t.uid) game.frostbiteUnit(t); break;
-      case 'recall': for (const t of targets) if (t.uid) game.recallUnit(t); break;
+      case 'recall': for (const t of targets) if (t.uid) game.recallUnit(t, source); break;
       case 'silence': for (const t of targets) if (t.uid) game.silenceUnit(t); break;
-      case 'kill': for (const t of targets) if (t.uid) game.killUnit(t, { source, reason: 'effect' }); break;
+      case 'destroyEquipment':
+      case 'detach': {
+        for (const t of targets) {
+          if (t.uid) game.detachEquipment(t, { source, reason: 'effect', destroy: action.type === 'destroyEquipment' });
+        }
+        break;
+      }
+      case 'moveToDeck': {
+        for (const t of targets) {
+          if (t.uid) game.moveUnitToDeck(t, { source, position: action.position || action.to || 'shuffle' });
+        }
+        break;
+      }
+      case 'kill': game.killUnits(targets.filter((t) => t?.uid), { source, reason: 'effect' }); break;
       case 'obliterate': for (const t of targets) if (t.uid) game.obliterateUnit(t); break;
       case 'draw': {
         const who = action.who === 'opponent' ? game.playersOnTeam(enemyTeam) : action.who === 'all' ? [...game.players.values()] : [controller];
@@ -556,7 +713,7 @@ export class EffectRunner {
       }
       case 'discard': {
         const who = action.who === 'opponent' ? game.playersOnTeam(enemyTeam) : [controller];
-        for (const p of who) game.discardCards(p, amount || 1, { random: action.random !== false });
+        for (const p of who) game.discardCards(p, amount || 1, { random: action.random !== false, source, reason: 'effect' });
         break;
       }
       case 'summon': {
@@ -590,7 +747,10 @@ export class EffectRunner {
       case 'emptyManaGem': game.addManaGem(team); break;
       case 'rally': game.rally(team); break;
       case 'strike': {
-        if (source && target) game.strike(source, target, { combat: false, effect: true });
+        const striker = action.striker === 'eventCard'
+          ? (res.ctx.played || res.ctx.summoned || res.ctx.card || res.ctx.spell || res.ctx.equipment || res.ctx.target)
+          : source;
+        if (striker && target) game.strike(striker, target, { combat: false, effect: true });
         break;
       }
       case 'fight': {
@@ -653,14 +813,21 @@ export function promptForTarget(type) {
 export function targetSpecsForScript(script) {
   if (!script?.triggers) return [];
   const specs = [];
-  for (const trigger of script.triggers) {
-    if (!['play', 'summon', 'cast', 'levelUp'].includes(trigger.on)) continue;
-    for (const action of trigger.actions || []) {
+  const visit = (actions) => {
+    for (const action of actions || []) {
       if (action.target && targetNeedsChoice(normalizeTarget(action.target).type)) {
         const spec = normalizeTarget(action.target);
         specs.push({ ...spec, prompt: action.prompt || spec.prompt || promptForTarget(spec.type), actionType: action.type });
       }
+      visit(action.actions);
+      visit(action.elseActions);
+      visit(action.then);
+      for (const branch of action.branches || []) visit(Array.isArray(branch) ? branch : branch.actions);
     }
+  };
+  for (const trigger of script.triggers) {
+    if (![EVENTS.PLAY, EVENTS.SUMMON, 'cast', EVENTS.LEVEL_UP].includes(trigger.on)) continue;
+    visit(trigger.actions);
   }
   return specs;
 }

@@ -107,6 +107,32 @@ test('content offers validate scripts and reject duplicate cards', () => {
   });
   assert.equal(ignoredScript.ok, true);
   assert.deepEqual(ignoredScript.scripts, {});
+
+  // Peer scripts are always custom and never carry host verification or seed
+  // metadata, even when the sender includes them.
+  const peerVerified = sanitizeContentOffer({
+    cards: [card],
+    scripts: {
+      OFFER_CARD_1: {
+        status: 'curated',
+        script: { triggers: [{ on: 'play', actions: [{ type: 'draw', amount: 1 }] }] },
+        verification: { version: 1, test: 'test/protocol.test.mjs#peer' },
+        seed: { version: '0.3.0', origin: 'seed' },
+      },
+    },
+  });
+  assert.equal(peerVerified.ok, true);
+  assert.deepEqual(peerVerified.scripts.OFFER_CARD_1, {
+    script: { triggers: [{ on: 'play', actions: [{ type: 'draw', amount: 1 }] }] },
+    status: 'custom',
+  });
+
+  const semanticScript = sanitizeContentOffer({
+    cards: [card],
+    scripts: { OFFER_CARD_1: { script: { triggers: [{ on: 'play', actions: [{ type: 'teleport' }] }] } } },
+  });
+  assert.equal(semanticScript.ok, false);
+  assert.match(semanticScript.errors.join(' '), /unknown action type/);
 });
 
 test('declarative scripts stay bounded and reject non-object shapes', () => {

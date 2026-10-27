@@ -688,7 +688,7 @@ export async function submitGuestDeck(deckId) {
       count: Number(entry.count || entry.quantity || 1),
     })).filter((entry) => entry.cardId);
     if (!cards.length) throw new Error('That deck is empty.');
-    const sent = send('setDeck', { deck: { name: deck.name, cards, regions: deck.regions || [] } });
+    const sent = send('setDeck', { deck: { name: deck.name, cards, regions: deck.regions || [], format: deck.format || 'Eternal' } });
     if (sent) {
       toast(`Submitting “${deck.name}” to the host…`, 'gold');
     }
@@ -1096,13 +1096,17 @@ export function renderApp() {
     document.getElementById('retry-boot')?.addEventListener('click', () => boot());
     return;
   }
-  if (!state.meta || !state.pool.length) {
-    app.innerHTML = `<div class="boot"><div class="boot-mark">✦</div><div class="boot-title">NEXUS FORGE</div><div class="boot-sub">Forging the card pool…</div><div class="loader" style="margin-top:8px"></div></div>`;
+  if (!state.meta) {
+    app.innerHTML = `<div class="boot"><div class="boot-mark">✦</div><div class="boot-title">NEXUS FORGE</div><div class="boot-sub">Lighting the forge…</div><div class="loader" style="margin-top:8px"></div></div>`;
     return;
   }
   const route = parseRoute();
-  document.body.classList.toggle('game-mode', route.name === 'game' && !!state.game);
   const homeRoute = route.name === 'home' || (route.name === 'lobby' && !state.lobby) || (route.name === 'game' && !state.game);
+  if (!state.pool.length && !homeRoute) {
+    app.innerHTML = `<div class="boot"><div class="boot-mark">✦</div><div class="boot-title">NEXUS FORGE</div><div class="boot-sub">Forging the card pool…</div><div class="loader" style="margin-top:8px"></div></div>`;
+    return;
+  }
+  document.body.classList.toggle('game-mode', route.name === 'game' && !!state.game);
   document.body.classList.toggle('home-mode', homeRoute);
   document.body.classList.toggle('deck-selection-mode', route.name === 'selection' || route.name === 'collectionDecks');
   document.body.classList.toggle('collection-mode', route.name === 'decks');
@@ -1171,15 +1175,21 @@ async function boot() {
         state.desktopConfig = null;
       }
     }
-    const [meta, pool, decksData] = await Promise.all([
+    const poolRequest = apiGet('/api/cardpool').then(
+      (pool) => ({ pool }),
+      (error) => ({ error }),
+    );
+    const [meta, decksData] = await Promise.all([
       apiGet('/api/meta'),
-      apiGet('/api/cardpool'),
       apiGet('/api/decks'),
     ]);
     state.meta = meta;
     state.desktop = state.desktop || !!meta.desktop;
-    state.pool = pool.cards || [];
     state.decks = decksData.decks || [];
+    renderApp();
+    const { pool, error } = await poolRequest;
+    if (error) throw error;
+    state.pool = pool.cards || [];
     setCardIndex(state.pool);
     state.libraryVersion++;
     if (state.desktop && !state.net.role) {

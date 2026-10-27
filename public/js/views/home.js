@@ -22,7 +22,10 @@ export function icon(name) {
 export function renderHome(root, ctx) {
   const { state } = ctx;
   const pool = state.pool || [];
-  const champions = pool.filter((card) => card.supertype === 'Champion').length;
+  const cardCount = pool.length || state.meta?.stats?.enabled || 0;
+  const champions = pool.length
+    ? pool.filter((card) => card.supertype === 'Champion').length
+    : state.meta?.stats?.championsEnabled || 0;
   const online = state.connected ? '' : 'disabled';
   const internet = !!state.desktop;
   const createHelp = internet
@@ -60,7 +63,7 @@ export function renderHome(root, ctx) {
           <span class="home-player-name">${esc(name())}</span>
         </button>
         <dl class="home-resources" aria-label="Your collection">
-          <div class="home-resource cards" title="Cards available in the card pool"><dt>${icon('cards')}<span>Cards</span></dt><dd>${pool.length.toLocaleString('en-US')}</dd></div>
+          <div class="home-resource cards" title="Cards available in the card pool"><dt>${icon('cards')}<span>Cards</span></dt><dd>${cardCount.toLocaleString('en-US')}</dd></div>
           <div class="home-resource champions" title="Champions available in the card pool"><dt>${icon('champion')}<span>Champions</span></dt><dd>${champions.toLocaleString('en-US')}</dd></div>
           <div class="home-resource decks" title="Saved decks, including starter decks"><dt>${icon('collection')}<span>Decks</span></dt><dd>${state.decks.length}</dd></div>
         </dl>

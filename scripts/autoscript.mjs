@@ -1,7 +1,7 @@
 // Conservative auto-scripting pass for Data Dragon card text.
 // Only cards whose entire text can be translated are given a script; everything else is
 // left as "manual" so it can be resolved with the tabletop tools or edited in the admin forge.
-import { readFile, writeFile } from 'node:fs/promises';
+import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -104,7 +104,7 @@ const TARGET_MAP = [
   [/^the enemy$/i, 'enemyNexus'],
 ];
 
-function cleanText(text) {
+export function cleanText(text) {
   return String(text || '').replace(/\r\n/g, '\n').replace(/\u00a0/g, ' ').trim();
 }
 
@@ -203,7 +203,7 @@ function makeGrant(target, keyword, duration = 'permanent') {
   return { type: 'grantKeyword', keyword, duration, target: Array.isArray(target) ? target[0] : target };
 }
 
-function parseActionText(text, cardNames) {
+export function parseActionText(text, cardNames) {
   let t = text.trim().replace(/\.$/, '');
   if (!t) return null;
   const { text: body, condition } = trailingCondition(t);
@@ -382,8 +382,9 @@ function parseRandomFilter(text) {
   return Object.keys(filter).length ? filter : null;
 }
 
-const NAME_INDEX = new Map();
-function buildNameIndex(cards) {
+export const NAME_INDEX = new Map();
+export function buildNameIndex(cards) {
+  NAME_INDEX.clear();
   for (const c of cards) {
     if (!c.name) continue;
     const key = c.name.toLowerCase();
@@ -404,7 +405,7 @@ function findCardName(name, cardNames) {
   return null;
 }
 
-function parseTriggerLine(line, card, cardNames) {
+export function parseTriggerLine(line, card, cardNames) {
   let { conditions: prefixConds, rest } = parseCondition(line);
   let text = rest;
   let triggers = [];
@@ -454,7 +455,7 @@ function parseTriggerLine(line, card, cardNames) {
   return { triggers, actions, condition };
 }
 
-function parseCard(card, cardNames) {
+export function parseCard(card, cardNames) {
   const text = cleanText(card.text);
   if (!text) return null;
   if (/^to play/i.test(text)) return null;
@@ -503,39 +504,136 @@ function parseCard(card, cardNames) {
   return triggers.length ? { triggers } : null;
 }
 
-async function main() {
-  const payload = JSON.parse(await readFile(path.join(DATA, 'cards.json'), 'utf8'));
-  let scripts = {};
-  try { scripts = JSON.parse(await readFile(path.join(DATA, 'scripts.json'), 'utf8')); } catch {}
-  buildNameIndex(payload.cards);
-  const cards = payload.cards.filter((c) => c.collectible && c.enabled !== false);
-  const report = { total: cards.length, scripted: 0, keywordsOnly: 0, manual: 0, byRegion: {}, manualCards: [] };
+export function generateScripts({ payload, scripts = {}, only = null, now = () => new Date().toISOString() }) {
+  buildNameIndex(payload.cards || []);
+  const allCards = (payload.cards || []).filter((card) => card.collectible && card.enabled !== false);
+  const wanted = only?.length ? new Set(only) : null;
+  const cards = wanted ? allCards.filter((card) => wanted.has(card.id)) : allCards;
+  const report = {
+    total: cards.length,
+    scripted: 0,
+    keywordsOnly: 0,
+    manual: 0,
+    skipped: 0,
+    byRegion: {},
+    manualCards: [],
+    changes: [],
+    unknownOnly: wanted ? [...wanted].filter((id) => !allCards.some((card) => card.id === id)) : [],
+  };
   const next = { ...scripts };
   for (const card of cards) {
     const existing = scripts[card.id];
-    if (existing && ['curated', 'custom'].includes(existing.status)) continue;
+    // Never regenerate hand-reviewed or user-owned entries. `partial` is
+    // treated as hand-reviewed even without verification metadata.
+    if (existing && ['curated', 'custom', 'partial'].includes(existing.status)) {
+      report.skipped++;
+      continue;
+    }
     const hasText = !!cleanText(card.text);
     if (!hasText) {
-      delete next[card.id];
+      if (existing?.status === 'auto') {
+        delete next[card.id];
+        report.changes.push(card.id);
+      }
       report.keywordsOnly++;
       continue;
     }
     const script = parseCard(card, NAME_INDEX);
     if (script) {
-      next[card.id] = { status: 'auto', script, updatedAt: new Date().toISOString() };
-      report.scripted++;
+      const unchanged = existing?.status === 'auto'
+        && JSON.stringify(existing.script) === JSON.stringify(script);
+      if (unchanged) {
+        report.scripted++;
+      } else {
+        next[card.id] = { status: 'auto', script, updatedAt: now() };
+        report.changes.push(card.id);
+        report.scripted++;
+      }
       const region = (card.regions || ['Neutral'])[0];
       report.byRegion[region] = (report.byRegion[region] || 0) + 1;
     } else {
-      delete next[card.id];
+      if (existing?.status === 'auto') {
+        delete next[card.id];
+        report.changes.push(card.id);
+      }
       report.manual++;
       report.manualCards.push({ id: card.id, name: card.name, text: card.text.replace(/\r\n/g, ' / ') });
     }
   }
-  await writeFile(path.join(DATA, 'scripts.json'), JSON.stringify(next, null, 2));
-  await writeFile(path.join(DATA, 'scripts-report.json'), JSON.stringify(report, null, 2));
-  console.log(`Auto-scripted ${report.scripted}/${cards.length} cards. ${report.manual} need manual resolution; ${report.keywordsOnly} are keyword-only.`);
-  console.log('By region:', report.byRegion);
+  return { next, report };
 }
 
-main().catch((err) => { console.error(err); process.exit(1); });
+function entryDiff(a, b) {
+  return JSON.stringify(a?.script ?? null) !== JSON.stringify(b?.script ?? null)
+    || (a?.status || null) !== (b?.status || null);
+}
+
+async function main() {
+  const args = process.argv.slice(2);
+  const check = args.includes('--check');
+  const write = args.includes('--write');
+  const outIndex = args.indexOf('--out');
+  const outFile = outIndex >= 0 ? args[outIndex + 1] : null;
+  const only = [];
+  for (let i = 0; i < args.length; i++) {
+    if (args[i] !== '--only') continue;
+    i++;
+    while (i < args.length && !args[i].startsWith('--')) {
+      only.push(...args[i].split(',').map((id) => id.trim()).filter(Boolean));
+      i++;
+    }
+    i--;
+  }
+  if (check && (write || outFile)) {
+    console.error('--check cannot be combined with --write or --out.');
+    process.exit(1);
+  }
+  if (write && outFile) {
+    console.error('--write and --out are mutually exclusive.');
+    process.exit(1);
+  }
+
+  const payload = JSON.parse(await readFile(path.join(DATA, 'cards.json'), 'utf8'));
+  let scripts = {};
+  try { scripts = JSON.parse(await readFile(path.join(DATA, 'scripts.json'), 'utf8')); } catch {}
+  const { next, report } = generateScripts({ payload, scripts, only });
+  const changed = report.changes;
+
+  console.log(`Auto-scripted ${report.scripted}/${report.total} cards. ${report.manual} need manual resolution; ${report.keywordsOnly} are keyword-only; ${report.skipped} preserved.`);
+  if (report.unknownOnly.length) console.log(`Unknown --only ids: ${report.unknownOnly.join(', ')}`);
+  console.log('By region:', report.byRegion);
+
+  if (check) {
+    const scopeIds = only.length ? new Set(only) : new Set((payload.cards || []).filter((card) => card.collectible && card.enabled !== false).map((card) => card.id));
+    const diffs = [...scopeIds].filter((id) => entryDiff(scripts[id], next[id]));
+    if (diffs.length) {
+      console.error(`Check failed: ${diffs.length} generated entry change(s): ${diffs.slice(0, 20).join(', ')}${diffs.length > 20 ? '…' : ''}`);
+      process.exit(1);
+    }
+    console.log('Check passed: generated entries are current.');
+    return;
+  }
+
+  if (outFile) {
+    await writeFile(path.resolve(outFile), `${JSON.stringify(next, null, 2)}\n`);
+    console.log(`Wrote generated scripts to ${outFile}. data/scripts.json was not touched.`);
+    return;
+  }
+
+  if (write) {
+    const backupDir = path.join(DATA, 'backups');
+    await mkdir(backupDir, { recursive: true });
+    const stamp = new Date().toISOString().replace(/[:.]/g, '-');
+    const backupFile = path.join(backupDir, `scripts-autoscript-${stamp}.json`);
+    await writeFile(backupFile, `${JSON.stringify(scripts, null, 2)}\n`);
+    await writeFile(path.join(DATA, 'scripts.json'), `${JSON.stringify(next, null, 2)}\n`);
+    await writeFile(path.join(DATA, 'scripts-report.json'), `${JSON.stringify(report, null, 2)}\n`);
+    console.log(`Wrote ${changed.length} change(s) to data/scripts.json. Backup: ${backupFile}`);
+    return;
+  }
+
+  console.log(`Read-only: ${changed.length} entry change(s) would be made. Use --check, --out <file>, or --write.`);
+}
+
+const isMain = process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url);
+if (isMain) main().catch((err) => { console.error(err); process.exit(1); });

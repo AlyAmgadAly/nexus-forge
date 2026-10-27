@@ -4,7 +4,8 @@ import {
   APP_VERSION, ENGINE_SCHEMA, PROTOCOL_VERSION, MAX_CONTENT_TRANSFER_BYTES,
   MAX_CUSTOM_ART_BYTES, MAX_CUSTOM_CARDS, MAX_DECK_BYTES,
 } from '../shared/protocol.js';
-import { validateScript } from './script-validation.js';
+import { lintScript } from './script-lint.js';
+import { normalizeFormat } from '../shared/deck-validator.js';
 
 export function canonicalJson(value) {
   if (value === null || value === undefined) return 'null';
@@ -79,7 +80,7 @@ export function sanitizeCustomCard(input) {
     setName: 'Custom Forge',
     collectible: true,
     spellSpeed: String(input.spellSpeed || '').slice(0, 20),
-    formats: ['Standard'],
+    formats: ['Standard', 'Eternal'],
     associatedCardRefs: strings(input.associatedCardRefs, 10, 40),
     art: art && Buffer.byteLength(art) <= MAX_CUSTOM_ART_BYTES ? art : null,
     fullArt: fullArt || null,
@@ -113,9 +114,11 @@ export function sanitizeContentOffer(raw) {
   for (const [id, entry] of Object.entries(raw.scripts && typeof raw.scripts === 'object' ? raw.scripts : {})) {
     if (!seen.has(id)) continue;
     const script = entry?.script ?? entry;
-    const validation = validateScript(script);
+    const validation = lintScript(script);
     if (!validation.ok) { errors.push(`Script for ${id}: ${validation.errors.join('; ')}`); continue; }
     warnings.push(...validation.warnings.map((warning) => `Script for ${id}: ${warning}`));
+    // Peer scripts are never host-verified, even if the sender included
+    // verification or seed metadata.
     scripts[id] = { script, status: 'custom' };
   }
   const payload = { cards, scripts };
@@ -156,9 +159,10 @@ export function sanitizeDeckPayload(raw, { maxBytes = MAX_DECK_BYTES } = {}) {
     ? raw.regions.map((region) => String(region || '').slice(0, 40)).filter(Boolean).slice(0, 4)
     : undefined;
   const name = String(raw.name || 'Submitted deck').replace(/[\u0000-\u001f<>]/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 60) || 'Submitted deck';
+  const format = normalizeFormat(raw.format) || 'Eternal';
   return {
     ok: errors.length === 0,
-    deck: errors.length ? null : { name, cards, regions },
+    deck: errors.length ? null : { name, cards, regions, format },
     errors,
   };
 }
@@ -220,8 +224,10 @@ export function sanitizeRoomCatalog(cards, scripts, mechanics = []) {
       cleanCards.push(clean.card);
       const entry = scripts?.[card.id];
       if (entry?.script) {
-        const validation = validateScript(entry.script);
-        if (validation.ok) cleanScripts[card.id] = { script: entry.script, status: entry.status || 'custom' };
+        const validation = lintScript(entry.script);
+        // Room catalogs only carry custom content. A host cannot smuggle a
+        // curated/verified status into another player's local scripts.
+        if (validation.ok) cleanScripts[card.id] = { script: entry.script, status: 'custom' };
       }
     }
   }

@@ -1,0 +1,66 @@
+{
+  "endpoint": "http://127.0.0.1:56928",
+  "targetId": "DD1F4E924F064E5988797D36B0E903BF",
+  "checks": [
+    {
+      "name": "Favorite, Edit and Play layout",
+      "detail": "Favorite persists in local storage and the tools flank the deck",
+      "result": "passed"
+    },
+    {
+      "name": "Left deck rail and four-column library",
+      "detail": {
+        "paneWidth": 437.296875,
+        "footerBottom": 1079
+      },
+      "result": "passed"
+    },
+    {
+      "name": "Left click removes and adds one copy",
+      "detail": "40 → 39 → 40; Done follows actual deck validation",
+      "result": "passed"
+    },
+    {
+      "name": "Pointer hover shows the full card beside the rail",
+      "detail": {
+        "previewWidth": 326.046875,
+        "previewLeft": 377.296875
+      },
+      "result": "passed"
+    },
+    {
+      "name": "Tools, curve and filters",
+      "detail": "Panels open, close with Escape, and filters suspend deck controls",
+      "result": "passed"
+    },
+    {
+      "name": "Done saves a starter copy and returns to Play",
+      "detail": {
+        "deckId": "deck-43f6f150",
+        "starterDecks": 6
+      },
+      "result": "passed"
+    },
+    {
+      "name": "Edit updates the existing saved deck",
+      "detail": "No duplicate deck was created",
+      "result": "passed"
+    },
+    {
+      "name": "Mobile layout",
+      "detail": {
+        "width": 390,
+        "scrollWidth": 390,
+        "pane": 156,
+        "columns": "210px"
+      },
+      "result": "passed"
+    },
+    {
+      "name": "Page errors",
+      "detail": "None observed",
+      "result": "passed"
+    }
+  ],
+  "pageErrors": []
+}

@@ -34,4 +34,4 @@ Original LoR frame sprites, mode illustrations, and stone textures were not avai
 
 Review artifacts: [gallery](qa/deckselection/gallery-1910x1073.png), [selected deck](qa/deckselection/selected-1910x1073.png), [narrow preview](qa/deckselection/selected-390x844.png), and [scenario results](qa/deckselection/verification.json).
 
-Runtime verification used the source service on loopback with Microsoft Edge through REA. A fresh native Electron run, a new portable release build, and external-network acceptance testing were not performed for this UI change. The desktop guest submission path reuses the existing implementation; the recorded new guest browser scenario exercised the local WebSocket path.
+The initial runtime verification above used the source service on loopback with Microsoft Edge through REA. The subsequent [selected-deck and left editor update](deck-editor-ui.md) rebuilt the local portable UI preview and verified it in packaged Electron. External-network acceptance testing remains separate. The desktop guest submission path reuses the existing implementation; the recorded guest browser scenario exercised the local WebSocket path.

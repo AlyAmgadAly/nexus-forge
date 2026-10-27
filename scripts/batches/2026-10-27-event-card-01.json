@@ -1,0 +1,86 @@
+{
+  "batch": "2026-10-27-event-card-01",
+  "cards": {
+    "04IO014": {
+      "status": "curated",
+      "script": {
+        "triggers": [
+          {
+            "on": "summonOther",
+            "condition": {
+              "type": "eventCard",
+              "filter": {
+                "keyword": "Ephemeral"
+              }
+            },
+            "actions": [
+              {
+                "type": "buff",
+                "power": 1,
+                "health": 0,
+                "duration": "round",
+                "target": "self"
+              }
+            ]
+          }
+        ]
+      },
+      "verification": {
+        "version": 1,
+        "cardTextHash": "c0e4cf4783e394abf2514bc9ef4fcfc1836182dd0026c8945cd2d7bd4ade8d0b",
+        "verifiedAt": "2026-10-27T00:00:00.000Z",
+        "verifiedBy": "agent",
+        "test": "test/starter-vanguard.test.mjs#shadow-apprentice-ephemeral-summon-grants-1-0-this-round",
+        "clauses": [
+          "When you summon an Ephemeral ally, give me +1|+0 this round."
+        ],
+        "notes": ""
+      }
+    },
+    "06DE043": {
+      "status": "curated",
+      "script": {
+        "triggers": [
+          {
+            "on": "summonOther",
+            "condition": {
+              "type": "and",
+              "conditions": [
+                {
+                  "type": "eventCard",
+                  "filter": {
+                    "subtype": "ELITE"
+                  }
+                },
+                {
+                  "type": "firstTimeThisGame",
+                  "flag": "trustyRamhoundElite"
+                }
+              ]
+            },
+            "actions": [
+              {
+                "type": "buff",
+                "power": 2,
+                "health": 2,
+                "duration": "permanent",
+                "target": "self"
+              }
+            ]
+          }
+        ]
+      },
+      "verification": {
+        "version": 1,
+        "cardTextHash": "7a460ce5a0e25cef21067b52e8bdbf2838ac3abdf5b264c76f47a65e785e43b6",
+        "verifiedAt": "2026-10-27T00:00:00.000Z",
+        "verifiedBy": "agent",
+        "test": "test/starter-vanguard.test.mjs#trusty-ramhound-first-elite-summon-grants-2-2",
+        "clauses": [
+          "The first time you summon an Elite, grant me +2|+2."
+        ],
+        "notes": ""
+      }
+    }
+  }
+}

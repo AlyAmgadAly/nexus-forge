@@ -5,6 +5,7 @@ import {
   EffectRunner, targetSpecsForScript, targetNeedsChoice, normalizeTarget, evalCondition,
   targetOptions, autoTargetIds, resolveEntity, promptForTarget,
 } from './effects.js';
+import { EVENTS } from '../../shared/script-vocabulary.js';
 
 const DEFAULT_RULES = {
   deckSize: 40,
@@ -18,6 +19,27 @@ const DEFAULT_RULES = {
   spellManaCap: 3,
   maxMana: 10,
 };
+
+// Engine safety limits, not game rules. A single top-level pump may dispatch
+// this many event batches before the storm guard drops the rest. Tests can
+// lower the limits through settings.events.
+const MAX_EVENTS_PER_PUMP = 500;
+const MAX_EVENT_QUEUE = 500;
+
+// `castSpell` is the legacy name for the canonical `spellCast` event. Keep
+// both trigger names working without dispatching two batches.
+const EVENT_ALIASES = Object.freeze({
+  [EVENTS.CAST_SPELL]: EVENTS.SPELL_CAST,
+  [EVENTS.SPELL_CAST]: EVENTS.CAST_SPELL,
+});
+
+function eventMatches(triggerOn, event) {
+  return triggerOn === event || triggerOn === EVENT_ALIASES[event];
+}
+
+function scriptHasEvent(script, event) {
+  return (script?.triggers || []).some((trigger) => eventMatches(trigger.on, event));
+}
 
 function cardView(card) {
   if (!card) return null;
@@ -69,10 +91,21 @@ export class Game {
     this.manual = null;
     this.resolutionStack = [];
     this.pumping = false;
+    this.eventQueue = [];
+    this.eventSeq = 0;
+    this.eventDeferDepth = 0;
+    this.eventsProcessed = 0;
+    this.maxEventsPerPump = Math.max(1, Number(settings.events?.maxPerPump) || MAX_EVENTS_PER_PUMP);
+    this.maxEventQueue = Math.max(1, Number(settings.events?.maxQueue) || MAX_EVENT_QUEUE);
+    this.eventQueueGuardLogged = false;
+    this.seatOrder = new Map();
     this.uidSeq = 0;
     this.iidSeq = 0;
     this.logSeq = 0;
     this.logs = [];
+    this.damageHistory = [];
+    this.healHistory = [];
+    this.targetHistory = [];
     this.teams = {
       A: this.makeTeam('A', mode === '2v2' ? this.rules.nexus2v2 : this.rules.nexus1v1, mode === '2v2' ? 2 : 20),
       B: this.makeTeam('B', mode === '2v2' ? this.rules.nexus2v2 : this.rules.nexus1v1, mode === '2v2' ? 2 : 20),
@@ -106,13 +139,20 @@ export class Game {
       spellsPlayedThisRound: 0,
       alliesDiedThisRound: 0,
       unitsDiedThisRound: 0,
+      damageTakenThisRound: 0,
+      damageDealtThisRound: 0,
+      lurkActiveThisRound: false,
     };
   }
 
   setup(players, decks) {
     const list = players || [];
     for (const p of list) {
-      const deck = (decks?.[p.id] || decks?.[p.name] || []).map((x) => (typeof x === 'string' ? x : x.id || x.cardId)).filter(Boolean);
+      const deck = (decks?.[p.id] || decks?.[p.name] || []).flatMap((entry) => {
+        if (typeof entry === 'string') return [entry];
+        const id = entry.id || entry.cardId;
+        return id ? Array(Number(entry.count) || 1).fill(id) : [];
+      });
       const player = {
         id: p.id,
         name: p.name || 'Player',
@@ -130,16 +170,24 @@ export class Game {
           spellManaSpent: 0,
           stunnedOrRecalled: 0,
           cardsDrawn: 0,
+          cardsDrawnThisRound: 0,
+          maxCardsDrawnInRound: 0,
           damageToEnemyNexus: 0,
           unitsKilled: 0,
           alliesDied: 0,
           survivedDamage: 0,
           levelsGained: 0,
+          equipsThisGame: 0,
         },
         flags: {},
+        roundFlags: {},
+        gameFlags: {},
       };
       this.players.set(player.id, player);
     }
+    // Stable seat order for simultaneous-trigger resolution. The active team
+    // is placed first at sort time; within a team this index is the seat order.
+    this.seatOrder = new Map([...this.players.keys()].map((id, index) => [id, index]));
     this.teamPlayers = {
       A: [...this.players.values()].filter((p) => p.team === 'A'),
       B: [...this.players.values()].filter((p) => p.team === 'B'),
@@ -169,8 +217,8 @@ export class Game {
   isAutoChoice(type) { return !targetNeedsChoice(normalizeTarget(type).type); }
   touch() { if (this.onUpdate) this.onUpdate(this); }
 
-  log(text, type = 'info', playerId = null) {
-    this.logs.push({ id: ++this.logSeq, round: this.round, text, type, playerId, at: Date.now() });
+  log(text, type = 'info', playerId = null, { privateTo = null, publicText = null } = {}) {
+    this.logs.push({ id: ++this.logSeq, round: this.round, text, type, playerId, at: Date.now(), ...(privateTo ? { privateTo, publicText } : {}) });
     if (this.logs.length > 300) this.logs.shift();
   }
 
@@ -182,6 +230,9 @@ export class Game {
       const kw = canonicalKeyword(k);
       keywordCounts[kw] = (keywordCounts[kw] || 0) + 1;
     }
+    const handBuffs = (opts.handEntry?.buffs || [])
+      .filter((buff) => buff.duration !== 'round' || buff.round === this.round)
+      .map((buff) => ({ ...buff }));
     return {
       uid: `u${++this.uidSeq}`,
       cardId: card.id,
@@ -193,7 +244,7 @@ export class Game {
       basePower: card.attack || 0,
       baseHealth: Math.max(1, card.health || 1),
       damage: 0,
-      buffs: [],
+      buffs: handBuffs,
       baseKeywords: new Set(card.keywords || []),
       keywordCounts,
       grantedKeywords: new Set(),
@@ -235,6 +286,7 @@ export class Game {
     if (unit.baseKeywords?.has(key)) return true;
     if (unit.grantedKeywords?.has(key)) return true;
     if (unit.aura?.keywords?.has(key)) return true;
+    if ((unit.equipment || []).some((e) => (e.keywords || []).includes(key))) return true;
     const exp = unit.tempKeywords?.get(key);
     return exp != null && exp >= this.round;
   }
@@ -244,6 +296,7 @@ export class Game {
     let count = unit.keywordCounts?.[kw] || 0;
     if (unit.grantedKeywords?.has(kw)) count = Math.max(count, 1);
     if (unit.aura?.keywords?.has(kw)) count = Math.max(count, 1);
+    for (const e of unit.equipment || []) if ((e.keywords || []).includes(kw)) count = Math.max(count, 1);
     for (const [k, exp] of unit.tempKeywords || []) if (k === kw && exp >= this.round) count = Math.max(count, 1);
     return count;
   }
@@ -252,6 +305,7 @@ export class Game {
     if (!unit) return 0;
     let h = unit.baseHealth;
     for (const b of unit.buffs) h += b.health || 0;
+    for (const e of unit.equipment || []) h += e.health || 0;
     h += unit.aura?.health || 0;
     h += this.keywordStacks(unit, 'Spirit') - this.keywordStacks(unit, 'Gloom');
     return Math.max(0, h);
@@ -266,6 +320,7 @@ export class Game {
     if (!unit) return 0;
     let p = unit.basePower;
     for (const b of unit.buffs) p += b.power || 0;
+    for (const e of unit.equipment || []) p += e.attack || 0;
     p += unit.aura?.power || 0;
     p += this.keywordStacks(unit, 'Spirit') - this.keywordStacks(unit, 'Gloom');
     if (this.hasKeyword(unit, 'Formidable')) p = this.health(unit);
@@ -282,12 +337,12 @@ export class Game {
       }
       for (const source of this.allUnits()) {
         if (!source.script || source.dead || source.statuses?.silenced) continue;
-        const auraTriggers = (source.script.triggers || []).filter((t) => t.on === 'aura');
+        const auraTriggers = (source.script.triggers || []).filter((t) => t.on === EVENTS.AURA);
         if (!auraTriggers.length) continue;
         const owner = this.player(source.owner);
         if (!owner) continue;
         for (const trigger of auraTriggers) {
-          const ctx = { source, controller: owner, event: 'aura', combat: this.combat };
+          const ctx = { source, controller: owner, event: EVENTS.AURA, combat: this.combat };
           if (!evalCondition(this, trigger.condition, ctx)) continue;
           for (const action of trigger.actions || []) {
             if (!['buff', 'give', 'grantKeyword', 'debuff'].includes(action.type)) continue;
@@ -314,21 +369,124 @@ export class Game {
     }
   }
 
-  healUnit(unit, amount) {
+  healUnit(unit, amount, source = null) {
     if (!unit || unit.dead) return 0;
+    const wasDamaged = unit.damage > 0;
     const healed = Math.min(unit.damage, Math.max(0, amount));
     unit.damage -= healed;
-    if (healed > 0) this.log(`${unit.name} heals ${healed}.`, 'heal');
+    if (healed > 0) {
+      const healer = source?.owner ? this.player(source.owner) : null;
+      this.healHistory.push({
+        round: this.round,
+        targetKind: 'unit',
+        target: unit.uid,
+        targetName: unit.name,
+        amount: healed,
+        overheal: Math.max(0, amount - healed),
+        wasDamaged,
+        source: source?.uid || null,
+        sourceName: source?.name || null,
+        healer: healer?.id || null,
+      });
+      if (this.healHistory.length > 500) this.healHistory.shift();
+      this.log(`${unit.name} heals ${healed}.`, 'heal');
+      this.emitEvents(this.watcherEntries(EVENTS.HEAL, {
+        eventCtx: {
+          healed: unit,
+          amount: healed,
+          source,
+          healer,
+          wasDamaged,
+          overheal: Math.max(0, amount - healed),
+        },
+      }));
+    }
     return healed;
   }
 
-  healNexus(team, amount) {
+  healNexus(team, amount, source = null) {
     const t = this.teams[team];
     if (!t) return 0;
+    const wasDamaged = t.nexus < t.maxNexus;
     const healed = Math.min(t.maxNexus - t.nexus, Math.max(0, amount));
     t.nexus += healed;
-    if (healed > 0) this.log(`${this.teamName(team)} Nexus heals ${healed}.`, 'heal');
+    if (healed > 0) {
+      const healer = source?.owner ? this.player(source.owner) : null;
+      this.healHistory.push({
+        round: this.round,
+        targetKind: 'nexus',
+        target: team,
+        targetName: `${this.teamName(team)} Nexus`,
+        amount: healed,
+        overheal: Math.max(0, amount - healed),
+        wasDamaged,
+        source: source?.uid || null,
+        sourceName: source?.name || null,
+        healer: healer?.id || null,
+      });
+      if (this.healHistory.length > 500) this.healHistory.shift();
+      this.log(`${this.teamName(team)} Nexus heals ${healed}.`, 'heal');
+      this.emitEvents(this.watcherEntries(EVENTS.HEAL, {
+        eventCtx: {
+          nexus: team,
+          amount: healed,
+          source,
+          healer,
+          wasDamaged,
+          overheal: Math.max(0, amount - healed),
+        },
+      }));
+    }
     return healed;
+  }
+
+  recordTargeting(target, { source = null, action = 'effect', spell = false } = {}) {
+    if (!target?.uid) return;
+    this.targetHistory.push({
+      round: this.round,
+      target: target.uid,
+      targetName: target.name,
+      source: source?.uid || null,
+      sourceName: source?.name || null,
+      action,
+      spell: !!spell,
+      skill: !spell,
+    });
+    if (this.targetHistory.length > 500) this.targetHistory.shift();
+    this.emitEvents(this.watcherEntries(EVENTS.TARGETED, {
+      eventCtx: { target, source, action, spell: !!spell, skill: !spell },
+    }));
+  }
+
+  detachEquipment(unit, { source = null, reason = 'effect', destroy = false, cardId = null } = {}) {
+    if (!unit || !(unit.equipment || []).length) return [];
+    const removed = cardId
+      ? unit.equipment.filter((e) => e.cardId === cardId)
+      : [...unit.equipment];
+    if (!removed.length) return [];
+    unit.equipment = cardId
+      ? unit.equipment.filter((e) => e.cardId !== cardId)
+      : [];
+    const owner = this.player(unit.owner);
+    if (owner) {
+      for (const eq of removed) {
+        if (destroy) owner.discard.push(eq.cardId);
+        else this.addCardToHand(owner, eq.cardId, { fromEquipment: true });
+      }
+    }
+    this.log(`${removed.map((e) => e.name).join(', ')} detached from ${unit.name}.`, 'equip');
+    this.recalcAuras();
+    this.emitEvents(this.watcherEntries(EVENTS.DETACH, {
+      eventCtx: {
+        unit,
+        equipped: unit,
+        equipment: removed.map((e) => e.card),
+        cards: removed,
+        source,
+        reason,
+      },
+    }));
+    return removed;
   }
 
   buffUnit(unit, power, health, duration = 'permanent', source = null) {
@@ -342,6 +500,19 @@ export class Game {
     }
     const sign = (n) => (n >= 0 ? `+${n}` : `${n}`);
     this.log(`${unit.name} gets ${sign(power)}|${sign(health)}${duration === 'round' ? ' this round' : ''}.`, 'buff');
+  }
+
+  buffHandCard(handCard, power, health, duration = 'permanent', source = null) {
+    if (!handCard) return;
+    handCard.buffs = handCard.buffs || [];
+    handCard.buffs.push({ power, health, duration, source: source?.uid || null, round: this.round });
+    const card = this.cardDB.get(handCard.cardId);
+    const sign = (n) => (n >= 0 ? `+${n}` : `${n}`);
+    const owner = [...this.players.values()].find((player) => player.hand.includes(handCard));
+    const suffix = `gets ${sign(power)}|${sign(health)}${duration === 'round' ? ' this round' : ''}.`;
+    this.log(`${card?.name || 'Card'} in hand ${suffix}`, 'buff', owner?.id || null, {
+      privateTo: owner?.id || null, publicText: `A card in hand ${suffix}`,
+    });
   }
 
   grantKeyword(unit, keyword, duration = 'permanent') {
@@ -363,10 +534,19 @@ export class Game {
     this.log(`${unit.name} loses ${kw}.`, 'keyword');
   }
 
-  grantStatus(unit, status) {
+  grantStatus(unit, status, source = null) {
     if (!unit || unit.dead) return;
     unit.statuses[status] = true;
     this.log(`${unit.name} gains ${status}.`, 'status');
+    if (status === 'barrier') {
+      const owner = this.player(unit.owner);
+      if (!owner) return;
+      const eventCtx = { unit, source };
+      this.emitEvents([
+        { event: EVENTS.BARRIER, script: unit.script, source: unit, controller: owner, opts: { auto: true, eventCtx } },
+        ...this.watcherEntries(EVENTS.BARRIER, { eventCtx, exclude: unit, team: unit.team }),
+      ]);
+    }
   }
 
   stunUnit(unit) {
@@ -418,19 +598,72 @@ export class Game {
     let dmg = Math.max(0, amount || 0);
     if (this.hasKeyword(unit, 'Tough')) dmg = Math.max(0, dmg - 1);
     if (dmg <= 0) return 0;
+    const beforeHealth = this.health(unit);
     unit.damage += dmg;
     unit.damageTakenThisRound += dmg;
+    const sourceTeam = source?.team || (source?.owner ? this.player(source.owner)?.team : null);
+    this.teams[unit.team].damageTakenThisRound += dmg;
+    if (sourceTeam) this.teams[sourceTeam].damageDealtThisRound += dmg;
+    const damageRecord = {
+      round: this.round,
+      targetKind: 'unit',
+      target: unit.uid,
+      targetName: unit.name,
+      amount: dmg,
+      overkill: Math.max(0, dmg - beforeHealth),
+      source: source?.uid || null,
+      sourceName: source?.name || null,
+      sourceTeam,
+      lethal: this.health(unit) <= 0,
+      combat: !!opts.combat,
+      spell: !!opts.spell,
+      skill: !!opts.skill,
+    };
+    this.damageHistory.push(damageRecord);
+    if (this.damageHistory.length > 500) this.damageHistory.shift();
     this.log(`${unit.name} takes ${dmg} damage (${this.health(unit)}/${this.maxHealth(unit)}).`, 'damage');
-    if (this.health(unit) <= 0) {
-      this.killUnit(unit, { source, reason: 'damage' });
-    } else {
-      unit.damageSurvived += dmg;
-      const owner = this.player(unit.owner);
-      if (unit.script && owner) {
-        this.runScript(unit.script, 'surviveDamage', unit, owner, { auto: true, eventCtx: { target: source, damage: dmg } });
+    // Prepare damage watchers before death processing so the damaged unit can
+    // still observe its own damage trigger. A lethal hit marks the unit dead
+    // first, then queues the damage event before the death batch.
+    const eventCtx = {
+      damaged: unit,
+      amount: dmg,
+      source,
+      lethal: this.health(unit) <= 0,
+      combat: !!opts.combat,
+      spell: !!opts.spell,
+      skill: !!opts.skill,
+    };
+    const damageEntries = this.watcherEntries(EVENTS.DAMAGE_UNIT, { eventCtx });
+    if (eventCtx.lethal) {
+      if (opts.deathBatch) {
+        if (this.markUnitDead(unit, { source, reason: 'damage' })) opts.deathBatch.push(unit);
+        else eventCtx.lethal = false;
+        this.emitEvents(damageEntries);
+      } else {
+        const marked = this.markUnitDead(unit, { source, reason: 'damage' });
+        if (marked) {
+          this.deferEvents(() => {
+            this.emitEvents(damageEntries);
+            this.emitDeaths([unit], { source });
+          });
+        } else {
+          eventCtx.lethal = false;
+          this.emitEvents(damageEntries);
+        }
       }
-      this.checkLevelUps();
+    } else {
+      this.emitEvents(damageEntries);
+      if (!unit.dead) {
+        unit.damageSurvived += dmg;
+        const owner = this.player(unit.owner);
+        if (unit.script && owner) {
+          this.runScript(unit.script, EVENTS.SURVIVE_DAMAGE, unit, owner, { auto: true, eventCtx: { target: source, damage: dmg } });
+        }
+        this.checkLevelUps();
+      }
     }
+    damageRecord.lethal = eventCtx.lethal;
     return dmg;
   }
 
@@ -440,23 +673,45 @@ export class Game {
     const dmg = Math.max(0, amount || 0);
     if (!dmg) return 0;
     t.nexus -= dmg;
+    t.damageTakenThisRound += dmg;
+    const sourceTeam = source?.team || (source?.owner ? this.player(source.owner)?.team : null);
+    if (sourceTeam) this.teams[sourceTeam].damageDealtThisRound += dmg;
+    this.damageHistory.push({
+      round: this.round,
+      targetKind: 'nexus',
+      target: team,
+      targetName: `${this.teamName(team)} Nexus`,
+      amount: dmg,
+      overkill: Math.max(0, -t.nexus),
+      source: source?.uid || null,
+      sourceName: source?.name || null,
+      sourceTeam,
+      lethal: t.nexus <= 0,
+      combat: !!opts.combat,
+      spell: !!opts.spell,
+      skill: !!opts.skill,
+    });
+    if (this.damageHistory.length > 500) this.damageHistory.shift();
     this.log(`${this.teamName(team)} Nexus takes ${dmg} damage (${Math.max(0, t.nexus)} left).`, 'damage');
     const attackerTeam = otherTeam(team);
     this.teams[attackerTeam].plunderedThisRound = true;
     const p = source?.owner ? this.player(source.owner) : null;
     if (p && team !== p.team) p.stats.damageToEnemyNexus += dmg;
+    this.emitEvents(this.watcherEntries(EVENTS.DAMAGE_NEXUS, {
+      eventCtx: { nexus: team, amount: dmg, source, combat: !!opts.combat, spell: !!opts.spell, skill: !!opts.skill },
+    }));
     this.checkWin();
     return dmg;
   }
 
-  killUnit(unit, { source = null, reason = 'effect' } = {}) {
-    if (!unit || unit.dead) return;
+  markUnitDead(unit, { source = null, reason = 'effect' } = {}) {
+    if (!unit || unit.dead) return false;
     if (unit.statuses.deathless) {
       unit.statuses.deathless = false;
       unit.damage = Math.max(0, this.maxHealth(unit) - 1);
       unit.statuses.stunned = true;
       this.log(`${unit.name}'s Deathless revives it Stunned with 1 Health.`, 'keyword');
-      return;
+      return false;
     }
     if (unit.isEquipment && unit.attachedTo) {
       // Equipment is not a board unit; handled elsewhere.
@@ -497,19 +752,66 @@ export class Game {
         }
       }
     }
-    // Last Breath / death trigger for this unit.
-    if (unit.script) {
-      this.runScript(unit.script, 'death', unit, owner, { auto: true, eventCtx: { target: source, killer: source, dead: unit } });
+    return true;
+  }
+
+  killUnit(unit, opts = {}) {
+    const marked = this.markUnitDead(unit, opts);
+    if (marked) this.emitDeaths([unit], opts);
+    return marked;
+  }
+
+  killUnits(units, opts = {}) {
+    const dead = [];
+    for (const unit of units || []) {
+      if (this.markUnitDead(unit, opts)) dead.push(unit);
     }
-    // Other allies/enemies watching deaths.
-    for (const other of this.allUnits()) {
-      if (other === unit || !other.script) continue;
-      const evt = other.team === unit.team ? 'allyDeath' : 'enemyDeath';
-      if ((other.script.triggers || []).some((t) => t.on === evt)) {
-        this.runScript(other.script, evt, other, this.player(other.owner), { auto: true, eventCtx: { dead: unit, killer: source } });
+    if (dead.length) this.emitDeaths(dead, opts);
+    return dead;
+  }
+
+  emitDeaths(units, { source = null } = {}) {
+    const deadUnits = [...new Set(units || [])].filter((u) => u?.dead);
+    if (!deadUnits.length) return;
+    const entries = [];
+    // The dying unit's own Last Breath resolves before watchers from the same
+    // seat. The phase is a tie-breaker after active-team and seat order.
+    for (const unit of deadUnits) {
+      const owner = this.player(unit.owner);
+      if (unit.script && owner) {
+        entries.push({
+          event: EVENTS.DEATH,
+          script: unit.script,
+          source: unit,
+          controller: owner,
+          phase: 0,
+          opts: { auto: true, eventCtx: { target: source, killer: source, dead: unit } },
+        });
       }
     }
-    this.recalcAuras();
+    for (const other of this.allUnits()) {
+      if (!other.script || other.dead) continue;
+      const controller = this.player(other.owner);
+      if (!controller) continue;
+      for (const unit of deadUnits) {
+        if (other === unit) continue;
+        const evt = other.team === unit.team ? EVENTS.ALLY_DEATH : EVENTS.ENEMY_DEATH;
+        if (scriptHasEvent(other.script, evt)) {
+          entries.push({
+            event: evt,
+            script: other.script,
+            source: other,
+            controller,
+            phase: 1,
+            opts: { auto: true, eventCtx: { dead: unit, killer: source } },
+          });
+        }
+      }
+    }
+    this.deferEvents(() => {
+      this.emitEvents(entries);
+      this.recalcAuras();
+    });
     this.checkLevelUps();
     this.checkWin();
   }
@@ -523,13 +825,13 @@ export class Game {
     this.recalcAuras();
   }
 
-  recallUnit(unit) {
+  recallUnit(unit, source = null) {
     if (!unit || unit.dead || unit.isLandmark) return;
     const owner = this.player(unit.owner);
     if (!owner) return;
     if (owner.hand.length >= this.rules.handMax) {
       this.obliterateUnit(unit);
-      this.log(`${unit.name} is recalled but hand is full — Obliterated.`, 'death');
+      this.log(`${unit.name} is recalled but hand is full - Obliterated.`, 'death');
       return;
     }
     unit.dead = true;
@@ -537,7 +839,42 @@ export class Game {
     this.addCardToHand(owner, unit.cardId, { fromRecall: true });
     owner.stats.stunnedOrRecalled++;
     this.log(`${unit.name} is Recalled.`, 'recall');
+    const eventCtx = { recalled: unit, player: owner, source };
+    this.emitEvents([
+      { event: EVENTS.RECALL, script: unit.script, source: unit, controller: owner, opts: { auto: true, eventCtx } },
+      ...this.watcherEntries(EVENTS.RECALL, { eventCtx, exclude: unit }),
+    ]);
     this.recalcAuras();
+  }
+
+  moveUnitToDeck(unit, { source = null, position = 'shuffle' } = {}) {
+    if (!unit || unit.dead) return;
+    const owner = this.player(unit.owner);
+    if (!owner) return;
+    const team = this.teams[unit.team];
+    for (const eq of unit.equipment || []) this.addCardToHand(owner, eq.cardId, { fromEquipment: true });
+    unit.equipment = [];
+    team.board = team.board.filter((u) => u !== unit);
+    unit.dead = true;
+    if (this.combat) {
+      this.combat.attackers = this.combat.attackers.filter((u) => u !== unit);
+      this.combat.blockers = this.combat.blockers.filter((u) => u !== unit);
+      for (const [att, blk] of Object.entries(this.combat.blockMap || {})) {
+        if (blk === unit || att === unit.uid) delete this.combat.blockMap[att];
+      }
+      for (const [supporter, supported] of Object.entries(this.combat.supports || {})) {
+        if (supporter === unit.uid || supported === unit.uid) delete this.combat.supports[supporter];
+      }
+    }
+    if (position === 'top') owner.deck.unshift(unit.cardId);
+    else if (position === 'bottom') owner.deck.push(unit.cardId);
+    else {
+      owner.deck.push(unit.cardId);
+      this.shuffleDeck(owner);
+    }
+    this.log(`${unit.name} is placed into ${owner.name}'s deck${position === 'top' ? ' on top' : position === 'bottom' ? ' on the bottom' : ''}.`, 'effect');
+    this.recalcAuras();
+    this.touch();
   }
 
   // ---------------------------------------------------------------- cards & zones
@@ -549,12 +886,16 @@ export class Game {
     }
     const cardId = player.deck.shift();
     player.stats.cardsDrawn++;
+    if (this.round > 0) {
+      player.stats.cardsDrawnThisRound++;
+      player.stats.maxCardsDrawnInRound = Math.max(player.stats.maxCardsDrawnInRound, player.stats.cardsDrawnThisRound);
+    }
     if (player.hand.length >= this.rules.handMax) {
       this.log(`${player.name} burns ${this.cardDB.get(cardId)?.name || cardId} (hand full).`, 'burn');
       return null;
     }
     const iid = `c${++this.iidSeq}`;
-    player.hand.push({ iid, cardId, fleeting });
+    player.hand.push({ iid, cardId, fleeting, buffs: [] });
     if (!silent) this.log(`${player.name} draws a card.`, 'draw', player.id);
     return iid;
   }
@@ -572,8 +913,11 @@ export class Game {
       return null;
     }
     const iid = `c${++this.iidSeq}`;
-    player.hand.push({ iid, cardId, fleeting: !!opts.fleeting });
-    this.log(`${player.name} adds ${card.name} to hand${opts.fleeting ? ' (Fleeting)' : ''}.`, 'create', player.id);
+    player.hand.push({ iid, cardId, fleeting: !!opts.fleeting, buffs: [] });
+    const suffix = `to hand${opts.fleeting ? ' (Fleeting)' : ''}.`;
+    this.log(`${player.name} adds ${card.name} ${suffix}`, 'create', player.id, {
+      privateTo: player.id, publicText: `${player.name} adds a card ${suffix}`,
+    });
     return iid;
   }
 
@@ -586,15 +930,40 @@ export class Game {
     return this.addCardToHand(player, card.id, { fleeting });
   }
 
-  discardCards(player, count, { random = true } = {}) {
+  discardCards(player, count, { random = true, source = null, reason = 'effect' } = {}) {
     if (!player) return;
+    const entries = [];
     for (let i = 0; i < count && player.hand.length; i++) {
       let idx = 0;
       if (random) idx = Math.floor(this.rng() * player.hand.length);
       const [h] = player.hand.splice(idx, 1);
+      const card = this.cardDB.get(h.cardId);
       player.discard.push(h.cardId);
-      this.log(`${player.name} discards ${this.cardDB.get(h.cardId)?.name || 'a card'}.`, 'discard', player.id);
+      this.log(`${player.name} discards ${card?.name || 'a card'}.`, 'discard', player.id);
+      const eventCtx = { card, player, random, reason, source };
+      if (card?.script && scriptHasEvent(card.script, EVENTS.DISCARD)) {
+        const virtual = {
+          id: null,
+          uid: null,
+          name: card.name,
+          card,
+          owner: player.id,
+          team: player.team,
+          isSpell: card.type === 'Spell',
+          handCard: true,
+        };
+        entries.push({
+          event: EVENTS.DISCARD,
+          script: card.script,
+          source: virtual,
+          controller: player,
+          phase: 0,
+          opts: { auto: true, eventCtx },
+        });
+      }
+      entries.push(...this.watcherEntries(EVENTS.DISCARD, { eventCtx, phase: 1 }));
     }
+    this.emitEvents(entries);
   }
 
   randomCard(filter = {}, player = null) {
@@ -606,7 +975,12 @@ export class Game {
     if (filter.keyword) pool = pool.filter((c) => (c.keywords || []).includes(canonicalKeyword(filter.keyword)));
     if (filter.maxCost != null) pool = pool.filter((c) => c.cost <= filter.maxCost);
     if (filter.minCost != null) pool = pool.filter((c) => c.cost >= filter.minCost);
-    if (filter.excludeRegions && player) {
+    if (filter.excludeRegion) {
+      pool = pool.filter((c) => !(c.regions || []).includes(filter.excludeRegion));
+    }
+    if (Array.isArray(filter.excludeRegions)) {
+      pool = pool.filter((c) => !(c.regions || []).some((r) => filter.excludeRegions.includes(r)));
+    } else if (filter.excludeRegions && player) {
       // Regions the player's deck already has, useful for "from a region other than yours".
       const own = new Set((player.deck || []).flatMap((id) => this.cardDB.get(id)?.regions || []));
       pool = pool.filter((c) => !(c.regions || []).some((r) => own.has(r)));
@@ -697,6 +1071,9 @@ export class Game {
       t.spellsPlayedThisRound = 0;
       t.alliesDiedThisRound = 0;
       t.unitsDiedThisRound = 0;
+      t.damageTakenThisRound = 0;
+      t.damageDealtThisRound = 0;
+      t.lurkActiveThisRound = false;
       t.plunderedThisRound = false;
       t.hasAttacked = false;
       t.scoutUsed = false;
@@ -714,6 +1091,10 @@ export class Game {
         u.damageTakenThisRound = 0;
       }
     }
+    for (const p of this.players.values()) {
+      p.roundFlags = {};
+      p.stats.cardsDrawnThisRound = 0;
+    }
     // Attack token alternates each round.
     this.attackTokenTeam = this.round === 1 ? this.attackTokenTeam : this.otherTeam(this.attackTokenTeam);
     this.teams.A.attackToken = this.attackTokenTeam === 'A';
@@ -721,13 +1102,38 @@ export class Game {
     this.activeTeam = this.attackTokenTeam;
     this.priorityTeam = this.attackTokenTeam;
     this.recalcAuras();
-    // Round start triggers before the draw.
+    // Round start triggers before the draw. Queue every unit first so the
+    // batch can be sorted by active team and seat before any trigger resolves.
+    const roundStartEntries = [];
     for (const u of this.allUnits()) {
-      if (u.script) this.runScript(u.script, 'roundStart', u, this.player(u.owner), { auto: true, eventCtx: { round: this.round } });
+      if (u.script) {
+        roundStartEntries.push({
+          event: EVENTS.ROUND_START,
+          script: u.script,
+          source: u,
+          controller: this.player(u.owner),
+          opts: { auto: true, eventCtx: { round: this.round } },
+        });
+      }
+    }
+    this.emitEvents(roundStartEntries);
+    // Countdown advances for every landmark as one round-start batch. Watchers
+    // see the new value and whether the landmark reached zero.
+    const countdownEntries = [];
+    const expiredLandmarks = [];
+    for (const u of this.allUnits()) {
       if (u.isLandmark && u.card?.keywords?.includes('Countdown')) {
         u.countdown = (u.countdown ?? 1) - 1;
-        if (u.countdown <= 0) this.killUnit(u, { reason: 'countdown' });
+        const destroyed = u.countdown <= 0;
+        if (destroyed) expiredLandmarks.push(u);
+        countdownEntries.push(...this.watcherEntries(EVENTS.COUNTDOWN, {
+          eventCtx: { landmark: u, countdown: u.countdown, destroyed },
+        }));
       }
+    }
+    this.emitEvents(countdownEntries);
+    for (const u of expiredLandmarks) {
+      if (!u.dead) this.killUnit(u, { reason: 'countdown' });
     }
     // Draw 1 for each player.
     for (const p of this.players.values()) this.drawCard(p);
@@ -740,9 +1146,19 @@ export class Game {
   endRound() {
     if (this.winner) return;
     this.log(`Round ${this.round} ends.`, 'phase');
+    const roundEndEntries = [];
     for (const u of this.allUnits()) {
-      if (u.script) this.runScript(u.script, 'roundEnd', u, this.player(u.owner), { auto: true, eventCtx: { round: this.round } });
+      if (u.script) {
+        roundEndEntries.push({
+          event: EVENTS.ROUND_END,
+          script: u.script,
+          source: u,
+          controller: this.player(u.owner),
+          opts: { auto: true, eventCtx: { round: this.round } },
+        });
+      }
     }
+    this.emitEvents(roundEndEntries);
     for (const t of Object.values(this.teams)) {
       for (const u of [...t.board]) {
         if (u.dead) continue;
@@ -874,14 +1290,20 @@ export class Game {
     team.cardsPlayedThisRound++;
     this.log(`${p.name} plays ${card.name} (${cost}).`, 'play', p.id);
     this.lastAction = { playerId, type: 'play', cardId: card.id };
-    // Cast triggers from allied units.
+    // Cast watchers are one simultaneous batch. `castSpell` remains a trigger
+    // alias for `spellCast`; the event itself is dispatched only once.
     if (isSpell) {
-      for (const u of this.unitsOnTeam(p.team)) {
-        if (u.script) this.runScript(u.script, 'castSpell', u, this.player(u.owner), { auto: true, eventCtx: { spell: card, caster: p } });
-      }
-      for (const u of this.unitsOnTeam(this.otherTeam(p.team))) {
-        if (u.script) this.runScript(u.script, 'enemySpell', u, this.player(u.owner), { auto: true, eventCtx: { spell: card, caster: p } });
-      }
+      const castEntries = [
+        ...this.watcherEntries(EVENTS.SPELL_CAST, {
+          team: p.team,
+          eventCtx: { spell: card, caster: p },
+        }),
+        ...this.watcherEntries(EVENTS.ENEMY_SPELL, {
+          team: this.otherTeam(p.team),
+          eventCtx: { spell: card, caster: p },
+        }),
+      ];
+      this.emitEvents(castEntries);
     }
     if (isSpell) {
       const item = {
@@ -898,7 +1320,7 @@ export class Game {
       if (speed === 'Burst' || speed === 'Focus') {
         this.log(`${card.name} resolves at ${speed} speed.`, 'spell', p.id);
         const virtual = { id: null, uid: null, name: card.name, card, owner: p.id, team: p.team, isSpell: true };
-        this.runScript(card.script, 'play', virtual, p, {
+        this.runScript(card.script, EVENTS.PLAY, virtual, p, {
           presetTargets: chosen,
           eventCtx: { spell: card },
           onDone: () => { this.checkLevelUps(); this.checkWin(); this.touch(); },
@@ -928,13 +1350,55 @@ export class Game {
         return { ok: false, error: 'Equipment needs an allied unit target' };
       }
       const targetUnit = this.unitById(target.uid);
-      targetUnit.equipment.push({ cardId: card.id, name: card.name });
-      for (const kw of card.keywords || []) targetUnit.grantedKeywords.add(canonicalKeyword(kw));
-      this.buffUnit(targetUnit, card.attack || 0, card.health || 0, 'permanent', null);
+      if (!targetUnit || targetUnit.team !== p.team) {
+        team.mana += cost;
+        p.hand.splice(handIndex, 0, h);
+        p.stats.cardsPlayed--;
+        p.stats.unitsPlayed--;
+        team.cardsPlayedThisRound--;
+        return { ok: false, error: 'Equipment needs an allied unit target' };
+      }
+      const attachment = {
+        cardId: card.id,
+        name: card.name,
+        card,
+        attack: card.attack || 0,
+        health: card.health || 0,
+        keywords: (card.keywords || []).map(canonicalKeyword).filter(Boolean),
+      };
+      targetUnit.equipment.push(attachment);
+      p.stats.equipsThisGame++;
+      this.recalcAuras();
       this.addMana(team, 0);
       this.passed.clear();
       this.priorityTeam = this.otherTeam(p.team);
       this.log(`${p.name} equips ${card.name} to ${targetUnit.name}.`, 'equip', p.id);
+      const playCardEntries = this.watcherEntries(EVENTS.PLAY_CARD, {
+        eventCtx: { card, equipped: targetUnit, player: p },
+      });
+      const equipEntries = this.watcherEntries(EVENTS.EQUIP, {
+        eventCtx: { equipped: targetUnit, equipment: card, player: p },
+      });
+      this.deferEvents(() => {
+        this.emitEvents(playCardEntries);
+        this.emitEvents(equipEntries);
+        const virtual = {
+          id: null,
+          uid: null,
+          name: card.name,
+          card,
+          owner: p.id,
+          team: p.team,
+          isSpell: false,
+          isEquipment: true,
+        };
+        this.runScript(card.script, EVENTS.PLAY, virtual, p, {
+          presetTargets: [],
+          eventCtx: { equipped: targetUnit, equipment: card },
+        });
+      });
+      this.checkLevelUps();
+      this.checkWin();
       this.touch();
       return { ok: true };
     }
@@ -943,6 +1407,9 @@ export class Game {
       const existing = this.unitsOnTeam(p.team).find((u) => u.name === card.name && u.card?.supertype === 'Champion' && !u.leveled);
       if (existing && card.level2Id) {
         this.levelUp(existing);
+        this.emitEvents(this.watcherEntries(EVENTS.PLAY_CARD, {
+          eventCtx: { card, played: existing, player: p, leveled: true },
+        }));
         this.passed.clear();
         this.priorityTeam = this.otherTeam(p.team);
         this.touch();
@@ -952,7 +1419,7 @@ export class Game {
     if (this.unitsOnTeam(p.team).length >= this.rules.boardMax && card.type !== 'Equipment') {
       return { ok: false, error: 'Your board is full' };
     }
-    const unit = this.summonUnit(card, p, { fromHand: true, source: null, presetTargets: chosen });
+    const unit = this.summonUnit(card, p, { fromHand: true, source: null, presetTargets: chosen, handEntry: h });
     if (!unit) {
       // Refund if the board filled between checks.
       team.mana += cost;
@@ -968,52 +1435,97 @@ export class Game {
     return { ok: true };
   }
 
-  summonUnit(card, controller, { source = null, token = false, fromHand = false, presetTargets = [] } = {}) {
+  summonUnit(card, controller, { source = null, token = false, fromHand = false, presetTargets = [], handEntry = null } = {}) {
     if (!card || !controller) return null;
     const team = this.teams[controller.team];
     if (team.board.filter((u) => !u.dead).length >= this.rules.boardMax) {
-      this.log(`${controller.name}'s board is full — ${card.name} can't be summoned.`, 'error');
+      this.log(`${controller.name}'s board is full - ${card.name} can't be summoned.`, 'error');
       return null;
     }
-    const unit = this.makeUnit(card, controller, { source });
+    const unit = this.makeUnit(card, controller, { source, handEntry });
     team.board.push(unit);
     this.log(`${controller.name} summons ${card.name} (${this.power(unit)}|${this.health(unit)}).`, 'summon', controller.id);
     if (this.hasKeyword(unit, 'Attune')) {
       this.addSpellMana(controller.team, 1);
     }
     this.recalcAuras();
-    // Other units' summon watchers.
+    // Other units' summon watchers and the summoned card's own triggers are
+    // queued together so watchers resolve before the new unit's play/summon
+    // triggers, while still using one deterministic ordering pass.
+    const summonEntries = [];
     for (const other of this.allUnits()) {
       if (other === unit || other.dead || !other.script) continue;
       const owner = this.player(other.owner);
-      if ((other.script.triggers || []).some((t) => t.on === 'summonOther' || t.on === 'allySummon')) {
-        this.runScript(other.script, other.team === controller.team ? 'summonOther' : 'enemySummon', other, owner, { auto: true, eventCtx: { summoned: unit, source: unit } });
+      if (!owner) continue;
+      const summonEvent = other.team === controller.team ? EVENTS.SUMMON_OTHER : EVENTS.ENEMY_SUMMON;
+      if (scriptHasEvent(other.script, summonEvent)) {
+        summonEntries.push({
+          event: summonEvent,
+          script: other.script,
+          source: other,
+          controller: owner,
+          opts: { auto: true, eventCtx: { summoned: unit, source: unit } },
+        });
       }
     }
-    // The summoned card's own triggers.
-    if (fromHand) {
-      this.runScript(card.script, 'play', unit, controller, { presetTargets, eventCtx: { summoned: unit } });
-      this.runScript(card.script, 'summon', unit, controller, { presetTargets: [], eventCtx: { summoned: unit } });
-    } else {
-      this.runScript(card.script, 'summon', unit, controller, { presetTargets: [], auto: false, eventCtx: { summoned: unit } });
-    }
+    const playCardEntries = fromHand
+      ? this.watcherEntries(EVENTS.PLAY_CARD, { eventCtx: { card, played: unit, player: controller } })
+      : [];
+    this.deferEvents(() => {
+      this.emitEvents(summonEntries);
+      if (fromHand) {
+        this.emitEvents(playCardEntries);
+        this.runScript(card.script, EVENTS.PLAY, unit, controller, { presetTargets, eventCtx: { summoned: unit } });
+        this.runScript(card.script, EVENTS.SUMMON, unit, controller, { presetTargets: [], eventCtx: { summoned: unit } });
+      } else {
+        this.runScript(card.script, EVENTS.SUMMON, unit, controller, { presetTargets: [], auto: false, eventCtx: { summoned: unit } });
+      }
+    });
     this.checkLevelUps();
     this.touch();
     return unit;
   }
 
-  runScript(script, event, source, controller, opts = {}) {
-    if (!script || !controller) {
-      if (opts.onDone) opts.onDone();
-      return;
+  watcherEntries(event, { eventCtx = {}, exclude = null, auto = true, team = null, phase = 1 } = {}) {
+    const entries = [];
+    for (const unit of this.allUnits()) {
+      if (!unit.script || unit === exclude) continue;
+      if (team && unit.team !== team) continue;
+      const controller = this.player(unit.owner);
+      if (!controller || !scriptHasEvent(unit.script, event)) continue;
+      entries.push({
+        event,
+        script: unit.script,
+        source: unit,
+        controller,
+        phase,
+        opts: { auto, eventCtx },
+      });
     }
-    const entries = (script.triggers || []).filter((t) => t.on === event);
-    let firstResolution = null;
-    for (const trigger of entries) {
-      if (!evalCondition(this, trigger.condition, {
-        source, controller, event, ...opts.eventCtx, combat: opts.eventCtx?.combat || this.combat,
-      })) continue;
-      const resolution = {
+    return entries;
+  }
+
+  collectResolutions(script, event, source, controller, opts = {}) {
+    if (!script || !controller) return [];
+    const triggers = (script.triggers || []).filter((t) => eventMatches(t.on, event));
+    const resolutions = [];
+    // Keep the trigger's source separate from the event's cause. `eventSource`
+    // is the unit/spell that caused damage, healing, a discard, and so on;
+    // `source` remains the unit whose trigger is resolving so `self` targets
+    // keep working for watchers.
+    const eventCtx = opts.eventCtx || {};
+    const { source: eventSource, ...eventFields } = eventCtx;
+    const conditionCtx = {
+      source,
+      controller,
+      event,
+      eventSource,
+      ...eventFields,
+      combat: eventFields.combat || this.combat,
+    };
+    for (const trigger of triggers) {
+      if (!evalCondition(this, trigger.condition, conditionCtx)) continue;
+      resolutions.push({
         script,
         trigger,
         controller,
@@ -1021,24 +1533,116 @@ export class Game {
         index: 0,
         chosen: new Map(),
         ctx: {
-          event, source, controller, ...opts.eventCtx,
-          target: opts.eventCtx?.target || null,
-          combat: opts.eventCtx?.combat || this.combat,
+          event,
+          source,
+          controller,
+          eventSource,
+          ...eventFields,
+          target: eventCtx.target || null,
+          combat: eventFields.combat || this.combat,
         },
         auto: !!opts.auto,
         presetTargets: [...(opts.presetTargets || [])],
+        continueOnSourceDeath: !!trigger.continueOnSourceDeath,
         onDone: null,
-      };
-      this.resolutionStack.push(resolution);
-      if (!firstResolution) firstResolution = resolution;
+        // Captured when this resolution begins, not when the batch is queued.
+        // A trigger already queued still resolves if its source leaves play
+        // before it starts; only a death during its own actions stops it.
+        sourceDeadAtStart: undefined,
+      });
     }
-    if (!firstResolution) {
-      if (opts.onDone) opts.onDone();
-      return;
+    return resolutions;
+  }
+
+  compareEventEntries(a, b) {
+    const active = this.activeTeam || this.priorityTeam || this.attackTokenTeam || 'A';
+    const rank = (entry) => ((entry.controller?.team || entry.source?.team || 'A') === active ? 0 : 1);
+    const seat = (entry) => this.seatOrder?.get(entry.controller?.id) ?? Number.MAX_SAFE_INTEGER;
+    const phase = (entry) => entry.phase ?? 0;
+    const board = (entry) => {
+      const source = entry.source;
+      if (!source?.uid) return Number.MAX_SAFE_INTEGER;
+      const index = (this.teams[source.team]?.board || []).findIndex((u) => u.uid === source.uid);
+      return index >= 0 ? index : Number.MAX_SAFE_INTEGER - 1;
+    };
+    const uid = (entry) => {
+      const match = /^u(\d+)$/.exec(entry.source?.uid || '');
+      return match ? Number(match[1]) : Number.MAX_SAFE_INTEGER;
+    };
+    return rank(a) - rank(b)
+      || seat(a) - seat(b)
+      || phase(a) - phase(b)
+      || board(a) - board(b)
+      || uid(a) - uid(b)
+      || (a._order ?? 0) - (b._order ?? 0);
+  }
+
+  logEventOrder(entries) {
+    if (entries.length < 2) return;
+    const active = this.activeTeam || this.priorityTeam || this.attackTokenTeam || 'A';
+    const labels = entries.map((entry) => `${entry.event}:${entry.controller?.name || '?'}:${entry.source?.name || 'effect'}`);
+    this.log(`Event order (${this.teamName(active)} active first, then seat): ${labels.join(' -> ')}.`, 'event');
+  }
+
+  enqueueEventEntries(prepared, meta = {}) {
+    if (!prepared.length) {
+      if (meta.onDone) meta.onDone();
+      return 0;
     }
-    // The first resolution sits at the bottom of the stack and therefore finishes last.
-    firstResolution.onDone = opts.onDone || null;
+    prepared.sort((a, b) => this.compareEventEntries(a, b));
+    if (this.eventQueue.length >= this.maxEventQueue) {
+      if (!this.eventQueueGuardLogged) {
+        this.log(`Event queue guard: dropped ${prepared.length} queued trigger(s) because the queue is full.`, 'error');
+        this.eventQueueGuardLogged = true;
+      }
+      if (meta.onDone) meta.onDone();
+      return 0;
+    }
+    // The last sorted entry's last trigger is pushed first, so it sits at the
+    // bottom of the LIFO resolution stack and finishes last.
+    if (meta.onDone) {
+      const last = prepared[prepared.length - 1];
+      const lastResolution = last.resolutions[last.resolutions.length - 1];
+      if (lastResolution) lastResolution.onDone = meta.onDone;
+    }
+    this.logEventOrder(prepared);
+    this.eventQueue.push({ id: ++this.eventSeq, entries: prepared });
+    this.maybePump();
+    return prepared.length;
+  }
+
+  emitEvents(entries, meta = {}) {
+    const prepared = [];
+    let order = 0;
+    for (const entry of entries || []) {
+      if (!entry?.script || !entry.controller) continue;
+      const resolutions = this.collectResolutions(entry.script, entry.event, entry.source, entry.controller, entry.opts || {});
+      if (!resolutions.length) continue;
+      prepared.push({ ...entry, resolutions, _order: order++ });
+    }
+    return this.enqueueEventEntries(prepared, meta);
+  }
+
+  maybePump() {
+    if (this.eventDeferDepth > 0 || this.pumping) return;
     this.effects.pump();
+  }
+
+  deferEvents(fn) {
+    this.eventDeferDepth++;
+    try {
+      return fn();
+    } finally {
+      this.eventDeferDepth--;
+      if (this.eventDeferDepth === 0) this.maybePump();
+    }
+  }
+
+  runScript(script, event, source, controller, opts = {}) {
+    return this.emitEvents(
+      [{ event, script, source, controller, opts }],
+      { onDone: opts.onDone },
+    );
   }
 
   // ---------------------------------------------------------------- stack
@@ -1065,7 +1669,7 @@ export class Game {
       return;
     }
     const virtual = { id: null, uid: null, name: item.card.name, card: item.card, owner: item.casterId, team: item.team, isSpell: true };
-    this.runScript(item.script, 'play', virtual, caster, {
+    this.runScript(item.script, EVENTS.PLAY, virtual, caster, {
       presetTargets: item.targets,
       eventCtx: { spell: item.card },
       onDone: () => {
@@ -1104,7 +1708,7 @@ export class Game {
     return true;
   }
 
-  attack(playerId, attackerUids = [], challengers = {}) {
+  attack(playerId, attackerUids = [], challengers = {}, supports = {}) {
     const p = this.player(playerId);
     if (!p) return { ok: false, error: 'Unknown player' };
     if (this.pending) return { ok: false, error: 'Resolve the pending choice first' };
@@ -1121,6 +1725,21 @@ export class Game {
       attackers.push(u);
     }
     if (!attackers.length) return { ok: false, error: 'Choose at least one attacker' };
+    const supportLinks = {};
+    for (const u of attackers) {
+      if (!this.hasKeyword(u, 'Support')) continue;
+      const explicit = supports?.[u.uid];
+      let target = null;
+      if (explicit) {
+        target = this.unitById(explicit);
+        if (!target || target.dead || target.team !== p.team) {
+          return { ok: false, error: 'Invalid support target' };
+        }
+      } else {
+        target = attackers.find((a) => a !== u) || u;
+      }
+      supportLinks[u.uid] = target.uid;
+    }
     team.hasAttacked = true;
     for (const u of attackers) u.attacksThisRound++;
     this.combat = {
@@ -1132,18 +1751,82 @@ export class Game {
       blockMap: {},
       blockers: [],
       challengers: challengers || {},
+      supports: supportLinks,
     };
     this.phase = 'combat';
     this.passed.clear();
     this.priorityTeam = this.combat.defendingTeam;
     this.log(`${p.name} attacks with ${attackers.map((u) => u.name).join(', ')}.`, 'attack', p.id);
-    // Attack triggers.
+    // Attack triggers. Attackers and other allies are one simultaneous batch.
+    const attackEntries = [];
     for (const u of attackers) {
-      if (u.script) this.runScript(u.script, 'attack', u, this.player(u.owner), { auto: true, eventCtx: { attacker: u, combat: this.combat } });
+      if (u.script) {
+        attackEntries.push({
+          event: EVENTS.ATTACK,
+          script: u.script,
+          source: u,
+          controller: this.player(u.owner),
+          opts: { auto: true, eventCtx: { attacker: u, combat: this.combat } },
+        });
+      }
     }
     for (const u of this.unitsOnTeam(p.team)) {
-      if (!attackers.includes(u) && u.script) this.runScript(u.script, 'allyAttack', u, this.player(u.owner), { auto: true, eventCtx: { attackers, combat: this.combat } });
+      if (!attackers.includes(u) && u.script) {
+        attackEntries.push({
+          event: EVENTS.ALLY_ATTACK,
+          script: u.script,
+          source: u,
+          controller: this.player(u.owner),
+          opts: { auto: true, eventCtx: { attackers, combat: this.combat } },
+        });
+      }
     }
+    const lurkEntries = [];
+    const lurkers = attackers.filter((u) => this.hasKeyword(u, 'Lurker'));
+    if (lurkers.length) {
+      team.lurkActiveThisRound = true;
+      for (const u of this.unitsOnTeam(p.team)) {
+        if (scriptHasEvent(u.script, EVENTS.LURK)) {
+          lurkEntries.push({
+            event: EVENTS.LURK,
+            script: u.script,
+            source: u,
+            controller: this.player(u.owner),
+            opts: { auto: true, eventCtx: { attackers, lurkers, combat: this.combat } },
+          });
+        }
+      }
+    }
+    const supportEntries = [];
+    for (const [supporterUid, supportedUid] of Object.entries(supportLinks)) {
+      const supporter = this.unitById(supporterUid);
+      const supported = this.unitById(supportedUid);
+      if (!supporter || !supported) continue;
+      const eventCtx = { supporter, supported, combat: this.combat };
+      if (scriptHasEvent(supporter.script, EVENTS.SUPPORT)) {
+        supportEntries.push({
+          event: EVENTS.SUPPORT,
+          script: supporter.script,
+          source: supporter,
+          controller: this.player(supporter.owner),
+          opts: { auto: true, eventCtx },
+        });
+      }
+      if (scriptHasEvent(supported.script, EVENTS.SUPPORTED)) {
+        supportEntries.push({
+          event: EVENTS.SUPPORTED,
+          script: supported.script,
+          source: supported,
+          controller: this.player(supported.owner),
+          opts: { auto: true, eventCtx },
+        });
+      }
+    }
+    this.deferEvents(() => {
+      this.emitEvents(attackEntries);
+      this.emitEvents(lurkEntries);
+      this.emitEvents(supportEntries);
+    });
     this.recalcAuras();
     this.checkLevelUps();
     this.checkWin();
@@ -1206,6 +1889,33 @@ export class Game {
     this.passed.clear();
     this.priorityTeam = this.combat.attackingTeam;
     this.log(map && Object.keys(map).length ? `${p.name} declares blockers.` : `${p.name} declares no blockers.`, 'combat', p.id);
+    const blockEntries = [];
+    for (const [attackerUid, blockerUid] of Object.entries(map)) {
+      const attacker = this.combat.attackers.find((u) => u.uid === attackerUid);
+      const blocker = this.unitById(blockerUid);
+      if (!attacker || !blocker) continue;
+      const pairCombat = { ...this.combat, attacker, blocker, target: blocker };
+      const eventCtx = { attacker, blocker, target: blocker, combat: pairCombat };
+      if (scriptHasEvent(attacker.script, EVENTS.BLOCK)) {
+        blockEntries.push({
+          event: EVENTS.BLOCK,
+          script: attacker.script,
+          source: attacker,
+          controller: this.player(attacker.owner),
+          opts: { auto: true, eventCtx },
+        });
+      }
+      if (scriptHasEvent(blocker.script, EVENTS.BLOCK)) {
+        blockEntries.push({
+          event: EVENTS.BLOCK,
+          script: blocker.script,
+          source: blocker,
+          controller: this.player(blocker.owner),
+          opts: { auto: true, eventCtx },
+        });
+      }
+    }
+    this.emitEvents(blockEntries);
     this.touch();
     return { ok: true };
   }
@@ -1255,10 +1965,14 @@ export class Game {
       }
     } else {
       // Simultaneous: snapshot the power so a dying blocker still deals damage.
+      // Defer event draining until both strikes finish so death triggers cannot
+      // resolve in the middle of the exchange.
       const attackerPower = this.power(attacker);
       const blockerPower = this.power(blocker);
-      this.strike(attacker, blocker, { combat: true, simultaneous: true, fixedPower: attackerPower });
-      this.strike(blocker, attacker, { combat: true, simultaneous: true, fixedPower: blockerPower });
+      this.deferEvents(() => {
+        this.strike(attacker, blocker, { combat: true, simultaneous: true, fixedPower: attackerPower });
+        this.strike(blocker, attacker, { combat: true, simultaneous: true, fixedPower: blockerPower });
+      });
     }
   }
 
@@ -1270,7 +1984,7 @@ export class Game {
     if (target?.nexus) {
       dealt = this.damageNexus(target.nexus, amount, source, { combat });
       const owner = this.player(source.owner);
-      if (source.script && owner) this.runScript(source.script, 'nexusStrike', source, owner, { auto: true, eventCtx: { target, combat } });
+      if (source.script && owner) this.runScript(source.script, EVENTS.NEXUS_STRIKE, source, owner, { auto: true, eventCtx: { target, combat } });
     } else if (target?.uid) {
       const t = this.unitById(target.uid);
       if (!t || t.dead) return;
@@ -1285,14 +1999,14 @@ export class Game {
         dealt += excess;
       }
       const owner = this.player(source.owner);
-      if (source.script && owner) this.runScript(source.script, 'strike', source, owner, { auto: true, eventCtx: { target: t, combat, targetDied } });
+      if (source.script && owner) this.runScript(source.script, EVENTS.STRIKE, source, owner, { auto: true, eventCtx: { target: t, combat, targetDied } });
     }
     // Impact stacks.
     if (combat && this.hasKeyword(source, 'Impact')) {
       const stacks = this.keywordStacks(source, 'Impact');
       if (stacks > 0) this.damageNexus(this.otherTeam(source.team), stacks, source, { combat });
     }
-    if (source && this.hasKeyword(source, 'Lifesteal') && dealt > 0) this.healNexus(source.team, dealt);
+    if (source && this.hasKeyword(source, 'Lifesteal') && dealt > 0) this.healNexus(source.team, dealt, source);
     if (combat) {
       source.strikesThisRound++;
       if (this.hasKeyword(source, 'Ephemeral')) this.killUnit(source, { reason: 'ephemeral' });
@@ -1300,18 +2014,6 @@ export class Game {
     source.strikesThisGame++;
     this.checkLevelUps();
     this.checkWin();
-  }
-
-  fireEvent(event, ctx = {}) {
-    if (this.winner) return;
-    const units = [...this.allUnits()];
-    for (const u of units) {
-      if (u.dead || !u.script) continue;
-      if (!(u.script.triggers || []).some((t) => t.on === event)) continue;
-      const owner = this.player(u.owner);
-      if (!owner) continue;
-      this.runScript(u.script, event, u, owner, { auto: true, eventCtx: ctx });
-    }
   }
 
   rally(team) {
@@ -1397,7 +2099,7 @@ export class Game {
     this.log(`⬆ ${unit.name} levels up!`, 'levelup', unit.owner);
     const owner = this.player(unit.owner);
     if (owner) owner.stats.levelsGained++;
-    if (unit.script) this.runScript(unit.script, 'levelUp', unit, owner, { auto: true, eventCtx: { unit } });
+    if (unit.script) this.runScript(unit.script, EVENTS.LEVEL_UP, unit, owner, { auto: true, eventCtx: { unit } });
     this.recalcAuras();
     this.checkWin();
     this.touch();
@@ -1418,6 +2120,10 @@ export class Game {
     unit.damage = Math.min(unit.damage, Math.max(0, this.maxHealth(unit) - 1));
     this.recalcAuras();
     this.log(`${unit.name} transforms.`, 'transform');
+    const owner = this.player(unit.owner);
+    if (unit.script && owner) {
+      this.runScript(unit.script, EVENTS.TRANSFORM, unit, owner, { auto: true, eventCtx: { unit } });
+    }
   }
 
   copyUnit(unit, controller) {
@@ -1431,11 +2137,18 @@ export class Game {
     if (this.pending.playerId !== playerId) return { ok: false, error: 'Not your choice' };
     const res = this.pending.resolution;
     const count = this.pending.max || 1;
-    const picked = [...new Set(Array.isArray(ids) ? ids : [ids])].slice(0, count);
+    const picked = [...new Set(Array.isArray(ids) ? ids : [ids])];
     if (picked.length < (this.pending.min || 1)) return { ok: false, error: 'Choose more targets' };
+    const valid = new Set(this.pending.options.map((option) => option.id));
+    if (picked.length > count || picked.some((id) => !valid.has(id))) {
+      return { ok: false, error: 'Invalid choice' };
+    }
     res.chosen.set(this.pending.path, picked);
     const label = picked.map((id) => this.pending.options.find((o) => o.id === id)?.label || id).join(', ');
-    this.log(`${this.pending.playerName} chooses ${label}.`, 'choice');
+    const hidden = picked.some((id) => ['branch', 'hand'].includes(this.pending.options.find((option) => option.id === id)?.kind));
+    this.log(`${this.pending.playerName} chooses ${label}.`, 'choice', playerId, hidden ? {
+      privateTo: playerId, publicText: `${this.pending.playerName} resolves a choice.`,
+    } : {});
     this.pending = null;
     this.effects.pump();
     this.checkLevelUps();
@@ -1696,7 +2409,10 @@ export class Game {
         stats: viewer.stats,
       } : null,
       legal,
-      log: this.logs.slice(-120),
+      log: this.logs.slice(-120).map(({ privateTo, publicText, ...entry }) => {
+        if (!privateTo || revealAll || privateTo === playerId) return entry;
+        return publicText == null ? null : { ...entry, text: publicText };
+      }).filter(Boolean),
       manual: this.manual,
       settings: { rules: this.rules },
     };

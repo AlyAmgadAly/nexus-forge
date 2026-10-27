@@ -4,6 +4,9 @@ node_modules/
 /data/settings.json
 /data/art/
 /data/*.tmp
+/data/backups/
+/data/scripts-upgrade.json
+/data/scripts-report.json
 
 .env
 .env.*
