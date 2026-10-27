@@ -8,6 +8,9 @@ Forge. It is a reference for authoring card scripts, not a promise that every
 Riot card is already scripted. Coverage and verification are reported
 separately; see [Reporting](#reporting-and-status).
 
+Behavioral card specs, edge cases, and unresolved rulings are tracked in the
+[mechanics dossier](mechanics/README.md).
+
 Scripts are **data, never code**. The engine does not evaluate JavaScript from a
 script, and the DSL has no `eval`, `Function`, `import`, or `require` escape
 hatch. Unknown vocabulary is rejected by semantic lint and is never allowed to

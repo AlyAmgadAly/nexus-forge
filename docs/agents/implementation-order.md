@@ -205,6 +205,14 @@ Cards:
 - `01SI011` Ravenous Butcher — "To play me, kill an ally."
 - `05NX006` Reborn Grenadier — "To play, discard 1."
 
+Clause specs:
+[`01SI011`](../mechanics/cards/01SI011.md) and
+[`05NX006`](../mechanics/cards/05NX006.md). Shared cost rules:
+[additional-play-cost](../mechanics/families/additional-play-cost.md). Review
+the specs and the blocking rulings in
+[`rulings.md`](../mechanics/rulings.md) before implementation; a spec is
+`approved` only after the oracle answers the blocking questions.
+
 Required behavior:
 
 - A script can declare an additional cost that must be paid before the card
@@ -262,6 +270,9 @@ Card:
 
 - `01SI047` Fading Memories — "Pick a follower. Create an Ephemeral copy of it
   in hand."
+
+Clause spec: queued after the 2a.1 review; see
+[coverage.md](../mechanics/coverage.md).
 
 Required behavior:
 

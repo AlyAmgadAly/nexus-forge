@@ -261,6 +261,7 @@ Current release evidence: [Nexus Forge v0.3.0](https://github.com/AlyAmgadAly/ne
 - Regression: 47 syntax files, 215 tests, 288 lint entries with 0 errors and 0 warnings.
 - The 0.3.0 release artifact and tags are unchanged. No build was produced for this post-release batch.
 - Execution order and test order for the remaining batches: [`docs/agents/implementation-order.md`](docs/agents/implementation-order.md) and [`docs/agents/testing-order.md`](docs/agents/testing-order.md). The reviewable two-client manual plan is [`docs/agents/manual-game-testing.md`](docs/agents/manual-game-testing.md); it has not been executed under the headless-only instruction.
+- Clause-level mechanics specs for batch 2a: [`docs/mechanics/README.md`](docs/mechanics/README.md). `01SI011` Ravenous Butcher and `05NX006` Reborn Grenadier are drafted; no spec is approved and no card was implemented.
 - Open gates: external-network, relay/TURN, clean-machine, full 1v1, 2v2, spectator, reconnect, and the mulligan-stall investigation.
 
 ## Definition of the first desktop internet release
