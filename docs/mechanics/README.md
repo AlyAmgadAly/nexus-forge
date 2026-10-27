@@ -282,15 +282,16 @@ primitive and the first copy-to-hand card.
 
 | Card | Name | Spec | Implementation | Notes |
 | --- | --- | --- | --- | --- |
-| `01SI011` | Ravenous Butcher | [Drafted](cards/01SI011.md) | Missing | Kill-ally cost; blocking rulings. |
-| `05NX006` | Reborn Grenadier | [Drafted](cards/05NX006.md) | Missing | Discard cost and discard watcher; blocking rulings. |
-| `01SI047` | Fading Memories | Queued | Missing | Copy-to-hand; draft after the first two are reviewed. |
+| `01SI011` | Ravenous Butcher | [In review](cards/01SI011.md) | Missing | Kill-ally cost; R-004/R-012/R-014 confirmed; remaining rulings pending. |
+| `05NX006` | Reborn Grenadier | [In review](cards/05NX006.md) | Missing | Discard cost and discard watcher; R-004/R-024/R-026/R-030/R-033 confirmed; remaining rulings pending. |
+| `01SI047` | Fading Memories | Queued | Missing | Copy-to-hand; draft after the first two are approved. |
 
 Shared family spec:
 [additional-play-cost.md](families/additional-play-cost.md).
 
-The batch is **not approved** and **not implemented**. The next action is oracle
-review of the two drafted specs and the rulings they reference.
+The batch is **not approved** and **not implemented**. Seven blocking rulings are
+confirmed; the remaining standard rulings still need oracle confirmation before
+the specs can move to `approved`.
 
 ---
 
@@ -299,3 +300,4 @@ review of the two drafted specs and the rulings they reference.
 | Date | Change |
 | --- | --- |
 | 2026-10-27 | Created the mechanics dossier: workflow, source precedence, status model, review gates, oracle input guide, coverage rules, template, rulings log, coverage index, batch 2a family spec, and the first two card specs. No card behavior changed. |
+| 2026-10-27 | Oracle confirmed seven blocking rulings: R-004, R-012, R-014 for Butcher and R-004, R-024, R-026, R-030, R-033 for Grenadier. Both specs moved to `in review`; the remaining standard rulings are pending. No card behavior changed. |

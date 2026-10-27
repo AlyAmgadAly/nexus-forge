@@ -1,6 +1,6 @@
 # Mechanics coverage index
 
-**Status:** draft — two specs drafted, none approved
+**Status:** in review — two specs in review; seven rulings confirmed; none approved
 **Last updated:** 2026-10-27
 **Scope:** Reckless Revenants batch 2a and the full Reckless deck inventory
 
@@ -24,8 +24,8 @@ A script entry, an `auto` script, or a drafted spec is not coverage.
 
 | Card | Name | Spec | Implementation | Verified | Blocking rulings |
 | --- | --- | --- | --- | --- | --- |
-| `01SI011` | Ravenous Butcher | **Drafted** | Missing | No | R-004, R-012, R-014 |
-| `05NX006` | Reborn Grenadier | **Drafted** | Missing | No | R-004, R-024, R-026, R-030, R-033 |
+| `01SI011` | Ravenous Butcher | **In review** | Missing | No | Confirmed: R-004, R-012, R-014. Remaining: R-001, R-002, R-003, R-005, R-006, R-010, R-011, R-013, R-040, R-041, R-042, R-043. |
+| `05NX006` | Reborn Grenadier | **In review** | Missing | No | Confirmed: R-004, R-024, R-026, R-030, R-033. Remaining: R-001, R-002, R-003, R-005, R-006, R-020, R-021, R-022, R-023, R-025, R-031, R-032, R-040, R-041, R-042, R-043. |
 | `01SI047` | Fading Memories | Queued | Missing | No | R-034, R-035 |
 
 ### Spec status counts
@@ -33,8 +33,8 @@ A script entry, an `auto` script, or a drafted spec is not coverage.
 | Metric | Count |
 | --- | ---: |
 | Reckless text cards | 31 |
-| Specs drafted | 2 |
-| Specs in review | 0 |
+| Specs drafted | 0 |
+| Specs in review | 2 |
 | Specs approved | 0 |
 | Specs queued | 1 |
 | Specs not drafted — unverified (`missing` or `auto`) | 10 |
@@ -68,8 +68,8 @@ the card is reopened.
 
 | Card | Name | Type / cost | Family | Spec | Implementation | Verified | Notes |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| `01SI011` | Ravenous Butcher | Unit 0, 3/2 | Additional play cost | **Drafted** | Missing | No | [Spec](cards/01SI011.md); kill-ally cost. |
-| `05NX006` | Reborn Grenadier | Unit 1, 3/2, Ephemeral | Additional play cost; discard watcher | **Drafted** | Missing | No | [Spec](cards/05NX006.md); discard cost; exact-copy summon. |
+| `01SI011` | Ravenous Butcher | Unit 0, 3/2 | Additional play cost | **In review** | Missing | No | [Spec](cards/01SI011.md); kill-ally cost; R-004/R-012/R-014 confirmed. |
+| `05NX006` | Reborn Grenadier | Unit 1, 3/2, Ephemeral | Additional play cost; discard watcher | **In review** | Missing | No | [Spec](cards/05NX006.md); discard cost; exact-copy summon; R-004/R-024/R-026/R-030/R-033 confirmed. |
 | `01SI047` | Fading Memories | Spell 0, Burst | Copy-to-hand | **Queued** | Missing | No | Draft after the first two are reviewed. |
 
 ### 2.2 Remaining missing cards — no spec yet
@@ -170,3 +170,4 @@ with the working tree.
 | Date | Change |
 | --- | --- |
 | 2026-10-27 | Created the coverage index. Two specs drafted (`01SI011`, `05NX006`); one queued (`01SI047`); no spec approved; no new implementation. Reckless remains 18/31 verified, 12 missing, one `auto`. |
+| 2026-10-27 | Oracle confirmed seven blocking rulings: R-004, R-012, R-014 for Butcher and R-004, R-024, R-026, R-030, R-033 for Grenadier. Both specs moved to `in review`; neither is approved and no card was implemented. Reckless remains 18/31 verified, 12 missing, one `auto`. |

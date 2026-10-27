@@ -1,6 +1,6 @@
 # Global rulings
 
-**Status:** draft — no ruling is oracle-confirmed yet
+**Status:** in review — seven rulings confirmed; remaining blocking rulings pending
 **Last updated:** 2026-10-27
 **Rules oracle:** user
 
@@ -30,11 +30,15 @@ this file and every affected card spec.
 The fastest review path is to answer the blocking rulings for the two drafted
 cards. The third card is queued and does not need review yet.
 
-| Card | Blocking rulings | Spec |
+| Card | Review status | Spec |
 | --- | --- | --- |
-| `01SI011` Ravenous Butcher | R-001, R-002, R-003, R-004, R-005, R-006, R-010, R-011, R-012, R-013, R-014, R-040, R-041, R-042, R-043 | [01SI011](cards/01SI011.md) |
-| `05NX006` Reborn Grenadier | R-001, R-002, R-003, R-004, R-005, R-006, R-020, R-021, R-022, R-023, R-024, R-025, R-026, R-030, R-031, R-032, R-033, R-040, R-041, R-042, R-043 | [05NX006](cards/05NX006.md) |
-| `01SI047` Fading Memories | R-034, R-035, R-040, R-041, R-042, R-043 | queued |
+| `01SI011` Ravenous Butcher | Confirmed: R-004, R-012, R-014. Remaining: R-001, R-002, R-003, R-005, R-006, R-010, R-011, R-013, R-040, R-041, R-042, R-043. | [01SI011](cards/01SI011.md) |
+| `05NX006` Reborn Grenadier | Confirmed: R-004, R-024, R-026, R-030, R-033. Remaining: R-001, R-002, R-003, R-005, R-006, R-020, R-021, R-022, R-023, R-025, R-031, R-032, R-040, R-041, R-042, R-043. | [05NX006](cards/05NX006.md) |
+| `01SI047` Fading Memories | R-034, R-035, R-040, R-041, R-042, R-043. | queued |
+
+The confirmed answers are recorded in the individual ruling sections below.
+**The cards are not approved yet:** every remaining blocking ruling must be
+confirmed or explicitly deferred before implementation starts.
 
 If a ruling is not listed for a card, it does not block that card's
 implementation.
@@ -48,25 +52,25 @@ implementation.
 | R-001 | Definition and scope of an additional play cost | `proposed` | All "To play" cards |
 | R-002 | Payment order for mana, costs, entry, and triggers | `proposed` | All additional-cost cards |
 | R-003 | Cancellation and failure before/after payment | `proposed` | All additional-cost cards |
-| R-004 | Hand and board protection during cost events | `open` | 01SI011, 05NX006 |
+| R-004 | Hand and board protection during cost events | `confirmed` | 01SI011, 05NX006 |
 | R-005 | Priority during cost payment | `proposed` | All additional-cost cards |
 | R-006 | 2v2 scope of cost targets and hands | `project-decision` | 01SI011, 05NX006 |
 | R-010 | Legal targets for "kill an ally" | `proposed` | 01SI011, kill costs |
 | R-011 | Kill semantics and prevention | `proposed` | 01SI011, kill costs |
-| R-012 | Source/attribution of a cost kill | `open` | 01SI011 |
+| R-012 | Source/attribution of a cost kill | `confirmed` | 01SI011 |
 | R-013 | Death triggers versus the played card's entry | `proposed` | 01SI011 |
-| R-014 | Board-full and game-over during a kill cost | `open` | 01SI011 |
+| R-014 | Board-full and game-over during a kill cost | `confirmed` | 01SI011 |
 | R-020 | Discard-cost selection and self-discard | `proposed` | 05NX006, discard costs |
 | R-021 | A cost discard is a real discard | `proposed` | 05NX006, discard costs |
 | R-022 | Discard-trigger timing relative to the cause | `proposed` | 05NX006 |
 | R-023 | Hand-limit burn is not discard | `project-decision` | 05NX006 |
-| R-024 | Fleeting/round-end discard and Ephemeral timing | `open` | 05NX006 |
+| R-024 | Fleeting/round-end discard and Ephemeral timing | `confirmed` | 05NX006 |
 | R-025 | Discard from zones other than hand | `proposed` | 05NX006 |
-| R-026 | Multiple simultaneous discards | `open` | 05NX006 |
-| R-030 | "Exact copy" of a discarded hand card | `open` | 05NX006 |
+| R-026 | Multiple simultaneous discards | `confirmed` | 05NX006 |
+| R-030 | "Exact copy" of a discarded hand card | `confirmed` | 05NX006 |
 | R-031 | Ownership of the summoned copy | `project-decision` | 05NX006 |
 | R-032 | The copy is a summon, not a play | `proposed` | 05NX006 |
-| R-033 | Board full when the copy is summoned | `open` | 05NX006 |
+| R-033 | Board full when the copy is summoned | `confirmed` | 05NX006 |
 | R-034 | Fading Memories target scope | `project-decision` | 01SI047 |
 | R-035 | Fading Memories copy snapshot and hand limit | `open` | 01SI047 |
 | R-040 | 2v2 "ally" and "enemy" scope | `project-decision` | Team-sensitive cards |
@@ -162,23 +166,28 @@ and no play/summon trigger on a rejected play.
 cost-triggered summons fill the board and prevent the played card from entering
 play?
 
-**Proposed ruling:** The played card is protected from hand-limit burn during its
-own cost events. The controller's team reserves one board slot for the played
-card before cost events resolve; cost-triggered summons cannot use that slot. If
-the board is already full before the play, the play is rejected.
+**Confirmed ruling:** The played card is protected from hand-limit burn during
+its own cost events; if a cost-triggered draw would burn a card, the drawn card
+burns, not the played card. The controller's team reserves one board slot for the
+played card before cost events resolve; a cost-triggered summon that would take
+that reserved slot is not summoned and vanishes.
 
-**Status:** `open`
+A full board before the play does not automatically reject a kill-cost card: the
+mandatory kill frees a slot, so the played card can replace the killed ally. A
+discard-cost card still needs an open slot because its cost removes no board
+unit. Validate the final board state, not the pre-cost board count.
 
-**Basis:** Not specified in the current engine or implementation order. Needed to
-keep payment atomic when a killed ally's Last Breath summons a unit, or when a
-discarded Grenadier summons a copy.
+**Status:** `confirmed` (oracle, 2026-10-27)
+
+**Basis:** Oracle ruling, 2026-10-27; consistent with the Last Breath rule in
+R-014. The engine currently has no reservation or hand protection, so both must
+be added.
 
 **Affects:** `01SI011` (Last Breath summon), `05NX006` (discarding another
 Grenadier).
 
-**Note:** The alternative is to let the cost events resolve and obliterate the
-played card if the board fills. That is a different rule and must be chosen
-explicitly. Do not implement either option without a ruling.
+**Note:** The reservation is one slot, not a replacement rule for arbitrary
+board-full plays. Only a cost that actually removes a board unit frees a slot.
 
 ---
 
@@ -279,21 +288,21 @@ death follows the normal champion rules.
 **Question:** Which entity is the source of the kill for "when I kill" or "when
 you kill" triggers?
 
-**Proposed ruling:** The cost has no unit source. It is paid by the controller,
-not by the card being played, which is not in play yet. "When I kill" on the
-played card does not trigger. Decide explicitly whether "when you kill" watchers
-count a cost kill for the controller.
+**Confirmed ruling:** No one is credited. The cost has no unit source; the
+controller is not treated as the killer for "When you kill" triggers. "When I
+kill" on the played card does not trigger, because the card is not in play. No
+kill trigger fires from a cost kill.
 
-**Status:** `open`
+**Status:** `confirmed` (oracle, 2026-10-27)
 
-**Basis:** The engine attributes kills to a `source` unit when one exists; a
-pre-play cost has no board source.
+**Basis:** Oracle ruling, 2026-10-27. The engine attributes kills to a `source`
+unit when one exists; a pre-play cost has no board source.
 
 **Affects:** `01SI011`; Camavoran Dragon-style "when I kill" cards; any future
 "when you kill" watcher.
 
-**Note:** This is easy to get wrong. Record the oracle's answer before
-implementing.
+**Note:** Do not credit the controller as a convenience. If a future card needs
+"when you kill" to count cost kills, that is a new ruling.
 
 ---
 
@@ -325,21 +334,26 @@ before allied death watchers, following the engine's existing death order.
 **Question:** What if the killed ally's Last Breath fills the board, or the
 death trigger ends the game?
 
-**Proposed ruling:** Reserve a board slot for the played card (R-004). If the
-game ends during cost events, the play stops and the card does not enter play.
-If the board is full before the play, reject. If the engine cannot reserve, the
-project must choose a different terminal rule; do not silently lose the mana or
-the card.
+**Confirmed ruling:** The played card reserves one board slot (R-004). If the
+killed ally's Last Breath would fill that reserved slot, the Last Breath summon
+is not put on the board and vanishes. The played card then enters play. The
+vanishing summon does not fire summon triggers and is not placed in the discard
+pile. If the game ends during cost events, the play stops and the card does not
+enter play.
 
-**Status:** `open`
+A board full before the play is not an automatic rejection for a kill-cost card:
+the kill frees a slot. A board full before a discard-cost play still rejects
+because no board unit leaves.
 
-**Basis:** Atomic payment is impossible if the board fills after a death and the
-engine tries to refund.
+**Status:** `confirmed` (oracle, 2026-10-27)
 
-**Affects:** `01SI011`.
+**Basis:** Oracle ruling, 2026-10-27; the oracle cited gameplay video evidence
+for the vanishing Last Breath summon.
 
-**Note:** This is a design decision, not just a card ruling. Pick one rule and
-test it.
+**Affects:** `01SI011`; any future kill-cost card whose death trigger summons.
+
+**Note:** The vanishing summon applies when there is no board space. Do not
+return the summoned card to hand or put it in the discard pile as a death.
 
 ---
 
@@ -441,19 +455,21 @@ pile). The trigger must not fire either way.
 discarded"? If the trigger summons an Ephemeral unit during round-end cleanup,
 does it die in the same cleanup?
 
-**Proposed ruling:** A Fleeting round-end discard is a discard and triggers. The
-summoned copy is Ephemeral. Resolve round-end cleanup in a defined order: discard
-triggers first, then Ephemeral deaths, so the copy dies in the same round-end if
-it is Ephemeral. Confirm.
+**Confirmed ruling:** A Fleeting round-end discard is a discard and triggers
+"When I'm discarded." Resolve round-end cleanup in this order: discard triggers
+first, then Ephemeral deaths. The summoned copy is Ephemeral, so it is summoned
+and then dies in the same round-end cleanup.
 
-**Status:** `open`
+**Status:** `confirmed` (oracle, 2026-10-27)
 
-**Basis:** Fleeting is a discard; Ephemeral dies at round end. The interaction
-depends on the engine's cleanup order.
+**Basis:** Oracle ruling, 2026-10-27. The current engine logs Fleeting removal
+without emitting a discard event and checks Ephemeral before removing Fleeting
+cards; both must change to match this ruling.
 
 **Affects:** `05NX006`.
 
-**Note:** High-risk edge case. A timecoded clip would settle it.
+**Note:** The copy's summon does not survive to the next round. If the board is
+full, see R-033.
 
 ---
 
@@ -484,19 +500,20 @@ effect, cost, round-end Fleeting) triggers. Proposed: yes.
 **Question:** If an effect discards two cards including two Grenadiers, in what
 order do the copies summon?
 
-**Proposed ruling:** Each discarded card produces its own discard event. Resolve
-them in the order the cards were discarded; if the discard is simultaneous, use a
-deterministic order and log it. All triggers resolve. If the board fills, later
-summons fail (R-033).
+**Confirmed ruling:** Each discarded card produces its own discard event. Resolve
+them sequentially in the order the cards were discarded, including when an effect
+discards multiple cards at once; log the order. All triggers resolve. If the
+board fills, later summons fail under R-033.
 
-**Status:** `open`
+**Status:** `confirmed` (oracle, 2026-10-27)
 
-**Basis:** Not specified; the engine processes discard entries in a loop.
+**Basis:** Oracle ruling, 2026-10-27. The engine's discard loop must preserve the
+chosen order and drain each card's trigger before the next discard.
 
 **Affects:** `05NX006`; effects that discard multiple cards.
 
-**Note:** Confirm whether "discard 2" is sequential or simultaneous for trigger
-ordering.
+**Note:** Do not batch the summons into one simultaneous insertion. Sequential
+resolution is the rule.
 
 ---
 
@@ -507,22 +524,24 @@ ordering.
 
 **Question:** What exactly does "exact copy" copy for `05NX006`?
 
-**Proposed ruling:** The copy uses the discarded card's ID and its effective
-hand-entry stats, keywords, and buffs at the moment of discard. It is a fresh
-unit with full health; damage does not carry because a hand card has no damage.
-Equipment and attachments do not carry. Ephemeral and other keywords do carry.
-Cost modifiers and temporary buffs need an explicit decision.
+**Confirmed ruling:** The copy uses the discarded card's ID and its current
+hand-entry state at the moment of discard: current power/health, keywords, and
+hand buffs. Round-duration buffs keep their duration and expire at round end;
+they do not become permanent. A fresh unit is created at full health. Damage and
+equipment do not carry because a hand card has none. Ephemeral and other keywords
+do carry. Cost modifiers are not relevant to a summoned copy because it is not
+played.
 
-**Status:** `open`
+**Status:** `confirmed` (oracle, 2026-10-27)
 
-**Basis:** The printed word is "exact copy"; the engine currently stores only
-card IDs in the discard pile.
+**Basis:** Oracle ruling, 2026-10-27. The engine currently stores only card IDs
+in the discard pile; the hand entry must be snapshotted through the discard
+event.
 
 **Affects:** `05NX006`; Fading Memories.
 
-**Note:** The implementation must snapshot the hand entry, not just the card ID.
-Confirm whether a temporary "this round" buff on the discarded card becomes a
-permanent stat on the copy or expires at round end.
+**Note:** Do not copy the base stats only. Do not make temporary buffs permanent.
+If a hand buff has expired by the time the copy is summoned, it does not apply.
 
 ---
 
@@ -574,18 +593,19 @@ later played from hand, it is a normal play and pays its cost.
 **Question:** What happens if the board is full when the discard trigger tries to
 summon the copy?
 
-**Proposed ruling:** The summon fails; the discard remains; the copy is not
-created. Log the failure. Do not return the discarded card to hand.
+**Confirmed ruling:** The summon fails; the discard remains; the copy is not
+created and does not fire summon triggers. Log the failure. Do not return the
+discarded card to hand and do not remove it from the discard pile.
 
-**Status:** `open`
+**Status:** `confirmed` (oracle, 2026-10-27)
 
-**Basis:** The engine's `summonUnit()` returns null when the board is full.
+**Basis:** Oracle ruling, 2026-10-27. The engine's `summonUnit()` returns null
+when the board is full; use that path and log it.
 
 **Affects:** `05NX006`.
 
-**Note:** Confirm whether the copy is obliterated, remains in the discard pile, or
-is simply not summoned. The observable result is the same for most cards; the
-log and zone matter for later recursion.
+**Note:** The discarded card stays in the discard pile. The failed copy is not a
+new card in any zone.
 
 ---
 
@@ -727,3 +747,4 @@ Decide now, not after implementing the cards.
 | Date | Change |
 | --- | --- |
 | 2026-10-27 | Created the global ruling log with 28 rulings for additional play costs, kill costs, discard costs and triggers, copy semantics, play-versus-summon, and 2v2 scope. No ruling is oracle-confirmed yet. |
+| 2026-10-27 | Oracle confirmed R-004, R-012, R-014, R-024, R-026, R-030, and R-033. R-004 now distinguishes a kill cost freeing a slot, reservation of the played card's slot, and hand-limit protection. R-014 records that a Last Breath summon with no space vanishes. The remaining blocking rulings are still pending. |

@@ -1,6 +1,6 @@
 # Mechanic family — additional play costs
 
-**Status:** draft — shared rulings pending
+**Status:** in review — seven shared rulings confirmed; remaining rulings pending
 **Last updated:** 2026-10-27
 **Cards in this batch:** `01SI011` Ravenous Butcher, `05NX006` Reborn Grenadier
 **First future users:** `04SI004T1` Last Wind, `01SI057` Ancient Crocolith,
@@ -44,8 +44,9 @@ These rules apply to every additional play cost, regardless of the cost type.
 | No priority | The opponent cannot respond to cost payment. Cost-triggered abilities resolve immediately. | R-005, R-043 |
 | Before entry | The cost is paid before the card enters play and before its play/summon triggers. | R-002 |
 | Deterministic order | Cost-triggered events resolve to completion before the card enters play. | R-013, R-022 |
-| Protection | The card being played cannot be discarded, burned, or killed by its own cost events. | R-004 |
-| Board slot | The team reserves one board slot for the card being played. | R-004 |
+| Protection | The card being played cannot be discarded, burned, or killed by its own cost events. A cost-triggered draw burns the drawn card, not the played card. | R-004 |
+| Board slot | The team reserves one board slot for the card being played. A cost-triggered summon that would take it vanishes. | R-004, R-014 |
+| Board full | A kill cost frees a slot, so a full board does not automatically reject it. A discard cost frees no slot, so a full board rejects. | R-004 |
 | Visible legality | `handView` and `playable` reflect cost legality, or the play attempt returns a deterministic needs-cost response. | R-002 |
 | 2v2 | "Ally" is team-wide for a kill cost; a discard cost uses the controller's own hand; the board limit is the shared team board. | R-006, R-040 |
 
@@ -68,6 +69,10 @@ The card is treated as "being played" from step 2 onward. It is protected from
 hand-limit burn and from being chosen for its own discard cost. The team's board
 slot is reserved from step 2 so a cost-triggered summon cannot fill the last
 space.
+
+R-004 and R-014 are confirmed: the played card is protected from hand-limit burn;
+a cost-triggered summon that would take the reserved slot vanishes; a kill cost
+frees a slot, while a discard cost does not.
 
 If the game ends during step 4, the game-over state wins and the card does not
 enter play (R-003, R-014).
@@ -106,9 +111,11 @@ Rites; `08SI037` Spectral Ironhound.
 - Only enemy units or only landmarks -> reject.
 - All allies unkillable -> reject.
 - Cancel before payment -> no-op.
-- Board full before the play -> reject.
-- Board filled by the cost's death trigger -> the reserved slot prevents it; see
-  R-004 and R-014.
+- Board full before the play -> legal because the kill frees a slot; the played
+  card replaces the killed ally.
+- A cost-triggered summon that would take the reserved slot -> the summon
+  vanishes; the played card still enters (R-004, R-014).
+- Game ends during cost events -> the play stops; the card does not enter play.
 
 ---
 
@@ -142,6 +149,7 @@ Excited!; `03PZ018` Poro Cannon; `05NX012` Roar of the Slayer.
 - Invalid card selection -> reject with no mutation.
 - Cancel before payment -> no-op.
 - Insufficient mana -> reject before discard.
+- Board full before the play -> reject; the discard cost frees no board slot.
 - Board full when a discard trigger tries to summon -> the summon fails; the
   discard remains; see R-033.
 
@@ -229,8 +237,10 @@ Every additional-cost card needs at least these cases:
 - [ ] Insufficient mana: play rejected before the cost.
 - [ ] Cost event triggers a death/discard watcher: correct order.
 - [ ] Cost event draws with a full hand: played card is not burned.
-- [ ] Cost event summons with a full board: reserved slot protects the play.
-- [ ] Board full before the play: rejected.
+- [ ] Cost event summons with a full board: reserved slot protects the play;
+      a summon that would take the slot vanishes.
+- [ ] Board full before the play: rejected for a discard cost; legal for a kill
+      cost because the kill frees a slot.
 - [ ] Card is summoned/revived, not played: no cost.
 - [ ] 2v2 partner target/copy ownership where relevant.
 - [ ] The effect does not fire twice.
@@ -264,16 +274,16 @@ generalize to "up to" or "spend all mana" until their specs are reviewed.
 
 | ID | Question | Ruling |
 | --- | --- | --- |
-| R-002 | Mana before or after the additional cost? | Open/proposed |
-| R-004 | Hand and board protection during cost events | Open |
+| R-002 | Mana before or after the additional cost? | Proposed |
+| R-004 | Hand and board protection during cost events | Confirmed (2026-10-27) |
 | R-006 | 2v2 partner units and hand scope | Project decision/proposed |
-| R-012 | Source attribution for a cost kill | Open |
-| R-014 | Board-full and game-over during a kill cost | Open |
+| R-012 | Source attribution for a cost kill | Confirmed (2026-10-27) |
+| R-014 | Board-full and game-over during a kill cost | Confirmed (2026-10-27) |
 | R-020 | Self-discard exclusion | Proposed |
-| R-024 | Fleeting round-end discard and Ephemeral timing | Open |
-| R-026 | Multiple simultaneous discards | Open |
-| R-030 | Exact-copy snapshot for a discarded hand card | Open |
-| R-033 | Board full when a copy is summoned | Open |
+| R-024 | Fleeting round-end discard and Ephemeral timing | Confirmed (2026-10-27) |
+| R-026 | Multiple simultaneous discards | Confirmed (2026-10-27) |
+| R-030 | Exact-copy snapshot for a discarded hand card | Confirmed (2026-10-27) |
+| R-033 | Board full when a copy is summoned | Confirmed (2026-10-27) |
 | R-043 | Stack/priority during a cost trigger | Proposed |
 
 ---
@@ -283,3 +293,4 @@ generalize to "up to" or "spend all mana" until their specs are reviewed.
 | Date | Change |
 | --- | --- |
 | 2026-10-27 | Created the additional-play-cost family spec for batch 2a: shared rules, payment pipeline, `killAlly` and `discard` cost types, proposed DSL shape, engine touch points, and test matrix. No behavior changed. |
+| 2026-10-27 | Oracle confirmed R-004, R-012, R-014, R-024, R-026, R-030, and R-033. Clarified that a kill cost frees a slot while a discard cost does not, a played card reserves its slot, a no-space summon vanishes or fails, and hand-limit protection applies to the played card. No behavior changed. |
