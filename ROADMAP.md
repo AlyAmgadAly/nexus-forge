@@ -54,7 +54,7 @@ Avoid a second game engine in the renderer. Separate message dispatch from WebSo
 | [M4](https://github.com/AlyAmgadAly/nexus-forge/milestone/4) | Player decks, room content synchronization, and version checks | M3 | Implemented; local deck/content approval verified | [#4](https://github.com/AlyAmgadAly/nexus-forge/issues/4) |
 | [M5](https://github.com/AlyAmgadAly/nexus-forge/milestone/5) | Reconnects, host departure, and clear connection states | M3, M4 | Implemented; local reconnect/host-close verified | [#5](https://github.com/AlyAmgadAly/nexus-forge/issues/5) |
 | [M6](https://github.com/AlyAmgadAly/nexus-forge/milestone/6) | Automated regression coverage and real-network release testing | M1-M5 | Automated checks pass; external matrix pending | [#6](https://github.com/AlyAmgadAly/nexus-forge/issues/6) |
-| [M7](https://github.com/AlyAmgadAly/nexus-forge/milestone/7) | Portable Windows release and player instructions | M6 | v0.2.0 published; v0.3.0 build ready; clean-machine/external gates pending | [#7](https://github.com/AlyAmgadAly/nexus-forge/issues/7) |
+| [M7](https://github.com/AlyAmgadAly/nexus-forge/milestone/7) | Portable Windows release and player instructions | M6 | v0.3.0 published; clean-machine/external gates pending | [#7](https://github.com/AlyAmgadAly/nexus-forge/issues/7) |
 
 GitHub issues and milestones mirror M1-M7. Completing an issue requires its acceptance criteria and recorded evidence, not just code being merged.
 
